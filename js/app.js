@@ -8,6 +8,7 @@ import {GTAOPass} from 'three/addons/postprocessing/GTAOPass.js';
 import {OutputPass} from 'three/addons/postprocessing/OutputPass.js';
 import {RoomEnvironment} from 'three/addons/environments/RoomEnvironment.js';
 import {mergeGeometries} from 'three/addons/utils/BufferGeometryUtils.js';
+import {buildRooms} from './rooms.js';
 import * as T from './tex.js';
 import {buildInstanced} from './furn.js';
 const Q=new URLSearchParams(location.search);const SHOT=Q.has('shot');
@@ -67,7 +68,7 @@ const loader=new GLTFLoader();loader.setMeshoptDecoder(MeshoptDecoder);
 const prog=document.getElementById('prog');
 let loaded=0;
 const KEEP_FIX=new Set(['led','ac']);
-function classOnly(c,list){const rooms=man.labels.filter(l=>l.floor===c.floor&&(!l.bld||l.bld===c.bld)&&l.room&&/^교실/.test(l.name)).map(l=>l.room);
+function classOnly(c,list){const rooms=man.labels.filter(l=>l.floor===c.floor&&(!l.bld||l.bld===c.bld)&&l.room&&(l.type==='class'||/^교실/.test(l.name))).map(l=>l.room);
  return (list||[]).filter(f=>KEEP_FIX.has(f[0])||rooms.some(r=>f[1]>=r[0]-0.05&&f[1]<=r[2]+0.05&&f[3]>=r[1]-0.05&&f[3]<=r[3]+0.05));}
 function addFurn(group,list){const by={};for(const it of list){(by[it[0]]=by[it[0]]||[]).push(it);}
  for(const k in by){if(k==='pine'||k==='tree'||k==='stage')continue;const ims=buildInstanced(k,by[k].map(f=>[f[1],f[2],-f[3],f[4]]),M);ims.forEach(m=>group.add(m));}
@@ -167,7 +168,7 @@ function buildPorch(){const p=man.porch,C=chunks.main_porch;if(!p||!C)return;C.g
   const rl=new THREE.Mesh(new THREE.BoxGeometry(0.04,0.04,n1-n0),fm);rl.position.set(fx,0.55,-(n0+n1)/2);G.add(rl);}
  G.userData.kind='porch';C.group.add(G);
  WALLS.main_porch={e:0,s:[],r:[[X0,NF,-1.8,NB],[1.9,NF,2.5,NB],[6.6,NF,X1,NB],...rr]};}
-function decorate(){buildStairs();buildFixtures();buildColumns();buildSigns();buildCorrLights();addFurnCollision();const s=man.sign;if(s){const g=new THREE.Group();const n=[...s.text];const cx=(s.x0+s.x1)/2;const sp=Math.min(5.4,(s.x1-s.x0)/(n.length+1.5));
+function decorate(){buildStairs();buildFixtures();buildColumns();buildSigns();buildCorrLights();addFurnCollision();try{buildRooms(chunks,WALLS,logoTex,man);}catch(err){console.error('rooms',err);}const s=man.sign;if(s){const g=new THREE.Group();const n=[...s.text];const cx=(s.x0+s.x1)/2;const sp=Math.min(5.4,(s.x1-s.x0)/(n.length+1.5));
  n.forEach((ch,i)=>{const p=textPlane(ch,1.6,1.6,{w:256,h:256,font:'bold 230px NanumGothic, sans-serif'});p.position.set(cx+(i-(n.length-1)/2)*sp+sp*0.6,s.y,-(s.n-0.26));g.add(p);});
  const lg=new THREE.Mesh(new THREE.PlaneGeometry(1.6,1.6),new THREE.MeshStandardMaterial({map:logoTex(),transparent:true}));lg.position.set(cx-(n.length-1)/2*sp-sp*0.5,s.y,-(s.n-0.26));g.add(lg);
  g.userData.kind='roofdeco';chunks.main_roof?.group.add(g);}
@@ -333,11 +334,12 @@ function okStep(p){const feet=cam.position.y-EYE;const sY=surfaceAt(p.x,-p.z,fee
 function tryMove(mv){const L=mv.length();if(!L)return;const ok=v=>!blocked(v,v.length())&&okStep(cam.position.clone().add(v));if(ok(mv)){cam.position.add(mv);return;}const ax=new THREE.Vector3(mv.x,0,0),az=new THREE.Vector3(0,0,mv.z);if(Math.abs(mv.x)>1e-6&&ok(ax))cam.position.add(ax);else if(Math.abs(mv.z)>1e-6&&ok(az))cam.position.add(az);}
 window.__walkState=()=>({pos:cam.position.toArray(),yaw,pitch,fov:cam.fov,walk,target:ctl.target.toArray(),chev:chev.children.filter(c=>c.visible).map(c=>{const v=c.position.clone().project(cam);return [c.userData.chev,(v.x+1)/2*innerWidth,(1-v.y)/2*innerHeight]})});window.__proj=(x,y,z)=>{const v=new THREE.Vector3(x,y,z).project(cam);return [(v.x+1)/2*innerWidth,(1-v.y)/2*innerHeight,v.z];};
 const clock=new THREE.Clock();let looping=false;
+function outdoors(p){for(const b of['main','info','hall','baseball']){const c=chunks[b+'_1F'];if(!c)continue;if(!c.box)c.box=new THREE.Box3().setFromObject(c.group);const B=c.box;if(p.x>B.min.x-0.3&&p.x<B.max.x+0.3&&p.z>B.min.z-0.3&&p.z<B.max.z+0.3)return false;}return true;}
 function step(){const dt=Math.min(clock.getDelta(),0.25);let moving=false;
  if(walk){const f=new THREE.Vector3(-Math.sin(yaw),0,-Math.cos(yaw)),rt=new THREE.Vector3(-f.z,0,f.x);let mf=-joy.y,mr=joy.x;if(glide){const k=Math.min(1,(performance.now()-glide.t0)/1000/glide.dur),q=k*k*(3-2*k);{const y_=cam.position.y,prev=cam.position.clone();cam.position.lerpVectors(glide.from,glide.to,q);cam.position.y=y_;if(!okStep(cam.position)){cam.position.copy(prev);glide=null;}}if(k>=1)glide=null;moving=true;}
   if(keys.KeyW||keys.ArrowUp)mf+=1;if(keys.KeyS||keys.ArrowDown)mf-=1;if(keys.KeyD||keys.ArrowRight)mr+=1;if(keys.KeyA||keys.ArrowLeft)mr-=1;if(keys.KeyQ){yaw+=1.6*dt;moving=true;}if(keys.KeyE){yaw-=1.6*dt;moving=true;}if(keys.KeyR){pitch=Math.min(1.2,pitch+1.2*dt);moving=true;}if(keys.KeyF){pitch=Math.max(-1.2,pitch-1.2*dt);moving=true;}if(keys.Equal||keys.NumpadAdd){cam.fov=Math.max(30,cam.fov-40*dt);cam.updateProjectionMatrix();moving=true;}if(keys.Minus||keys.NumpadSubtract){cam.fov=Math.min(90,cam.fov+40*dt);cam.updateProjectionMatrix();moving=true;}
   const sp=(keys.ShiftLeft?6:2.6)*dt;if(mf||mr){const mv=new THREE.Vector3().addScaledVector(f,mf*sp).addScaledVector(rt,mr*sp);tryMove(mv);moving=true;}{const feet=cam.position.y-EYE;const sY=surfaceAt(cam.position.x,-cam.position.z,feet);const ty=sY+EYE;if(Math.abs(ty-cam.position.y)>0.002){cam.position.y+=(ty>cam.position.y?1:Math.min(1,dt*10))*(ty-cam.position.y);moving=true;}
-  const fN=Object.entries(ELEV).filter(([k,v])=>v<=sY+0.3).sort((a,b)=>b[1]-a[1])[0];if(fN&&fN[0]!==curFloor){curFloor=fN[0];applyFloor();colCache=null;}}
+  const fN0=Object.entries(ELEV).filter(([k,v])=>v<=sY+0.3).sort((a,b)=>b[1]-a[1])[0];const fN=fN0&&(outdoors(cam.position)?['all']:fN0);if(fN&&fN[0]!==curFloor){curFloor=fN[0];applyFloor();colCache=null;}}
   cam.rotation.set(pitch,yaw,0,'YXZ');}
  else{if(stepAnim())moving=true;else{if(orbitKeys(dt))moving=true;if(ctl.update())moving=true;if(ctl._panOffset&&ctl._panOffset.lengthSq()>1e-6)moving=true;if(!detailMode&&!camAnim&&Math.abs(ctl.target.y)>0.01){const dy=ctl.target.y;ctl.target.y=0;cam.position.y-=dy;ctl.update();}if(!detailMode&&!camAnim&&cam.position.y<6){cam.position.y=6;ctl.update();}}}
  if(animDoors(dt))moving=true;if(walk){const key=cam.position.toArray().map(v=>v.toFixed(1)).join()+(yaw).toFixed(1);if(key!==chev.userData.key&&!glide){chev.userData.key=key;updateChevrons();}}
