@@ -111,7 +111,7 @@ function buildStairs(){const byChunk={};for(const st of STAIRS){const k=st.bld+'
 let FIXT=[];const fixtReady=fetch('fixtures.json').then(r=>r.json()).then(d=>FIXT=d).catch(()=>{});
 const fixMat=std({color:0xf4f6f6,roughness:0.3});
 function buildFixtures(){const by={};for(const f of FIXT){let ck=null;for(const k in chunks){const c=chunks[k];if(c.floor!==f.floor||c.kind!=='floor')continue;if(!c.box)c.box=new THREE.Box3().setFromObject(c.group);if(c.box.containsPoint(new THREE.Vector3(f.x,f.e+0.5,-f.n))){ck=k;break;}}if(!ck)continue;(by[ck]=by[ck]||[]).push(f);}
- for(const k in by){const ms=by[k].map(f=>{const h=/URIN/.test(f.kind)?0.6:/UNIT/.test(f.kind)?0.42:0.82;const y=/URIN/.test(f.kind)?f.e+0.45+h/2:f.e+h/2;return new THREE.Matrix4().compose(new THREE.Vector3(f.x,y,-f.n),new THREE.Quaternion().setFromEuler(new THREE.Euler(0,THREE.MathUtils.degToRad(f.rot),0)),new THREE.Vector3(f.w,h,f.d));});
+ for(const k in by){const ms=by[k].map(f=>{const h=/PART/.test(f.kind)?1.9:/URIN/.test(f.kind)?0.6:/UNIT/.test(f.kind)?0.42:0.82;const y=/PART/.test(f.kind)?f.e+0.12+h/2:/URIN/.test(f.kind)?f.e+0.45+h/2:/UNIT/.test(f.kind)?f.e+0.62:f.e+h/2;return new THREE.Matrix4().compose(new THREE.Vector3(f.x,y,-f.n),new THREE.Quaternion().setFromEuler(new THREE.Euler(0,THREE.MathUtils.degToRad(f.rot),0)),new THREE.Vector3(f.w,h,f.d));});
   const im=new THREE.InstancedMesh(new THREE.BoxGeometry(1,1,1),fixMat,ms.length);ms.forEach((m,i)=>im.setMatrixAt(i,m));im.instanceMatrix.needsUpdate=true;im.computeBoundingSphere();chunks[k].group.add(im);}}
 function decorate(){buildStairs();buildFixtures();const s=man.sign;if(s){const g=new THREE.Group();const n=[...s.text];const cx=(s.x0+s.x1)/2;const sp=Math.min(5.4,(s.x1-s.x0)/(n.length+1.5));
  n.forEach((ch,i)=>{const p=textPlane(ch,1.6,1.6,{w:256,h:256,font:'bold 230px NanumGothic, sans-serif'});p.position.set(cx+(i-(n.length-1)/2)*sp+sp*0.6,s.y,-(s.n-0.26));g.add(p);});
@@ -322,7 +322,7 @@ srch.oninput=fill;
 addEventListener('resize',()=>{cam.aspect=innerWidth/innerHeight;cam.updateProjectionMatrix();r.setSize(innerWidth,innerHeight);sizeLabels();render();});
 sizeLabels();setView('bird');applyFloor();
 // test hooks
-window.__api={setFloor:f=>{curFloor=f;applyFloor();},setWalk,roomFocus,labels:man.labels,render:()=>r.render(scene,cam),cam,ctl,setCut:v=>{cut=v;applyFloor();},info:()=>r.info.render};
+window.__api={setFloor:f=>{curFloor=f;applyFloor();},setWalk,roomFocus,labels:man.labels,render:()=>r.render(scene,cam),cam,ctl,setCut:v=>{cut=v;applyFloor();},info:()=>r.info.render,scene};
 
 // ---------- on-screen pad ----------
 document.querySelectorAll('#pad [data-k]').forEach(b=>{const k=b.dataset.k;const on=e=>{e.preventDefault();e.stopPropagation();keys[k]=true;t0=performance.now();loop();try{b.setPointerCapture(e.pointerId)}catch(_){}};let t0=0;const off=e=>{const el=performance.now()-t0;setTimeout(()=>{keys[k]=false;},Math.max(0,220-el));};
