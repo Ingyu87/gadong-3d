@@ -97,6 +97,27 @@ export function buildRooms(chunks,WALLS,logoTex,man){
   for(let x=47.6;x<63.6;x+=2.7)for(let n=-57.8;n<-36.5;n+=2.4){at.push([x,n]);for(const dx of[-0.5,0.5]){sa.push([x+dx,n-0.62]);sb.push([x+dx,n+0.62]);}R.rects.push([x-0.95,n-0.45,x+0.95,n+0.45]);}
   R.inst([[1.8,0.04,0.75,0,0.7,0,wh],[0.06,0.68,0.06,-0.8,0.34,-0.3,metal],[0.06,0.68,0.06,0.8,0.34,-0.3,metal],[0.06,0.68,0.06,-0.8,0.34,0.3,metal],[0.06,0.68,0.06,0.8,0.34,0.3,metal]],at);
   const stool=m=>[[0.34,0.04,0.34,0,0.44,0,m],[0.04,0.42,0.04,0,0.21,0,metal],[0.3,0.02,0.3,0,0.01,0,metal]];R.inst(stool(yel),sa);R.inst(stool(grn),sb);});
+
+ // 10) B1 (approximate: drawing has no anchor to 1F). Under 본관 centre, reached by 계단2 (S2) going down.
+ if(chunks.main_B1){const ck='main_B1';const c=chunks[ck];const rm=[];c.group.traverse(o=>{if(o.isMesh)rm.push(o);});rm.forEach(o=>o.removeFromParent());
+  if(!WALLS[ck])WALLS[ck]={e:-3.6,r:[],s:[]};
+  add(ck,(R)=>{const conc=S({map:rep(cv(256,256,(x,w,h)=>{x.fillStyle='#b9b7b1';x.fillRect(0,0,w,h);for(let i=0;i<2500;i++){x.fillStyle=`rgba(${Math.random()<.5?60:230},${Math.random()<.5?60:230},${Math.random()<.5?60:230},0.06)`;x.fillRect(Math.random()*w,Math.random()*h,2,2);}}),8,8),roughness:0.85}),wall=S({color:0xdedbd3,roughness:0.9}),ceil=S({color:0xeeeeea,roughness:0.9}),mach=S({color:0x6f8a9a,metalness:0.4,roughness:0.5}),pipe=S({color:0x9aa0a6,metalness:0.6,roughness:0.4}),mint=S({color:0xcfe8dd,roughness:0.8});
+   const F=[[-2.15,23.35,13.25,23.1],[-1.95,6.5,23.1,27.4]];for(const[a,b,c_,d]of F){R.box(conc,a,b,c_,d,-0.25,0);R.box(ceil,a,b,c_,d,3.3,3.35);}
+   const T=0.2,H=3.3;const W_=(x0,x1,n0,n1)=>{R.box(wall,x0,x1,n0,n1,0,H);R.rects.push([x0,n0,x1,n1]);};
+   const wallX=(n,x0,x1,gaps=[])=>{let a=x0;for(const[g0,g1]of gaps){if(g0>a)W_(a,g0,n-T/2,n+T/2);R.box(wall,g0,g1,n-T/2,n+T/2,2.2,H);a=g1;}if(x1>a)W_(a,x1,n-T/2,n+T/2);};
+   const wallN=(x,n0,n1,gaps=[])=>{let a=n0;for(const[g0,g1]of gaps){if(g0>a)W_(x-T/2,x+T/2,a,g0);R.box(wall,x-T/2,x+T/2,g0,g1,2.2,H);a=g1;}if(n1>a)W_(x-T/2,x+T/2,a,n1);};
+   wallX(13.25,-2.15,23.35);wallN(-2.15,13.25,23.1);wallN(23.35,13.25,23.1);wallX(23.1,6.5,23.35);wallN(-1.95-T/2,23.1,27.4);wallX(27.4+T/2,-1.95,6.5);wallN(6.5,23.1,27.4);
+   wallX(18.75,-2.15,23.35,[[2.0,3.2],[10.0,11.0],[18.3,19.3]]);wallN(6.85,13.25,18.75);wallN(14.35,13.25,18.75);
+   R.box(mint,-2.05,23.25,18.86,18.88,0,1.1);
+   // 기계실: boilers/pumps/pipes
+   for(const[x,n]of[[-0.6,15.0],[1.6,15.0],[3.8,15.0]]){R.box(mach,x-0.7,x+0.7,n-0.7,n+0.7,0,1.8);R.rects.push([x-0.7,n-0.7,x+0.7,n+0.7]);R.box(pipe,x-0.08,x+0.08,n-0.08,n+0.08,1.8,3.2);}
+   R.box(pipe,-2.0,6.7,16.9,17.05,2.8,2.95);R.box(S({color:0x3d4a55,metalness:0.4,roughness:0.5}),5.2,6.6,13.5,14.4,0,2.0);R.rects.push([5.2,13.5,6.6,14.4]);
+   // 창고: shelving
+   const shelf=S({color:0x8c939a,metalness:0.5,roughness:0.5}),box_=S({color:0xc7a77a,roughness:0.9});for(const n of[13.6,15.6]){R.box(shelf,7.3,13.9,n,n+0.6,0,2.1);R.rects.push([7.3,n,13.9,n+0.6]);for(let y=0.3;y<2;y+=0.6)R.box(box_,7.5,13.7,n+0.05,n+0.55,y,y+0.35);}
+   // 어머니실: table + chairs
+   const wd=S({color:0xc9a173,roughness:0.6}),seat=S({color:0x8fb6d8,roughness:0.6});R.box(wd,16.8,20.8,15.0,16.6,0.72,0.76);R.rects.push([16.8,15.0,20.8,16.6]);R.inst(chairParts(seat,metal),[[17.4,14.5,0],[18.8,14.5,0],[20.2,14.5,0],[17.4,17.1,Math.PI],[18.8,17.1,Math.PI],[20.2,17.1,Math.PI]]);
+   leds(R,-2.0,23.2,13.4,23.0,3.28,2.4,2.4);leds(R,-1.9,6.4,23.2,27.3,3.28,2.4,2.4);
+  });c.box=null;}
  // 6) 운동장 dressing: striped shade canopies, flagpoles, 가동문화관 sign
  const site=chunks.site;if(site){const g=new THREE.Group();g.name='playground';const stripes=cv(512,64,(x,w,h)=>{const cs=['#e53935','#fdd835','#43a047','#1e88e5','#fb8c00','#ffffff','#8e24aa'];for(let i=0;i<16;i++){x.fillStyle=cs[i%cs.length];x.fillRect(i*w/16,0,w/16,h);}});const sm=S({map:stripes,side:THREE.DoubleSide,roughness:0.8});const post=S({color:0x6b6f74,metalness:0.5,roughness:0.4});
   for(const[x0,x1]of[[-40.2,-5.6],[6.7,42.4]]){const len=x1-x0;const roof=new THREE.Mesh(new THREE.PlaneGeometry(len,7.4),sm);roof.material.map.wrapS=THREE.RepeatWrapping;roof.material.map.repeat.set(len/8,1);roof.rotation.x=-Math.PI/2+0.14;roof.position.set((x0+x1)/2,4.6,15.45);roof.castShadow=true;g.add(roof);

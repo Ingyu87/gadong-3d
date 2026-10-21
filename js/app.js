@@ -93,9 +93,9 @@ function inR(f,x,n,m=0){return x>=f.x0-m&&x<=f.x1+m&&n>=f.n0-m&&n<=f.n1+m;}
 function surfaceAt(x,n,feet){let best=-1e9;const cand=[];
  for(const st of STAIRS){if(!chunks[st.bld+'_'+st.floor])continue;for(const f of st.flights){f.run=st.run;if(inR(f,x,n))cand.push(flightY(f,x,n));}}
  for(const k in WALLS){const W=WALLS[k];if(k==='main_porch')continue;const c=chunks[k];if(!c)continue;if(!c.box)c.box=new THREE.Box3().setFromObject(c.group);const b=c.box;if(x<b.min.x||x>b.max.x||-n<b.min.z||-n>b.max.z)continue;
-  const hole=STAIRS.some(st=>st.bld+'_'+st.to===k&&inR({x0:st.core[0],n0:st.core[1],x1:st.core[2],n1:st.core[3]},x,n));if(!hole)cand.push(W.e);}
- cand.push(0);for(const y of cand)if(y<=feet+0.45&&y>best)best=y;return best===-1e9?feet:best;}
-window.__surface=(x,n,f)=>surfaceAt(x,n,f);
+  const hole=STAIRS.some(st=>(st.bld+'_'+st.to===k||k==='site'&&st.floor==='B1')&&inR({x0:st.core[0],n0:st.core[1],x1:st.core[2],n1:st.core[3]},x,n));if(!hole)cand.push(W.e);}
+ if(!STAIRS.some(st=>st.floor==='B1'&&inR({x0:st.core[0],n0:st.core[1],x1:st.core[2],n1:st.core[3]},x,n)))cand.push(0);for(const y of cand)if(y<=feet+0.45&&y>best)best=y;return best===-1e9?feet:best;}
+window.__surface=(x,n,f)=>surfaceAt(x,n,f);window.__surfC=(x,n)=>{const o=[];for(const st of STAIRS){if(!chunks[st.bld+'_'+st.floor])continue;for(const f of st.flights)if(inR(f,x,n))o.push([st.bld+st.id+st.floor,f.kind,flightY(f,x,n)]);}for(const k in WALLS){const c=chunks[k];if(!c||!c.box)continue;const b=c.box;if(x<b.min.x||x>b.max.x||-n<b.min.z||-n>b.max.z)continue;o.push([k,WALLS[k].e,STAIRS.some(st=>st.bld+'_'+st.to===k&&inR({x0:st.core[0],n0:st.core[1],x1:st.core[2],n1:st.core[3]},x,n))]);}return o;};
 const railMat=new THREE.MeshStandardMaterial({color:0x8a9aa6,metalness:0.4,roughness:0.5,transparent:true,opacity:0.85});
 function buildStairs(){const byChunk={};for(const st of STAIRS){const k=st.bld+'_'+st.floor;(byChunk[k]=byChunk[k]||[]).push(st);}
  for(const k in byChunk){const c=chunks[k];if(!c)continue;const mats=[],rails=[];
