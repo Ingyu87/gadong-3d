@@ -24,4 +24,9 @@ export const board=()=>cv(512,340,(x)=>{x.fillStyle='#f7f7f4';x.fillRect(0,0,512
  const cols=['#f2d16b','#9fd3e8','#f4a6a6','#c8e6a0','#ffffff'];for(let i=0;i<9;i++){x.fillStyle=cols[i%5];x.fillRect(30+(i%5)*92,40+Math.floor(i/5)*130,70,95);x.fillStyle='#555';for(let k=0;k<5;k++)x.fillRect(38+(i%5)*92,55+Math.floor(i/5)*130+k*14,50,4);}});
 export const terrazzo=()=>{const t=cv(1024,1024,(x,w,h)=>{x.fillStyle='#c9c5bb';x.fillRect(0,0,w,h);const cols=['#8d8a84','#e9e6df','#6f6a62','#b3aa98','#d8d2c4','#4f4c48','#a39a8a'];
  for(let i=0;i<14000;i++){x.fillStyle=cols[(rnd()*cols.length)|0];x.globalAlpha=0.5+rnd()*0.5;const r=1+rnd()*rnd()*7;x.beginPath();x.ellipse(rnd()*w,rnd()*h,r,r*(0.5+rnd()*0.5),rnd()*3,0,7);x.fill();}
- x.globalAlpha=1;x.strokeStyle='rgba(80,80,80,0.35)';x.lineWidth=3;x.strokeRect(0,0,w,h);});t.repeat.set(1/1.2,1/1.2);return t;};
+ x.globalAlpha=1;x.strokeStyle='rgba(80,80,80,0.35)';x.lineWidth=3;x.strokeRect(0,0,w,h);x.beginPath();x.moveTo(w/2,0);x.lineTo(w/2,h);x.moveTo(0,h/2);x.lineTo(w,h/2);x.stroke();for(const[a,b]of[[0,0],[w/2,0],[0,h/2],[w/2,h/2]]){x.fillStyle=`rgba(${rnd()<.5?255:0},${rnd()<.5?255:0},${rnd()<.5?255:0},0.03)`;x.fillRect(a,b,w/2,h/2);}});t.repeat.set(1/1.2,1/1.2);return t;};
+export const slideDoor=()=>{const c=document.createElement('canvas');c.width=256;c.height=512;const x=c.getContext('2d');x.fillStyle='#a8763f';x.fillRect(0,0,256,512);
+ for(let g=0;g<60;g++){x.strokeStyle=`rgba(70,40,15,${0.05+rnd()*0.1})`;x.lineWidth=1+rnd()*2;x.beginPath();const xx=rnd()*256;x.moveTo(xx,0);x.bezierCurveTo(xx+rnd()*8-4,170,xx+rnd()*8-4,340,xx,512);x.stroke();}
+ x.strokeStyle='#6e4a26';x.lineWidth=10;x.strokeRect(5,5,246,502);x.fillStyle='#e9eef0';x.fillRect(58,70,140,150);x.fillStyle='#7f9fb0';x.fillRect(66,78,124,134);x.fillStyle='rgba(255,255,255,0.35)';x.beginPath();x.moveTo(66,78);x.lineTo(130,78);x.lineTo(66,150);x.fill();
+ x.fillStyle='#c8ccd0';x.fillRect(212,250,14,60);x.fillStyle='rgba(40,25,10,0.25)';x.fillRect(5,440,246,62);
+ const t=new THREE.CanvasTexture(c);t.colorSpace=THREE.SRGBColorSpace;t.anisotropy=8;return t;};
