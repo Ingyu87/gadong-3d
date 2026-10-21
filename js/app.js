@@ -8,9 +8,9 @@ import {GTAOPass} from 'three/addons/postprocessing/GTAOPass.js';
 import {OutputPass} from 'three/addons/postprocessing/OutputPass.js';
 import {RoomEnvironment} from 'three/addons/environments/RoomEnvironment.js';
 import {mergeGeometries} from 'three/addons/utils/BufferGeometryUtils.js';
-import {buildRooms} from './rooms.js';
-import * as T from './tex.js';
-import {buildInstanced} from './furn.js';
+import {buildRooms} from './rooms.js?v=202610220416';
+import * as T from './tex.js?v=202610220416';
+import {buildInstanced} from './furn.js?v=202610220416';
 const Q=new URLSearchParams(location.search);const SHOT=Q.has('shot');
 const MOBILE=matchMedia('(pointer:coarse)').matches||innerWidth<760;
 await document.fonts.load('bold 40px NanumGothic').catch(()=>{});
@@ -62,7 +62,8 @@ const M={
  frameG:std({color:0xd5d8da,metalness:0.5,roughness:0.35}),chairDark:std({color:0x33373d}),sofa:std({color:0x7a5a46}),sheet:std({color:0x8fb3d9}),stall:std({color:0xe6ddd0}),
  board:std({map:T.board(),roughness:0.3}),flag:std({map:T.flag()}),bark:std({color:0x6a4b33}),pine:std({color:0x4f7a35,roughness:0.9}),leaf:std({color:0x6e9a48,roughness:0.9})};
 // ---------- state ----------
-const man=await (await fetch('manifest.json')).json();
+const VER=(new URL(import.meta.url)).searchParams.get('v')||'dev';const V=u=>u+(u.includes('?')?'&':'?')+'v='+VER;
+const man=await (await fetch(V('manifest.json'))).json();
 const chunks={};const root=new THREE.Group();scene.add(root);
 const loader=new GLTFLoader();loader.setMeshoptDecoder(MeshoptDecoder);
 const prog=document.getElementById('prog');
@@ -86,7 +87,7 @@ function logoTex(){const c=document.createElement('canvas');c.width=c.height=256
  x.fillStyle='#f2c418';x.fillRect(-78,-34,64,16);x.fillRect(-30,-34,16,62);x.fillRect(-62,12,48,16);x.fillRect(4,-34,74,16);x.fillRect(4,-34,16,62);x.fillRect(4,12,74,16);
  const t=new THREE.CanvasTexture(c);t.colorSpace=THREE.SRGBColorSpace;return t;}
 // ---------- stairs (from DXF stair cores) ----------
-let STAIRS=[];const stairsReady=fetch('stairs.json').then(r=>r.json()).then(d=>STAIRS=d).catch(()=>{});
+let STAIRS=[];const stairsReady=fetch(V('stairs.json')).then(r=>r.json()).then(d=>STAIRS=d).catch(()=>{});
 function flightY(f,x,n){const u=f.x1-f.x0>f.n1-f.n0&&false?0:0;const along=(f.kind==='landing')?null:(STAIRRUN(f));if(!along)return f.y0;const [lo,hi,v]=along(x,n);const t=Math.max(0,Math.min(1,(v-lo)/(hi-lo)));return f.start==='hi'?f.y0+(1-t)*(f.y1-f.y0):f.y0+t*(f.y1-f.y0);}
 function STAIRRUN(f){return f.run==='x'?((x,n)=>[f.x0,f.x1,x]):((x,n)=>[f.n0,f.n1,n]);}
 function inR(f,x,n,m=0){return x>=f.x0-m&&x<=f.x1+m&&n>=f.n0-m&&n<=f.n1+m;}
@@ -95,7 +96,7 @@ function surfaceAt(x,n,feet){let best=-1e9;const cand=[];
  for(const k in WALLS){const W=WALLS[k];if(k==='main_porch')continue;const c=chunks[k];if(!c)continue;if(!c.box)c.box=new THREE.Box3().setFromObject(c.group);const b=c.box;if(x<b.min.x||x>b.max.x||-n<b.min.z||-n>b.max.z)continue;
   const hole=STAIRS.some(st=>(st.bld+'_'+st.to===k||k==='site'&&st.floor==='B1')&&inR({x0:st.core[0],n0:st.core[1],x1:st.core[2],n1:st.core[3]},x,n));if(!hole)cand.push(W.e);}
  if(!STAIRS.some(st=>st.floor==='B1'&&inR({x0:st.core[0],n0:st.core[1],x1:st.core[2],n1:st.core[3]},x,n)))cand.push(0);for(const y of cand)if(y<=feet+0.45&&y>best)best=y;return best===-1e9?feet:best;}
-window.__surface=(x,n,f)=>surfaceAt(x,n,f);window.__surfC=(x,n)=>{const o=[];for(const st of STAIRS){if(!chunks[st.bld+'_'+st.floor])continue;for(const f of st.flights)if(inR(f,x,n))o.push([st.bld+st.id+st.floor,f.kind,flightY(f,x,n)]);}for(const k in WALLS){const c=chunks[k];if(!c||!c.box)continue;const b=c.box;if(x<b.min.x||x>b.max.x||-n<b.min.z||-n>b.max.z)continue;o.push([k,WALLS[k].e,STAIRS.some(st=>st.bld+'_'+st.to===k&&inR({x0:st.core[0],n0:st.core[1],x1:st.core[2],n1:st.core[3]},x,n))]);}return o;};
+window.__surface=(x,n,f)=>surfaceAt(x,n,f);
 const railMat=new THREE.MeshStandardMaterial({color:0x8a9aa6,metalness:0.4,roughness:0.5,transparent:true,opacity:0.85});
 function buildStairs(){const byChunk={};for(const st of STAIRS){const k=st.bld+'_'+st.floor;(byChunk[k]=byChunk[k]||[]).push(st);}
  for(const k in byChunk){const c=chunks[k];if(!c)continue;const mats=[],rails=[];
@@ -119,7 +120,7 @@ function buildStairs(){const byChunk={};for(const st of STAIRS){const k=st.bld+'
   }
   const im=new THREE.InstancedMesh(new THREE.BoxGeometry(1,1,1),M.stair,mats.length);mats.forEach((m,i)=>im.setMatrixAt(i,m));im.instanceMatrix.needsUpdate=true;im.computeBoundingSphere();im.castShadow=!MOBILE;im.receiveShadow=true;im.userData.mat='stair';im.userData.isStair=true;c.group.add(im);if(rails.length){const rm=new THREE.InstancedMesh(new THREE.BoxGeometry(1,1,1),railMat,rails.length);rails.forEach((m,i)=>rm.setMatrixAt(i,m));rm.instanceMatrix.needsUpdate=true;rm.computeBoundingSphere();rm.userData.isStair=true;c.group.add(rm);}}
 }
-let SIGNS=[];const signReady=fetch('signs.json').then(r=>r.json()).then(d=>SIGNS=d).catch(()=>{});
+let SIGNS=[];const signReady=fetch(V('signs.json')).then(r=>r.json()).then(d=>SIGNS=d).catch(()=>{});
 function buildCorrLights(){for(const f of['1F','2F','3F','4F','5F']){const ch=chunks['main_'+f];if(!ch)continue;const e=(man.chunks.find(c=>c.name==='main_'+f)||{}).elev||0;const ms=[];for(let x=-45;x<=46;x+=3.0){if(Math.abs(x-2.5)<5&&f!=='1F')continue;ms.push(new THREE.Matrix4().compose(new THREE.Vector3(x,e+2.885,-21.8),new THREE.Quaternion(),new THREE.Vector3(1.2,0.03,0.3)));}
  const im=new THREE.InstancedMesh(new THREE.BoxGeometry(1,1,1),M.led,ms.length);ms.forEach((m,i)=>im.setMatrixAt(i,m));im.instanceMatrix.needsUpdate=true;im.computeBoundingSphere();im.userData.furnType='led';ch.group.add(im);}}
 const FSZ={desk:[0.45,0.64,0,0.12],tdesk:[0.7,1.3,0,0.1],shelf:[0.35,1.2,-0.175,0.05],cabinet:[0.5,0.9,-0.25,0.05],shelf2:[0.4,1.5,0,0.05],ltable:[1.2,0.6,0,0.1],lab:[1.2,0.9,0,0.1],office:[0.7,1.2,0,0.1],piano:[0.6,1.5,0,0.05],bed:[0.9,1.9,0,0.05],sofa:[0.8,1.8,0,0.05],mtable:[1.2,2.4,0,0.1],pc:[0.6,1.2,0,0.1],front:[0.4,3.0,0,0.05]};
@@ -130,10 +131,10 @@ function buildSigns(){for(const g of SIGNS){const ch=chunks[g.bld+'_'+g.floor];i
  for(const sd of[1,-1]){const t=textPlane(g.t,w,h,{w:512,h:96,font:'bold 64px NanumGothic, sans-serif',fg:'#ffffff',bg:'#2f6f68'});t.rotation.y=sd*Math.PI/2;t.position.x=sd*0.017;grp.add(t);}
  const off=g.s*(w/2+0.02);if(g.ax==='x'){grp.position.set(g.x,g.y,-(g.n+off));}else{grp.rotation.y=Math.PI/2;grp.position.set(g.x+off,g.y,-g.n);}grp.userData.kind='sign';ch.group.add(grp);}}
 const signMat=new THREE.MeshStandardMaterial({color:0xf2f2ee,roughness:0.5});
-let COLS=[];const colReady=fetch('columns.json').then(r=>r.json()).then(d=>COLS=d).catch(()=>{});
+let COLS=[];const colReady=fetch(V('columns.json')).then(r=>r.json()).then(d=>COLS=d).catch(()=>{});
 function buildColumns(){const by={};for(const c of COLS){const k=c.bld+'_'+c.floor;if(!chunks[k])continue;(by[k]=by[k]||[]).push(c);}for(const k in by){const ch=chunks[k];const e=(man.chunks.find(c=>c.name===k)||{}).elev||0;const h=(man.chunks.find(c=>c.name===k)||{}).h||3.6;const ms=by[k].map(c=>new THREE.Matrix4().compose(new THREE.Vector3(c.x,e+h/2-0.1,-c.n),new THREE.Quaternion(),new THREE.Vector3(c.w+0.04,h-0.2,c.d+0.04)));const im=new THREE.InstancedMesh(new THREE.BoxGeometry(1,1,1),colMat,ms.length);ms.forEach((m,i)=>im.setMatrixAt(i,m));im.instanceMatrix.needsUpdate=true;im.computeBoundingSphere();im.userData.kind='column';ch.group.add(im);}}
 const colMat=new THREE.MeshStandardMaterial({color:0xe9e7e1,roughness:0.85});
-let FIXT=[];const fixtReady=fetch('fixtures.json').then(r=>r.json()).then(d=>FIXT=d).catch(()=>{});
+let FIXT=[];const fixtReady=fetch(V('fixtures.json')).then(r=>r.json()).then(d=>FIXT=d).catch(()=>{});
 const fixMat=std({color:0xf4f6f6,roughness:0.3});
 function buildFixtures(){const by={};for(const f of FIXT){let ck=null;for(const k in chunks){const c=chunks[k];if(c.floor!==f.floor||c.kind!=='floor')continue;if(!c.box)c.box=new THREE.Box3().setFromObject(c.group);if(c.box.containsPoint(new THREE.Vector3(f.x,f.e+0.5,-f.n))){ck=k;break;}}if(!ck)continue;(by[ck]=by[ck]||[]).push(f);}
  const por=std({color:0xf7f7f5,roughness:0.15}),steel=std({color:0xb8bcc0,metalness:0.8,roughness:0.25}),lam=std({color:0xb9cad6,roughness:0.45}),lamD=std({color:0x9fb4c4,roughness:0.45}),seat=std({color:0xeeeeea,roughness:0.3});
@@ -201,7 +202,7 @@ function decorate(){buildStairs();buildFixtures();buildColumns();buildSigns();bu
   const w=new THREE.Mesh(new THREE.BoxGeometry(4.8,1.6,0.8),M.stone);w.position.set(x,0.8,-n);chunks.site?.group.add(w);});}
 const ORDER=c=>c.kind==='site'?0:c.kind==='roof'?2:(c.bld==='main'?1:3);
 const list=[...man.chunks].sort((a,b)=>ORDER(a)-ORDER(b)||a.elev-b.elev);
-async function loadChunk(c){const g=await loader.loadAsync(c.file);const grp=new THREE.Group();grp.name=c.name;
+async function loadChunk(c){const g=await loader.loadAsync(V(c.file));const grp=new THREE.Group();grp.name=c.name;
  g.scene.traverse(o=>{if(o.isMesh){if(!o.geometry.attributes.normal){o.geometry=o.geometry.toNonIndexed();o.geometry.computeVertexNormals();}const n=(o.material&&o.material.name)||'';const mm=M[n]||M.white;o.material=mm;o.castShadow=!MOBILE&&!mm.transparent&&c.kind!=='site';o.receiveShadow=true;o.userData.mat=n;}});
  await doorsReady;await stairsReady;await fixtReady;await colReady;await signReady;if(c.kind!=='site'){const rm=[];g.scene.traverse(o=>{if(o.isMesh&&o.userData.mat==='door')rm.push(o);});rm.forEach(o=>o.removeFromParent());buildDoors(c,grp);}window.__shDirty=true;
  grp.add(g.scene);const fg=new THREE.Group();fg.name='furn';if(c.kind==='site')fg.add(trees(c.furn));else addFurn(fg,classOnly(c,c.furn));grp.add(fg);
@@ -229,8 +230,8 @@ function applyFloor(){window.__shDirty=true;const thr=curFloor==='all'?1e9:ELEV[
   c.group.traverse(o=>{if(o.isMesh&&(o.userData.mat==='ceil'))o.visible=!top||walk;if(o.isInstancedMesh&&['led','ac'].includes(o.userData.furnType))o.visible=!top||walk;});
   if(c.name==='baseball'){c.group.traverse(o=>{if(o.isMesh&&o.userData.mat==='roofMetal')o.visible=curFloor==='all';});}
  }
- labels.forEach(s=>{const l=s.userData.l;s.visible=showLabels&&(curFloor==='all'?false:(l.floor===curFloor||(l.floor==='site'&&false)));});
- bldSprites.forEach(s=>s.visible=showLabels&&curFloor==='all');
+ labels.forEach(s=>{const l=s.userData.l;s.visible=s.userData.base=showLabels&&(curFloor==='all'?false:(l.floor===curFloor||(l.floor==='site'&&false)));});
+ bldSprites.forEach(s=>s.visible=s.userData.base=showLabels&&curFloor==='all');
  document.querySelectorAll('#floors button').forEach(b=>b.classList.toggle('on',b.dataset.f===curFloor));render();}
 // ---------- controls ----------
 const ctl=new OrbitControls(cam,r.domElement);ctl.enableDamping=true;ctl.dampingFactor=0.12;ctl.minDistance=45;ctl.maxDistance=420;ctl.minPolarAngle=0.30;ctl.maxPolarAngle=1.31;ctl.addEventListener('change',render);ctl.screenSpacePanning=false;ctl.zoomToCursor=true;ctl.panSpeed=1.0;ctl.rotateSpeed=0.6;ctl.zoomSpeed=0.8;ctl.mouseButtons={LEFT:THREE.MOUSE.ROTATE,MIDDLE:THREE.MOUSE.DOLLY,RIGHT:THREE.MOUSE.PAN};ctl.touches={ONE:THREE.TOUCH.ROTATE,TWO:THREE.TOUCH.DOLLY_PAN};
@@ -255,7 +256,7 @@ r.domElement.addEventListener('pointerup',pend);r.domElement.addEventListener('p
 r.domElement.addEventListener('wheel',e=>{if(!walk)return;cam.fov=Math.max(30,Math.min(90,cam.fov+e.deltaY*0.03));cam.updateProjectionMatrix();render();},{passive:true});
 // ---------- doors ----------
 let DOORS=[];const doorIMs=[];const doorMat=std({map:T.slideDoor(),roughness:0.55});
-const doorsReady=fetch('doors.json').then(r=>r.json()).then(d=>DOORS=d).catch(()=>{});
+const doorsReady=fetch(V('doors.json')).then(r=>r.json()).then(d=>DOORS=d).catch(()=>{});
 const _m=new THREE.Matrix4(),_q=new THREE.Quaternion(),_e=new THREE.Euler();
 function doorMatrix(d){const L=d.ax==='x'?d.x1-d.x0:d.n1-d.n0;const base=d.ax==='x'?0:Math.PI/2;const hx=d.ax==='x'?d.x0:(d.x0+d.x1)/2,hz=d.ax==='x'?-(d.n0+d.n1)/2:-d.n0;
  if(d.sl){const H=d.h||2.1,k=d.ang/(Math.PI/2*0.95),off=k*L*0.9;_q.set(0,0,0,1);if(d.ax==='x')return _m.compose(new THREE.Vector3(hx+L/2-off,d.e+H/2,hz-0.07*k),_q.setFromEuler(_e.set(0,0,0)),new THREE.Vector3(L,H,0.045));return _m.compose(new THREE.Vector3(hx+0.07*k,d.e+H/2,hz-L/2+off),_q.setFromEuler(_e.set(0,Math.PI/2,0)),new THREE.Vector3(L,H,0.045));}
@@ -280,7 +281,7 @@ const chev=new THREE.Group();scene.add(chev);chev.visible=false;
 const chevGeo=(()=>{const sh=new THREE.Shape();sh.moveTo(0,0.45);sh.lineTo(0.42,-0.05);sh.lineTo(0.26,-0.2);sh.lineTo(0,0.1);sh.lineTo(-0.26,-0.2);sh.lineTo(-0.42,-0.05);sh.closePath();return new THREE.ShapeGeometry(sh);})();
 const chevMat=new THREE.MeshBasicMaterial({color:0xffffff,transparent:true,opacity:0.9,depthTest:false,side:THREE.DoubleSide});
 for(let k=0;k<8;k++){const m=new THREE.Mesh(chevGeo,chevMat.clone());m.rotation.order='YXZ';m.renderOrder=21;m.userData.chev=k;chev.add(m);}
-let WALLS={};fetch('walls.json').then(r=>r.json()).then(w=>{const m=w.main_1F;if(m)for(const r of m.r){if(Math.abs(r[0]-49.8)<0.01&&Math.abs(r[1]-15)<0.01&&Math.abs(r[3]-18.3)<0.01)r[3]=17.7;if(Math.abs(r[0]-49.95)<0.01&&Math.abs(r[1]-18.6)<0.01)r[1]=18.75;if(Math.abs(r[0]-49.95)<0.01&&Math.abs(r[1]-18.65)<0.01)r[1]=18.75;}return w;}).then(w=>WALLS=w).catch(()=>{});
+let WALLS={};fetch(V('walls.json')).then(r=>r.json()).then(w=>{const m=w.main_1F;if(m)for(const r of m.r){if(Math.abs(r[0]-49.8)<0.01&&Math.abs(r[1]-15)<0.01&&Math.abs(r[3]-18.3)<0.01)r[3]=17.7;if(Math.abs(r[0]-49.95)<0.01&&Math.abs(r[1]-18.6)<0.01)r[1]=18.75;if(Math.abs(r[0]-49.95)<0.01&&Math.abs(r[1]-18.65)<0.01)r[1]=18.75;}return w;}).then(w=>WALLS=w).catch(()=>{});
 function curChunks(){const y=cam.position.y-EYE;return Object.keys(WALLS).filter(k=>chunks[k]&&chunks[k].group.visible&&WALLS[k].e<=y+0.3&&y-WALLS[k].e<2.9);}
 function rayRect(ox,on,dx,dn,x0,n0,x1,n1){let t0=-1e9,t1=1e9;for(const [o,d,a,b] of [[ox,dx,x0,x1],[on,dn,n0,n1]]){if(Math.abs(d)<1e-9){if(o<a||o>b)return Infinity;}else{let ta=(a-o)/d,tb=(b-o)/d;if(ta>tb)[ta,tb]=[tb,ta];t0=Math.max(t0,ta);t1=Math.min(t1,tb);}}if(t0>t1||t1<0)return Infinity;return t0<0?Infinity:t0;}
 function freeDist(dir,max){const R=0.3;const d=dir.clone().setY(0).normalize();const ox=cam.position.x,on=-cam.position.z,dx=d.x,dn=-d.z;let best=max+R;
@@ -382,7 +383,11 @@ function step(){const dt=Math.min(clock.getDelta(),0.25);let moving=false;
  draw();return moving;}
 function loop(){if(looping)return;looping=true;clock.getDelta();const tick=()=>{const mv=step();if(mv||jid!==null||glide||camAnim||Object.values(KV).some(v=>v>0.01)||Object.values(keys).some(Boolean))requestAnimationFrame(tick);else{looping=false;}};requestAnimationFrame(tick);}
 let composer=null;const AO_ON=!MOBILE&&!SHOT&&Q.get('ao')!=='0';
-function draw(){if(window.__shDirty){r.shadowMap.needsUpdate=true;window.__shDirty=false;}if(AO_ON&&walk){if(!composer){composer=new EffectComposer(r);composer.addPass(new RenderPass(scene,cam));const ao=new GTAOPass(scene,cam,innerWidth,innerHeight);ao.updateGtaoMaterial({radius:0.6,distanceExponent:1.5,thickness:1.0,scale:1.0,samples:12});ao.blendIntensity=0.8;composer.addPass(ao);composer.addPass(new OutputPass());composer.setPixelRatio(Math.min(devicePixelRatio,1.25));}composer.render();}else r.render(scene,cam);}
+function declutter(){if(walk||!labelGroup.visible)return;const W=innerWidth,H=innerHeight,f=1/Math.tan(cam.fov*Math.PI/360),placed=[];const all=bldSprites.concat(labels).filter(s=>s.userData.base);
+ const pri=s=>{const l=s.userData.l;if(!l)return 1e9;const r=l.room;const a=r?Math.abs((r[2]-r[0])*(r[3]-r[1])):4;return (l.type==='class'||/^교실/.test(l.name))?a:a+1e4;};all.sort((a,b)=>pri(b)-pri(a));
+ const v=new THREE.Vector3();for(const s of all){v.copy(s.position).project(cam);let ok=v.z<1;if(ok){const sx=(v.x+1)/2*W,sy=(1-v.y)/2*H,h=s.scale.y*f*H/2,w=s.scale.x*f*H/2,R=[sx-w/2-2,sy-h/2-2,sx+w/2+2,sy+h/2+2];
+  if(R[0]<0||R[2]>W||R[1]<50||R[3]>H)ok=false;else for(const q of placed)if(R[0]<q[2]&&R[2]>q[0]&&R[1]<q[3]&&R[3]>q[1]){ok=false;break;}if(ok)placed.push(R);}s.visible=ok;}}
+function draw(){declutter();if(window.__shDirty){r.shadowMap.needsUpdate=true;window.__shDirty=false;}if(AO_ON&&walk){if(!composer){composer=new EffectComposer(r);composer.addPass(new RenderPass(scene,cam));const ao=new GTAOPass(scene,cam,innerWidth,innerHeight);ao.updateGtaoMaterial({radius:0.6,distanceExponent:1.5,thickness:1.0,scale:1.0,samples:12});ao.blendIntensity=0.8;composer.addPass(ao);composer.addPass(new OutputPass());composer.setPixelRatio(Math.min(devicePixelRatio,1.25));}composer.render();}else r.render(scene,cam);}
 addEventListener('resize',()=>{if(composer)composer.setSize(innerWidth,innerHeight);});
 function render(){if(SHOT){r.render(scene,cam);return;}loop();}
 ctl.addEventListener('start',loop);
