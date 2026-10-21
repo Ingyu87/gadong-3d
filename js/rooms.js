@@ -121,46 +121,58 @@ export function buildRooms(chunks,WALLS,logoTex,man){
    WALLS.site=WALLS.site||{e:0,s:[],r:[]};WALLS.site.r.push([bx0,-z1,bx1,-z0]);}
   const fp=[[-1.8,19.6],[0.55,19.9],[2.9,19.6]];const fl=S({map:cv(300,200,(x,w,h)=>{x.fillStyle='#fff';x.fillRect(0,0,w,h);x.fillStyle='#cd2e3a';x.beginPath();x.arc(w/2,h/2,50,Math.PI,0);x.fill();x.fillStyle='#0047a0';x.beginPath();x.arc(w/2,h/2,50,0,Math.PI);x.fill();x.fillStyle='#000';[[50,40],[w-70,40],[50,h-60],[w-70,h-60]].forEach(([a,b])=>x.fillRect(a,b,20,20));}),side:THREE.DoubleSide});const fl2=S({color:0x2e7d32,side:THREE.DoubleSide});
   fp.forEach(([x,z],i)=>{const p=new THREE.Mesh(new THREE.CylinderGeometry(0.05,0.08,12,8),S({color:0xdedede,metalness:0.6,roughness:0.3}));p.position.set(x,6,z);g.add(p);const f=new THREE.Mesh(new THREE.PlaneGeometry(1.8,1.2),i===1?fl:fl2);f.position.set(x+0.95,11.2,z);g.add(f);});
-  // exterior murals (다목적강당 west wall, 정보화동 east wall) — procedural kid-friendly scene
-  {const mural=(seed,W,H)=>cv(2048,Math.round(2048*H/W),(x,w,h)=>{let r=seed;const R=()=>{r=(r*16807)%2147483647;return r/2147483647;};
-    const g=x.createLinearGradient(0,0,0,h);g.addColorStop(0,'#7cc8f2');g.addColorStop(1,'#d8f1ff');x.fillStyle=g;x.fillRect(0,0,w,h);
-    x.fillStyle='#ffd54f';x.beginPath();x.arc(w*0.12,h*0.25,h*0.13,0,7);x.fill();x.strokeStyle='#ffca28';x.lineWidth=10;for(let k=0;k<12;k++){const a=k*Math.PI/6;x.beginPath();x.moveTo(w*0.12+Math.cos(a)*h*0.17,h*0.25+Math.sin(a)*h*0.17);x.lineTo(w*0.12+Math.cos(a)*h*0.24,h*0.25+Math.sin(a)*h*0.24);x.stroke();}
-    for(let k=0;k<5;k++){x.fillStyle='#ffffff';const cx=w*(0.3+k*0.16),cy=h*(0.15+R()*0.15);for(let j=0;j<3;j++){x.beginPath();x.arc(cx+j*40,cy,30+j%2*12,0,7);x.fill();}}
-    const hills=['#8bc34a','#66bb6a','#43a047'];hills.forEach((c,i)=>{x.fillStyle=c;x.beginPath();x.moveTo(0,h);for(let X=0;X<=w;X+=20)x.lineTo(X,h*(0.55+i*0.12)+Math.sin(X/(180+i*60)+seed+i)*h*0.06);x.lineTo(w,h);x.fill();});
-    for(let k=0;k<9;k++){const X=w*(0.05+k*0.11+R()*0.03),Y=h*0.72;x.fillStyle='#795548';x.fillRect(X-8,Y-h*0.12,16,h*0.14);x.fillStyle=['#2e7d32','#388e3c','#558b2f'][k%3];x.beginPath();x.arc(X,Y-h*0.16,h*0.09,0,7);x.fill();}
-    const cols=['#e53935','#1e88e5','#fdd835','#8e24aa','#fb8c00','#00acc1'];for(let k=0;k<8;k++){const X=w*(0.1+k*0.11),Y=h*0.86,c=cols[k%6];x.fillStyle='#ffe0bd';x.beginPath();x.arc(X,Y-h*0.13,h*0.035,0,7);x.fill();x.fillStyle=c;x.fillRect(X-h*0.03,Y-h*0.095,h*0.06,h*0.08);x.strokeStyle='#5d4037';x.lineWidth=8;x.beginPath();x.moveTo(X-h*0.02,Y-h*0.015);x.lineTo(X-h*0.03,Y+h*0.05);x.moveTo(X+h*0.02,Y-h*0.015);x.lineTo(X+h*0.03,Y+h*0.05);x.moveTo(X-h*0.03,Y-h*0.08);x.lineTo(X-h*0.07,Y-h*0.12);x.moveTo(X+h*0.03,Y-h*0.08);x.lineTo(X+h*0.07,Y-h*0.12);x.stroke();}
-    for(let k=0;k<60;k++){x.fillStyle=cols[k%6];x.beginPath();x.arc(R()*w,h*(0.92+R()*0.07),7+R()*6,0,7);x.fill();}
-    x.fillStyle='#ffeb3b';for(let k=0;k<6;k++){const X=w*(0.45+R()*0.5),Y=h*(0.35+R()*0.1);x.beginPath();x.moveTo(X,Y);x.lineTo(X+30,Y-15);x.lineTo(X+30,Y+15);x.fill();x.beginPath();x.moveTo(X,Y);x.lineTo(X-30,Y-15);x.lineTo(X-30,Y+15);x.fill();}});
-   const put=(tex,W,H,x,y,z,ry)=>{const m=new THREE.Mesh(new THREE.PlaneGeometry(W,H),S({map:tex,roughness:0.85}));m.position.set(x,y,z);m.rotation.y=ry;m.receiveShadow=true;g.add(m);};
-   put(mural(7,9,0.85),8.6,0.85,44.96,0.58,52.8,-Math.PI/2);   // 다목적강당 west facade (x 45.0), brick band below the windows, n -57.1..-48.5 (clear of the outdoor stair)
-   put(mural(13,6,0.85),5.6,0.85,-43.76,0.58,33.3,Math.PI/2);  // 정보화동 east facade (x -43.8), brick band below the windows, n -36.1..-30.5
+  // exterior murals per school photos (refs/album3): 다목적강당 = yellow graphic wall 'SEOUL GADONG ELEMENTARY SCHOOL' (mural_gym_2, newest repaint),
+  // 정보화동 = low tile-mosaic band of children's drawing tiles behind a black fence (mural_info_1/2)
+  {const gymTex=cv(2048,768,(x,w,h)=>{x.fillStyle='#f6cf3c';x.fillRect(0,0,w,h);
+     x.fillStyle='#f9dd6a';x.fillRect(0,h*0.84,w,h*0.16);
+     const P=[['#8e6bd1',0.62,0.22,0.06],['#ef7fae',0.7,0.55,0.07],['#4fa3e0',0.86,0.3,0.05],['#ffffff',0.9,0.62,0.04],['#8e6bd1',0.44,0.7,0.05]];
+     for(const[c,cx,cy,r]of P){x.fillStyle=c;x.beginPath();x.moveTo(w*cx,h*(cy-r*2.6));x.lineTo(w*(cx+r),h*cy);x.lineTo(w*cx,h*(cy+r*2.6));x.lineTo(w*(cx-r),h*cy);x.fill();}
+     x.fillStyle='#ffffff';for(let k=0;k<6;k++){const X=w*0.3+k*58,Y=h*0.42;x.beginPath();x.moveTo(X,Y-40);x.lineTo(X+30,Y);x.lineTo(X,Y+40);x.lineTo(X+16,Y+40);x.lineTo(X+46,Y);x.lineTo(X+16,Y-40);x.fill();}
+     x.fillStyle='#2f6fc4';x.beginPath();x.arc(w*0.12,h*0.36,h*0.2,Math.PI,0);x.fill();x.fillStyle='#f6cf3c';x.beginPath();x.arc(w*0.12,h*0.36,h*0.2,0,Math.PI);x.fill();x.strokeStyle='#ffffff';x.lineWidth=14;x.beginPath();x.arc(w*0.12,h*0.36,h*0.21,0,7);x.stroke();
+     x.fillStyle='#1f3d6b';x.textAlign='center';x.font='bold 120px NanumGothic, sans-serif';x.fillText('서울가동초등학교',w*0.56,h*0.86);x.font='bold 64px sans-serif';x.fillText('SEOUL GADONG ELEMENTARY SCHOOL',w*0.56,h*0.96);
+     x.fillStyle='#3c3f44';x.fillRect(w*0.86,h*0.42,w*0.1,h*0.42);x.fillStyle='#6f8fa8';x.fillRect(w*0.868,h*0.45,w*0.084,h*0.24);});
+   const mos=cv(2048,256,(x,w,h)=>{const base=['#d9d4c8','#c9cfd2','#e2ddd0','#b9c4c9','#d2c7b4','#c4ccc0'],acc=['#e0743a','#c9473a','#3f8fa0','#6aa57a','#4b6fa8','#e3b844','#8a5ab0','#4a9e8e','#d98b8b'];const T=32;
+     x.fillStyle='#9a9a94';x.fillRect(0,0,w,h);for(let i=0;i<w/T;i++)for(let j=0;j<h/T;j++){const r=Math.sin(i*12.9898+j*78.233)*43758.5453;const f=r-Math.floor(r);const patch=Math.sin(Math.floor(i/5)*3.1+Math.floor(j/3)*1.7)>0.8;
+      x.fillStyle=patch?acc[Math.floor(f*acc.length)]:base[Math.floor(f*base.length)];x.fillRect(i*T+2,j*T+2,T-4,T-4);
+      if(f>0.45){x.strokeStyle=acc[Math.floor(f*97)%acc.length];x.lineWidth=2;x.beginPath();x.arc(i*T+T/2,j*T+T/2,4+f*8,0,5);x.stroke();}}});
+   const put=(tex,W,H,x,y,z,ry)=>{const m=new THREE.Mesh(new THREE.PlaneGeometry(W,H),S({map:tex,roughness:0.85}));m.position.set(x,y,z);m.rotation.y=ry;m.receiveShadow=true;g.add(m);return m;};
+   put(gymTex,8.6,3.2,44.96,1.7,52.8,-Math.PI/2);   // 다목적강당 west 1F wall (playground side), n -57.1..-48.5, full storey height as in the photo
+   const mt=mos;mt.wrapS=THREE.RepeatWrapping;mt.repeat.set(1,1);
+   const fb=S({color:0x222426,metalness:0.4,roughness:0.5});
+   for(const[n0,n1]of[[-36.1,-30.6],[-28.2,-20.5]]){const L=n1-n0,c=(n0+n1)/2;const t=mos.clone();t.needsUpdate=true;t.wrapS=THREE.RepeatWrapping;t.repeat.set(L/10.6,1);put(t,L,1.15,-43.76,0.7,-c,Math.PI/2);   // 정보화동 east base mosaic band (door at n≈-29 left clear)
+    for(let n=n0;n<=n1+0.01;n+=L/Math.ceil(L/2.6)){const p=new THREE.Mesh(new THREE.BoxGeometry(0.05,1.25,0.05),fb);p.position.set(-43.0,0.62,-n);g.add(p);}
+    for(const y of[0.15,1.2]){const r=new THREE.Mesh(new THREE.BoxGeometry(0.04,0.04,L),fb);r.position.set(-43.0,y,-c);g.add(r);}
+    WALLS.site=WALLS.site||{e:0,s:[],r:[]};WALLS.site.r.push([-43.05,n0,-42.95,n1]);}
   }
-  // playground (놀이터) + benches: west of the track, south of 정보화동 (x -60..-44, n -74..-48)
+  // playground (놀이터) per photos playground_1/2 + mural_info_1: sand ground with painted multicolour kerb, red/blue climbing dome, blue slide on white frame,
+  // white bar jungle-gym, two white climbing arches, long flat wooden benches under trees. Placed west of the track, south of 정보화동 (x -60..-45, n -74..-49).
   {const P0=-60,P1=-45,N0=-74,N1=-49;WALLS.site=WALLS.site||{e:0,s:[],r:[]};const col=(x0,n0,x1,n1)=>WALLS.site.r.push([x0,n0,x1,n1]);
-   const rub=S({map:rep(cv(256,256,(x,w,h)=>{x.fillStyle='#3f8f5a';x.fillRect(0,0,w,h);for(let i=0;i<3000;i++){x.fillStyle=`rgba(${Math.random()<.5?20:120},${Math.random()<.5?60:160},${Math.random()<.5?40:90},0.25)`;x.fillRect(Math.random()*w,Math.random()*h,2,2);}}),6,8),roughness:0.95});
-   const fl=new THREE.Mesh(new THREE.PlaneGeometry(P1-P0,N1-N0),rub);fl.rotation.x=-Math.PI/2;fl.position.set((P0+P1)/2,0.02,-(N0+N1)/2);fl.receiveShadow=true;g.add(fl);
-   const edge=S({color:0xc9c3b6,roughness:0.8});for(const[x0,x1,n0,n1]of[[P0,P1,N0-0.15,N0],[P0,P1,N1,N1+0.15],[P0-0.15,P0,N0,N1],[P1,P1+0.15,N0,N1]]){const b=new THREE.Mesh(new THREE.BoxGeometry(x1-x0,0.15,n1-n0),edge);b.position.set((x0+x1)/2,0.075,-(n0+n1)/2);g.add(b);}
+   const kc=[0xe53935,0x1e88e5,0xfdd835,0x43a047];let ki=0;const kerb=(x0,x1,n0,n1)=>{const L=Math.max(x1-x0,n1-n0),N=Math.round(L/0.8);for(let i=0;i<N;i++){const t0=i/N,t1=(i+1)/N;const b=new THREE.Mesh(new THREE.BoxGeometry(x1-x0>n1-n0?(x1-x0)/N:0.18,0.2,x1-x0>n1-n0?0.18:(n1-n0)/N),S({color:kc[ki++%4],roughness:0.6}));b.position.set(x1-x0>n1-n0?x0+(t0+t1)/2*(x1-x0):(x0+x1)/2,0.1,-(x1-x0>n1-n0?(n0+n1)/2:n0+(t0+t1)/2*(n1-n0)));g.add(b);}};
+   kerb(P0,P1,N0,N0+0.18);kerb(P0,P1,N1-0.18,N1);kerb(P0,P0+0.18,N0,N1);kerb(P1-0.18,P1,N0,-63);kerb(P1-0.18,P1,-59,N1);
    const B=(m,x0,x1,y0,y1,n0,n1)=>{const b=new THREE.Mesh(new THREE.BoxGeometry(x1-x0,y1-y0,n1-n0),m);b.position.set((x0+x1)/2,(y0+y1)/2,-(n0+n1)/2);b.castShadow=b.receiveShadow=true;g.add(b);return b;};
-   const red=S({color:0xe53935,roughness:0.5}),yel=S({color:0xfdd835,roughness:0.5}),blu=S({color:0x1e88e5,roughness:0.5}),stl=S({color:0xb0b5ba,metalness:0.6,roughness:0.35}),wood=S({color:0xa1724a,roughness:0.7});
-   // combination climbing frame: tower + roof + slide
-   const tx0=-56,tn0=-62;for(const[a,b_]of[[0,0],[2.4,0],[0,2.4],[2.4,2.4]])B(blu,tx0+a-0.06,tx0+a+0.06,0,3.2,tn0+b_-0.06,tn0+b_+0.06);B(yel,tx0,tx0+2.4,1.4,1.5,tn0,tn0+2.4);
-   const roof=new THREE.Mesh(new THREE.ConeGeometry(1.9,1.1,4),red);roof.rotation.y=Math.PI/4;roof.position.set(tx0+1.2,3.75,-(tn0+1.2));g.add(roof);
-   for(const s_ of[0,2.4])B(red,tx0+0.1,tx0+2.3,1.5,2.3,tn0+s_-0.03,tn0+s_+0.03);
-   const sl=new THREE.Mesh(new THREE.BoxGeometry(0.7,0.06,3.4),yel);sl.position.set(tx0+3.95,0.8,-(tn0+1.2));sl.rotation.z=0;sl.rotation.x=0;sl.rotation.order='ZYX';sl.rotation.set(0,Math.PI/2,0);const sg=new THREE.Group();sg.add(sl);sl.position.set(0,0,0);sg.position.set(tx0+3.9,0.8,-(tn0+1.2));sg.rotation.z=-0.42;g.add(sg);
-   for(let k=0;k<5;k++)B(stl,tx0-0.6,tx0-0.05,0.25+k*0.28,0.29+k*0.28,tn0+0.8,tn0+1.6);
-   col(tx0-0.7,tn0-0.1,tx0+2.5,tn0+2.5);col(tx0+2.5,tn0+0.8,tx0+5.5,tn0+1.6);
-   // swings (3 seats)
-   const sx0=-58.5,sn=-69.5;for(const dx of[0,5.4]){for(const dn of[-0.9,0.9]){const l=new THREE.Mesh(new THREE.CylinderGeometry(0.06,0.06,2.75,8),stl);l.position.set(sx0+dx+(dx?-0.25:0.25),1.3,-(sn+dn));l.rotation.z=dx?-0.18:0.18;g.add(l);}}
-   B(stl,sx0-0.05,sx0+5.45,2.5,2.6,sn-0.05,sn+0.05);for(let k=0;k<3;k++){const x=sx0+1.0+k*1.7;B(red,x-0.25,x+0.25,0.45,0.5,sn-0.1,sn+0.1);for(const d of[-0.22,0.22])B(stl,x+d-0.01,x+d+0.01,0.5,2.5,sn-0.01,sn+0.01);}col(sx0-0.3,sn-1.0,sx0+5.7,sn+1.0);
-   // see-saw + spring riders
-   B(stl,-49.3,-48.7,0,0.45,-57.2,-56.8);B(yel,-51.0,-47.0,0.45,0.52,-57.15,-56.85);for(const x of[-50.7,-47.3])B(red,x-0.05,x+0.05,0.52,0.8,-57.2,-56.8);col(-51.1,-57.3,-46.9,-56.7);
-   for(const[x,n,m]of[[-48.5,-66,blu],[-48.5,-62,red]]){B(stl,x-0.06,x+0.06,0,0.45,n-0.06,n+0.06);B(m,x-0.35,x+0.35,0.45,0.85,n-0.18,n+0.18);col(x-0.4,n-0.3,x+0.4,n+0.3);}
-   // benches along the playground edge facing the track (east side) and along the north edge
-   const bench=(x,n,ry)=>{const bg=new THREE.Group();const p=(m,w,h,d,px,py,pz)=>{const b=new THREE.Mesh(new THREE.BoxGeometry(w,h,d),m);b.position.set(px,py,pz);b.castShadow=true;bg.add(b);};
-    for(const dz of[-0.75,0.75]){p(stl,0.45,0.42,0.06,0,0.21,dz);}for(let k=0;k<3;k++)p(wood,0.12,0.04,1.8,-0.15+k*0.15,0.44,0);for(let k=0;k<2;k++)p(wood,0.04,0.12,1.8,-0.24,0.62+k*0.16,0);
-    bg.position.set(x,0,-n);bg.rotation.y=ry;g.add(bg);};
-   const BN=[];for(const n of[-72,-68,-64,-60,-56,-52])BN.push([-43.6,n,0]);for(const x of[-58,-54,-50])BN.push([x,-47.6,-Math.PI/2]);
-   BN.forEach(([x,n,ry])=>{bench(x,n,ry);col(...(Math.abs(Math.sin(ry))>0.5?[x-0.95,n-0.3,x+0.95,n+0.3]:[x-0.3,n-0.95,x+0.3,n+0.95]));});
+   const tube=(m,a,b_,r=0.035)=>{const d=new THREE.Mesh(new THREE.CylinderGeometry(r,r,a.distanceTo(b_),6),m);d.position.copy(a).add(b_).multiplyScalar(0.5);d.quaternion.setFromUnitVectors(new THREE.Vector3(0,1,0),b_.clone().sub(a).normalize());d.castShadow=true;g.add(d);};
+   const V3=(x,y,n)=>new THREE.Vector3(x,y,-n);const red=S({color:0xd8302f,roughness:0.5}),blue=S({color:0x2a64c8,roughness:0.5}),wht=S({color:0xf1f2f0,metalness:0.3,roughness:0.4}),wood=S({color:0x9a6b43,roughness:0.75});
+   // climbing dome (red arcs + blue rope rings)
+   {const cx=-56,cn=-53.5,R=2.3;for(let k=0;k<6;k++){const a=k*Math.PI/6;const pts=[];for(let i=0;i<=16;i++){const t=Math.PI*i/16;pts.push(V3(cx+R*Math.cos(t)*Math.cos(a),R*Math.sin(t),cn+R*Math.cos(t)*Math.sin(a)));}g.add(new THREE.Mesh(new THREE.TubeGeometry(new THREE.CatmullRomCurve3(pts),32,0.05,6),red));}
+    for(const y of[0.6,1.2,1.8]){const r=Math.sqrt(R*R-y*y);const m=new THREE.Mesh(new THREE.TorusGeometry(r,0.025,6,40),blue);m.rotation.x=Math.PI/2;m.position.set(cx,y,-cn);g.add(m);}col(cx-R,cn-R,cx+R,cn+R);}
+   // slide: white frame tower + blue chute + ladder
+   {const x0=-55,n0=-62.5;for(const[a,b_]of[[0,0],[1.2,0],[0,1.2],[1.2,1.2]])tube(wht,V3(x0+a,0,n0+b_),V3(x0+a,2.4,n0+b_),0.05);B(wht,x0,x0+1.2,1.5,1.56,n0,n0+1.2);
+    for(const b_ of[0,1.2])tube(wht,V3(x0,2.3,n0+b_),V3(x0+1.2,2.3,n0+b_));const ch=new THREE.Mesh(new THREE.BoxGeometry(3.4,0.05,0.62),blue);ch.position.set(x0+1.2+1.55,0.82,-(n0+0.6));ch.rotation.z=-0.43;ch.castShadow=true;g.add(ch);
+    for(const s_ of[-0.33,0.33]){const sd=new THREE.Mesh(new THREE.BoxGeometry(3.4,0.2,0.04),blue);sd.position.set(x0+1.2+1.55,0.9,-(n0+0.6+s_));sd.rotation.z=-0.43;g.add(sd);}
+    for(const s_ of[0.2,1.0])tube(wht,V3(x0-0.9,0,n0+s_),V3(x0,1.56,n0+s_),0.03);for(let k=1;k<6;k++){const t=k/6;tube(wht,V3(x0-0.9+0.9*t,1.56*t,n0+0.2),V3(x0-0.9+0.9*t,1.56*t,n0+1.0),0.02);}
+    col(x0-0.95,n0,x0+4.3,n0+1.25);}
+   // white bar jungle gym (3 x 1.5 x 1.8 grid) and two climbing arches
+   {const x0=-59,n0=-71.5;for(let i=0;i<=4;i++)for(let j=0;j<=2;j++)tube(wht,V3(x0+i*0.75,0,n0+j*0.75),V3(x0+i*0.75,1.8,n0+j*0.75),0.025);
+    for(const y of[0.6,1.2,1.8]){for(let j=0;j<=2;j++)tube(wht,V3(x0,y,n0+j*0.75),V3(x0+3,y,n0+j*0.75),0.02);for(let i=0;i<=4;i++)tube(wht,V3(x0+i*0.75,y,n0),V3(x0+i*0.75,y,n0+1.5),0.02);}col(x0,n0,x0+3,n0+1.5);
+    for(const xa of[-53.5,-51.5]){const pts=[];for(let i=0;i<=12;i++){const t=Math.PI*i/12;pts.push(V3(xa+0.7*Math.cos(t),1.3*Math.sin(t),-70));}for(const dn of[-0.3,0.3]){const q=pts.map(p=>p.clone().add(new THREE.Vector3(0,0,-dn)));g.add(new THREE.Mesh(new THREE.TubeGeometry(new THREE.CatmullRomCurve3(q),24,0.03,6),wht));}
+     for(let i=1;i<12;i+=2){const t=Math.PI*i/12;tube(wht,V3(xa+0.7*Math.cos(t),1.3*Math.sin(t),-70.3),V3(xa+0.7*Math.cos(t),1.3*Math.sin(t),-69.7),0.02);}col(xa-0.75,-70.35,xa+0.75,-69.65);}}
+   // long flat wooden benches (no back) under trees along the east and north edges
+   const bench=(x,n,alongN)=>{const L=2.4;for(let k=0;k<3;k++){const o=-0.12+k*0.12;alongN?B(wood,x+o-0.05,x+o+0.05,0.42,0.46,n-L/2,n+L/2):B(wood,x-L/2,x+L/2,0.42,0.46,n+o-0.05,n+o+0.05);}
+     for(const d of[-L/2+0.25,L/2-0.25])alongN?B(S({color:0x7d7f82}),x-0.17,x+0.17,0,0.42,n+d-0.04,n+d+0.04):B(S({color:0x7d7f82}),x+d-0.04,x+d+0.04,0,0.42,n-0.17,n+0.17);
+     alongN?col(x-0.2,n-L/2,x+0.2,n+L/2):col(x-L/2,n-0.2,x+L/2,n+0.2);};
+   for(const n of[-71,-67,-57,-53])bench(-46.2,n,true);for(const x of[-57.5,-53,-48.5])bench(x,-49.9,false);
+   const trunk=S({color:0x6a4b33,roughness:0.9}),lv=[S({color:0xb5402a,roughness:0.9}),S({color:0x5f8f3e,roughness:0.9}),S({color:0xd99a2b,roughness:0.9})];
+   for(const[x,n,k]of[[-46.5,-69,0],[-46.5,-55,1],[-55,-49.2,2],[-50.8,-49.2,1],[-60.5,-60,0]]){const t=new THREE.Mesh(new THREE.CylinderGeometry(0.14,0.2,2.6,8),trunk);t.position.set(x,1.3,-n);t.castShadow=true;g.add(t);const c=new THREE.Mesh(new THREE.SphereGeometry(1.9,12,10),lv[k]);c.position.set(x,3.6,-n);c.scale.y=0.8;c.castShadow=true;g.add(c);col(x-0.25,n-0.25,x+0.25,n+0.25);}
   }
   const tx=text('가동문화관',7.5,1.1,{fg:'#ffffff',font:'bold 130px NanumGothic, sans-serif'});tx.rotation.y=-Math.PI/2;tx.position.set(44.85,8.6,30.5);g.add(tx);
   const lg=new THREE.Mesh(new THREE.CircleGeometry(0.8,40),S({map:logoTex()}));lg.rotation.y=-Math.PI/2;lg.position.set(44.85,8.6,25.9);g.add(lg);
