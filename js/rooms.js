@@ -142,4 +142,45 @@ export function buildRooms(chunks,WALLS,logoTex,man){
   const tx=text('가동문화관',7.5,1.1,{fg:'#ffffff',font:'bold 130px NanumGothic, sans-serif'});tx.rotation.y=-Math.PI/2;tx.position.set(44.85,8.6,30.5);g.add(tx);
   const lg=new THREE.Mesh(new THREE.CircleGeometry(0.8,40),S({map:logoTex()}));lg.rotation.y=-Math.PI/2;lg.position.set(44.85,8.6,25.9);g.add(lg);
   site.group.add(g);}
+
+ // 11) special-room furniture (P1-5): 컴퓨터실1/2, 음악실, 보건실, 인쇄실, 상담실, 실과실, 조정실. Extents from wall ray-casts; 1 m kept clear along walls for doors.
+ {const blk=S({color:0x23262b,roughness:0.5}),scr=S({color:0x2a3b52,emissive:0x1b2a40,emissiveIntensity:0.5,roughness:0.3}),grayT=S({color:0xd7dadd,roughness:0.5}),
+  wd=S({color:0xc9a173,roughness:0.6}),bseat=S({color:0x3e6fb0,roughness:0.6}),gseat=S({color:0x6aa84f,roughness:0.6}),sheet=S({color:0xf2f6fa,roughness:0.9}),curtain=S({color:0xbfe3e0,roughness:0.9,side:THREE.DoubleSide}),
+  copier=S({color:0xe8e8e4,roughness:0.5}),paper=S({color:0xffffff,roughness:0.9}),sofa=S({color:0x8a6a4f,roughness:0.85}),stool=S({color:0xd9822b,roughness:0.6}),steel=S({color:0xb8bcc0,metalness:0.6,roughness:0.35});
+  const pcRoom=(ck,x0,n0,x1,n1)=>add(ck,(R)=>{const at=[],mon=[],ch=[];for(let n=n0+2.4;n<n1-1.0;n+=1.7){R.rects.push([x0+1.1,n-0.3,x1-1.1,n+0.3]);for(let x=x0+1.5;x<x1-1.3;x+=0.9){at.push([x,n]);mon.push([x,n]);ch.push([x,n-0.65,0]);}}
+   R.inst([[0.85,0.03,0.6,0,0.72,0,grayT],[0.85,0.7,0.03,0,0.36,0.28,grayT]],at);R.inst([[0.5,0.32,0.03,0,1.0,0.12,scr],[0.52,0.34,0.02,0,1.0,0.14,blk],[0.08,0.24,0.08,0,0.8,0.16,blk],[0.42,0.02,0.15,0,0.745,-0.1,blk]],mon);R.inst(chairParts(bseat,metal),ch);
+   const cx=(x0+x1)/2;R.box(grayT,cx-1.0,cx+1.0,n0+0.7,n0+1.3,0.72,0.76);R.box(blk,cx-0.3,cx+0.3,n0+0.9,n0+0.95,0.8,1.15);R.rects.push([cx-1.0,n0+0.7,cx+1.0,n0+1.3]);R.wallp(S({color:0xf7f7f7,roughness:0.4}),'x',cx-2.2,cx+2.2,n0+0.06,0.95,2.15,1);});
+  pcRoom('info_3F',-54.5,-41.9,-43.8,-28.2);pcRoom('info_3F',-54.5,-28.05,-43.8,-14.9);
+  // 음악실: upright piano, drum, xylophone tables, chairs in arcs, staff-lined board
+  add('main_3F',(R)=>{const x0=52.2,n0=-4.35,x1=59.65,n1=4.75;R.box(blk,x0+1.0,x0+2.5,n0+0.4,n0+1.0,0,1.25);R.box(S({color:0xf5f5f0}),x0+1.05,x0+2.45,n0+1.0,n0+1.2,0.72,0.76);R.rects.push([x0+1.0,n0+0.4,x0+2.5,n0+1.2]);
+   const st=cv(512,160,(x,w,h)=>{x.fillStyle='#f8f8f6';x.fillRect(0,0,w,h);x.strokeStyle='#333';x.lineWidth=2;for(let k=0;k<5;k++){const y=40+k*16;x.beginPath();x.moveTo(10,y);x.lineTo(w-10,y);x.stroke();}x.fillStyle='#222';x.font='bold 90px serif';x.fillText('𝄞',14,118);});
+   R.wallp(S({map:st,roughness:0.4}),'x',x0+3.2,x1-1.0,n0+0.06,1.0,2.1,1);
+   R.box(S({color:0xc0392b,roughness:0.4}),x1-1.6,x1-0.9,n0+0.5,n0+1.2,0,0.55);R.rects.push([x1-1.6,n0+0.5,x1-0.9,n0+1.2]);
+   const ch=[];for(let row=0;row<4;row++){const n=n0+2.8+row*1.3;for(let x=x0+1.3;x<x1-1.0;x+=0.75)ch.push([x,n,Math.PI]);}R.inst(chairParts(gseat,metal),ch);
+   for(const x of[x0+0.6,x1-0.6])R.box(blk,x-0.3,x+0.3,n1-0.5,n1-0.2,0,1.0);
+   const xy=S({map:cv(256,64,(x,w,h)=>{for(let i=0;i<16;i++){x.fillStyle=i%2?'#d9a066':'#c08040';x.fillRect(i*16,8,14,h-16);}})});R.box(xy,x0+3.5,x0+5.0,n0+1.4,n0+1.8,0.7,0.76);R.box(metal,x0+3.6,x0+4.9,n0+1.55,n0+1.65,0,0.7);R.rects.push([x0+3.5,n0+1.4,x0+5.0,n0+1.8]);});
+  // 상담실: sofa set + low table + bookshelf, plant
+  add('main_3F',(R)=>{const x0=52.4,n0=14.05,x1=59.65,n1=20.25,cx=(x0+x1)/2,cn=(n0+n1)/2;R.box(sofa,cx-1.2,cx+1.2,cn-1.3,cn-0.6,0,0.45);R.box(sofa,cx-1.2,cx+1.2,cn-1.35,cn-1.15,0.45,0.85);
+   R.box(sofa,cx-1.2,cx+1.2,cn+0.6,cn+1.3,0,0.45);R.box(sofa,cx-1.2,cx+1.2,cn+1.15,cn+1.35,0.45,0.85);R.box(wd,cx-0.7,cx+0.7,cn-0.35,cn+0.35,0.38,0.42);R.rects.push([cx-1.2,cn-1.35,cx+1.2,cn+1.35]);
+   R.box(wd,x1-1.4,x1-0.2,n1-0.45,n1-0.15,0,1.8);R.rects.push([x1-1.4,n1-0.45,x1-0.2,n1-0.15]);R.box(S({color:0x3f7d3a}),x0+0.4,x0+0.9,n1-0.9,n1-0.4,0.3,1.2);R.box(S({color:0x8d6e63}),x0+0.45,x0+0.85,n1-0.85,n1-0.45,0,0.35);});
+  // 보건실: 3 beds with curtains, desk, medicine cabinet, scale
+  add('main_1F',(R)=>{const x0=11.5,n0=13.1,x1=20.2,n1=20.35;const beds=[];for(let k=0;k<3;k++){const x=x0+1.4+k*2.2;R.box(steel,x-0.48,x+0.48,n1-2.25,n1-0.25,0,0.5);R.box(sheet,x-0.46,x+0.46,n1-2.2,n1-0.3,0.5,0.62);R.box(paper,x-0.35,x+0.35,n1-0.75,n1-0.35,0.62,0.72);R.rects.push([x-0.5,n1-2.25,x+0.5,n1-0.25]);
+    R.wallp(curtain,'z',n1-2.4,n1-0.1,x+0.75,0.3,2.2,1);R.box(steel,x+0.73,x+0.77,n1-2.4,n1-0.1,2.2,2.23);}
+   R.box(wd,x1-2.0,x1-0.4,n0+1.0,n0+1.7,0.72,0.76);R.box(wd,x1-2.0,x1-1.95,n0+1.0,n0+1.7,0,0.72);R.box(wd,x1-0.45,x1-0.4,n0+1.0,n0+1.7,0,0.72);R.rects.push([x1-2.0,n0+1.0,x1-0.4,n0+1.7]);
+   R.box(S({color:0xf0f0f0,roughness:0.3}),x0+0.3,x0+1.5,n0+0.3,n0+0.75,0,1.9);R.box(S({color:0x9fc8e8,roughness:0.1,transparent:true,opacity:0.5}),x0+0.3,x0+1.5,n0+0.74,n0+0.76,0.9,1.85);R.rects.push([x0+0.3,n0+0.3,x0+1.5,n0+0.75]);
+   R.box(steel,x0+2.2,x0+2.6,n0+0.4,n0+0.8,0,0.08);R.box(steel,x0+2.38,x0+2.42,n0+0.75,n0+0.8,0.08,1.1);
+   const cr=S({map:cv(128,128,(x,w,h)=>{x.fillStyle='#fff';x.fillRect(0,0,w,h);x.fillStyle='#d32f2f';x.fillRect(48,20,32,88);x.fillRect(20,48,88,32);})});R.wallp(cr,'x',x0+3.0,x0+3.6,n0+0.06,1.6,2.2,1);});
+  // 인쇄실: 2 copiers, paper shelf, work table
+  add('main_1F',(R)=>{const x0=-13.35,n0=20.5,x1=-9.05,n1=28.65;for(const n of[n0+1.3,n0+2.8]){R.box(copier,x0+0.3,x0+1.0,n-0.55,n+0.55,0,1.05);R.box(S({color:0x55606a}),x0+0.35,x0+0.95,n-0.5,n+0.5,1.05,1.12);R.box(S({color:0x6fa8dc,emissive:0x203040}),x0+0.9,x0+1.0,n-0.15,n+0.15,1.0,1.06);R.rects.push([x0+0.3,n-0.55,x0+1.0,n+0.55]);}
+   R.box(steel,x1-0.65,x1-0.2,n1-3.0,n1-0.5,0,1.9);for(let y=0.1;y<1.8;y+=0.45)R.box(paper,x1-0.62,x1-0.23,n1-2.9,n1-0.6,y,y+0.25);R.rects.push([x1-0.65,n1-3.0,x1-0.2,n1-0.5]);
+   R.box(wd,x0+1.8,x0+3.0,n1-3.0,n1-1.4,0.85,0.9);R.box(metal,x0+1.85,x0+2.95,n1-2.95,n1-1.45,0,0.85);R.rects.push([x0+1.8,n1-3.0,x0+3.0,n1-1.4]);});
+  // 실과실: 4 work tables with stools, sink counter
+  add('main_1F',(R)=>{const x0=52.15,n0=-4.35,x1=59.65,n1=4.75;const st_=[];for(const x of[x0+2.4,x1-2.4])for(const n of[n0+2.6,n1-2.8]){R.box(wd,x-0.7,x+0.7,n-1.0,n+1.0,0.78,0.84);R.box(S({color:0x9e7b55}),x-0.65,x+0.65,n-0.95,n+0.95,0,0.78);R.rects.push([x-0.7,n-1.0,x+0.7,n+1.0]);for(const dn of[-0.6,0,0.6])st_.push([x-1.0,n+dn],[x+1.0,n+dn]);}
+   R.inst([[0.32,0.04,0.32,0,0.6,0,stool],[0.04,0.58,0.04,0,0.29,0,metal]],st_);
+   R.box(steel,x1-0.7,x1-0.1,n0+0.4,n0+3.4,0,0.88);R.box(S({color:0x9aa0a6,metalness:0.7,roughness:0.2}),x1-0.6,x1-0.2,n0+0.8,n0+1.4,0.86,0.89);R.box(S({color:0x9aa0a6,metalness:0.7,roughness:0.2}),x1-0.6,x1-0.2,n0+2.2,n0+2.8,0.86,0.89);R.rects.push([x1-0.7,n0+0.4,x1-0.1,n0+3.4]);});
+  // 조정실 (장미홀 control booth): console desk + monitors + rack
+  add('info_1F',(R)=>{const cx=-46.39,n=-20.3;R.box(blk,cx-1.2,cx+1.2,n-0.3,n+0.3,0,0.78);R.box(S({color:0x30343a}),cx-1.2,cx+1.2,n-0.3,n+0.3,0.78,0.82);R.rects.push([cx-1.2,n-0.3,cx+1.2,n+0.3]);
+   R.inst([[0.5,0.32,0.03,0,1.05,0,scr],[0.52,0.34,0.02,0,1.05,-0.015,blk]],[[cx-0.6,n-0.15],[cx+0.6,n-0.15]]);{const fd=S({color:0xcfd8dc,roughness:0.5}),fr=S({color:0xd84315,roughness:0.5});let k=0;for(let x=cx-0.9;x<cx+1.0;x+=0.08,k++)R.box(k%6?fd:fr,x,x+0.03,n+0.05,n+0.15,0.82,0.85);}
+   R.box(blk,cx+1.4,cx+1.95,n-0.3,n+0.3,0,1.6);R.rects.push([cx+1.4,n-0.3,cx+1.95,n+0.3]);});
+ }
 }
