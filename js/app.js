@@ -8,9 +8,9 @@ import {GTAOPass} from 'three/addons/postprocessing/GTAOPass.js';
 import {OutputPass} from 'three/addons/postprocessing/OutputPass.js';
 import {RoomEnvironment} from 'three/addons/environments/RoomEnvironment.js';
 import {mergeGeometries} from 'three/addons/utils/BufferGeometryUtils.js';
-import {buildRooms} from './rooms.js?v=202610220429';
-import * as T from './tex.js?v=202610220429';
-import {buildInstanced} from './furn.js?v=202610220429';
+import {buildRooms} from './rooms.js?v=202610220435';
+import * as T from './tex.js?v=202610220435';
+import {buildInstanced} from './furn.js?v=202610220435';
 const Q=new URLSearchParams(location.search);const SHOT=Q.has('shot');
 const MOBILE=matchMedia('(pointer:coarse)').matches||innerWidth<760;
 await document.fonts.load('bold 40px NanumGothic').catch(()=>{});
@@ -99,14 +99,16 @@ function surfaceAt(x,n,feet){let best=-1e9;const cand=[];
  if(!STAIRS.some(st=>st.floor==='B1'&&inR({x0:st.core[0],n0:st.core[1],x1:st.core[2],n1:st.core[3]},x,n)))cand.push(0);for(const y of cand)if(y<=feet+0.45&&y>best)best=y;return best===-1e9?feet:best;}
 window.__surface=(x,n,f)=>surfaceAt(x,n,f);
 const railMat=new THREE.MeshStandardMaterial({color:0x8a9aa6,metalness:0.4,roughness:0.5,transparent:true,opacity:0.85});
+const NOSE_M=new THREE.MeshStandardMaterial({color:0x3a3d42,roughness:0.6}),STR_M=new THREE.MeshStandardMaterial({color:0xd9d6cf,roughness:0.7}),HR_M=new THREE.MeshStandardMaterial({color:0x8a5a32,roughness:0.45});
 function buildStairs(){const byChunk={};for(const st of STAIRS){const k=st.bld+'_'+st.floor;(byChunk[k]=byChunk[k]||[]).push(st);}
- for(const k in byChunk){const c=chunks[k];if(!c)continue;const mats=[],rails=[];
+ for(const k in byChunk){const c=chunks[k];if(!c)continue;const mats=[],rails=[],nos=[],strs=[],hrs=[];
   for(const st of byChunk[k])for(const f of st.flights){if(f.kind==='landing'){const m=new THREE.Matrix4().compose(new THREE.Vector3((f.x0+f.x1)/2,f.y0-0.1,-(f.n0+f.n1)/2),new THREE.Quaternion(),new THREE.Vector3(f.x1-f.x0,0.2,f.n1-f.n0));mats.push(m);continue;}
    const run=st.run==='x'?f.x1-f.x0:f.n1-f.n0;const N=Math.max(4,Math.round((f.y1-f.y0)/0.16));const tw=run/N;
    for(let i=0;i<N;i++){const top=f.y0+(i+1)*(f.y1-f.y0)/N;const h=Math.max(0.16,top-f.y0+0.05);// step i from start end
     const s0=f.start==='hi'?(st.run==='x'?f.x1:f.n1)-(i+1)*tw:(st.run==='x'?f.x0:f.n0)+i*tw;const cx=st.run==='x'?s0+tw/2:(f.x0+f.x1)/2,cn=st.run==='x'?(f.n0+f.n1)/2:s0+tw/2;
     const sx=st.run==='x'?tw:f.x1-f.x0,sn=st.run==='x'?f.n1-f.n0:tw;const hh=Math.min(h,0.6);
     mats.push(new THREE.Matrix4().compose(new THREE.Vector3(cx,top-hh/2,-cn),new THREE.Quaternion(),new THREE.Vector3(sx,hh,sn)));
+    {const fe=f.start==='hi'?s0+tw-0.025:s0+0.025;nos.push(new THREE.Matrix4().compose(st.run==='x'?new THREE.Vector3(fe,top-0.012,-cn):new THREE.Vector3(cx,top-0.012,-fe),new THREE.Quaternion(),st.run==='x'?new THREE.Vector3(0.05,0.03,sn+0.002):new THREE.Vector3(sx+0.002,0.03,0.05)));}
     // underside slab
    }
    const ang=Math.atan2(f.y1-f.y0,run);const L=Math.hypot(run,f.y1-f.y0);const mid=[(f.x0+f.x1)/2,(f.y0+f.y1)/2-0.25,(f.n0+f.n1)/2];
@@ -115,11 +117,14 @@ function buildStairs(){const byChunk={};for(const st of STAIRS){const k=st.bld+'
    {const cxC=(st.core[0]+st.core[2])/2,cnC=(st.core[1]+st.core[3])/2;const sides=[];
     if(st.run==='x'){const inn=Math.abs(f.n0-cnC)<Math.abs(f.n1-cnC)?f.n0:f.n1;sides.push(inn);if(st.ext||st.flights.filter(g=>g.kind==='flight').length<2)sides.push(inn===f.n0?f.n1:f.n0);}
     else{const inn=Math.abs(f.x0-cxC)<Math.abs(f.x1-cxC)?f.x0:f.x1;sides.push(inn);if(st.ext||st.flights.filter(g=>g.kind==='flight').length<2)sides.push(inn===f.x0?f.x1:f.x0);}
+    {const yy=(f.y0+f.y1)/2;const ed=st.run==='x'?[f.n0,f.n1]:[f.x0,f.x1];for(const [k_,sv0] of ed.entries()){const sv=sv0+(k_?0.02:-0.02);const P_=st.run==='x'?new THREE.Vector3(mid[0],yy-0.02,-sv):new THREE.Vector3(sv,yy-0.02,-mid[2]);strs.push(new THREE.Matrix4().compose(P_,q,st.run==='x'?new THREE.Vector3(L+0.1,0.34,0.04):new THREE.Vector3(0.04,0.34,L+0.1)));
+     if(!sides.includes(sv0)){const sh=sv0+(k_?-0.07:0.07);const H_=st.run==='x'?new THREE.Vector3(mid[0],yy+0.9,-sh):new THREE.Vector3(sh,yy+0.9,-mid[2]);hrs.push(new THREE.Matrix4().compose(H_,q,st.run==='x'?new THREE.Vector3(L,0.045,0.045):new THREE.Vector3(0.045,0.045,L)));
+      for(const t of[0.15,0.5,0.85]){const B_=st.run==='x'?new THREE.Vector3(f.x0+(f.x1-f.x0)*t,0,-(sh+(k_?0.035:-0.035))):new THREE.Vector3(sh+(k_?0.035:-0.035),0,-(f.n0+(f.n1-f.n0)*t));const tt=st.run==='x'?(f.start==='hi'?1-t:t):(f.start==='hi'?1-t:t);B_.y=f.y0+tt*(f.y1-f.y0)+0.84;hrs.push(new THREE.Matrix4().compose(B_,new THREE.Quaternion(),new THREE.Vector3(0.03,0.08,0.03).set(st.run==='x'?0.03:0.07,0.08,st.run==='x'?0.07:0.03)));}}}}
     for(const sv of sides){const yy=(f.y0+f.y1)/2;const P_=st.run==='x'?new THREE.Vector3(mid[0],yy+0.5,-sv):new THREE.Vector3(sv,yy+0.5,-mid[2]);
      rails.push(new THREE.Matrix4().compose(P_,q,st.run==='x'?new THREE.Vector3(L,0.85,0.03):new THREE.Vector3(0.03,0.85,L)));
      const T_=P_.clone();T_.y+=0.45;rails.push(new THREE.Matrix4().compose(T_,q,st.run==='x'?new THREE.Vector3(L,0.06,0.07):new THREE.Vector3(0.07,0.06,L)));}}
   }
-  const im=new THREE.InstancedMesh(new THREE.BoxGeometry(1,1,1),M.stair,mats.length);mats.forEach((m,i)=>im.setMatrixAt(i,m));im.instanceMatrix.needsUpdate=true;im.computeBoundingSphere();im.castShadow=!MOBILE;im.receiveShadow=true;im.userData.mat='stair';im.userData.isStair=true;c.group.add(im);if(rails.length){const rm=new THREE.InstancedMesh(new THREE.BoxGeometry(1,1,1),railMat,rails.length);rails.forEach((m,i)=>rm.setMatrixAt(i,m));rm.instanceMatrix.needsUpdate=true;rm.computeBoundingSphere();rm.userData.isStair=true;c.group.add(rm);}}
+  const im=new THREE.InstancedMesh(new THREE.BoxGeometry(1,1,1),M.stair,mats.length);mats.forEach((m,i)=>im.setMatrixAt(i,m));im.instanceMatrix.needsUpdate=true;im.computeBoundingSphere();im.castShadow=!MOBILE;im.receiveShadow=true;im.userData.mat='stair';im.userData.isStair=true;c.group.add(im);const addIM=(arr,mat)=>{if(!arr.length)return;const q=new THREE.InstancedMesh(new THREE.BoxGeometry(1,1,1),mat,arr.length);arr.forEach((m,i)=>q.setMatrixAt(i,m));q.instanceMatrix.needsUpdate=true;q.computeBoundingSphere();q.receiveShadow=true;q.userData.isStair=true;c.group.add(q);};addIM(nos,NOSE_M);addIM(strs,STR_M);addIM(hrs,HR_M);if(rails.length){const rm=new THREE.InstancedMesh(new THREE.BoxGeometry(1,1,1),railMat,rails.length);rails.forEach((m,i)=>rm.setMatrixAt(i,m));rm.instanceMatrix.needsUpdate=true;rm.computeBoundingSphere();rm.userData.isStair=true;c.group.add(rm);}}
 }
 let SIGNS=[];const signReady=fetch(V('signs.json')).then(r=>r.json()).then(d=>SIGNS=d).catch(()=>{});
 function buildCorrLights(){for(const f of['1F','2F','3F','4F','5F']){const ch=chunks['main_'+f];if(!ch)continue;const e=(man.chunks.find(c=>c.name==='main_'+f)||{}).elev||0;const ms=[];for(let x=-45;x<=46;x+=3.0){if(Math.abs(x-2.5)<5&&f!=='1F')continue;ms.push(new THREE.Matrix4().compose(new THREE.Vector3(x,e+2.885,-21.8),new THREE.Quaternion(),new THREE.Vector3(1.2,0.03,0.3)));}
