@@ -8,9 +8,9 @@ import {GTAOPass} from 'three/addons/postprocessing/GTAOPass.js';
 import {OutputPass} from 'three/addons/postprocessing/OutputPass.js';
 import {RoomEnvironment} from 'three/addons/environments/RoomEnvironment.js';
 import {mergeGeometries} from 'three/addons/utils/BufferGeometryUtils.js';
-import {buildRooms} from './rooms.js?v=202610220435';
-import * as T from './tex.js?v=202610220435';
-import {buildInstanced} from './furn.js?v=202610220435';
+import {buildRooms} from './rooms.js?v=202610220735';
+import * as T from './tex.js?v=202610220735';
+import {buildInstanced} from './furn.js?v=202610220735';
 const Q=new URLSearchParams(location.search);const SHOT=Q.has('shot');
 const MOBILE=matchMedia('(pointer:coarse)').matches||innerWidth<760;
 await document.fonts.load('bold 40px NanumGothic').catch(()=>{});
@@ -95,8 +95,8 @@ function inR(f,x,n,m=0){return x>=f.x0-m&&x<=f.x1+m&&n>=f.n0-m&&n<=f.n1+m;}
 function surfaceAt(x,n,feet){let best=-1e9;const cand=[];
  for(const st of STAIRS){if(!chunks[st.bld+'_'+st.floor])continue;for(const f of st.flights){f.run=st.run;if(inR(f,x,n))cand.push(flightY(f,x,n));}}
  for(const k in WALLS){const W=WALLS[k];if(k==='main_porch')continue;const c=chunks[k];if(!c)continue;if(!c.box)c.box=new THREE.Box3().setFromObject(c.group);const b=c.box;if(x<b.min.x||x>b.max.x||-n<b.min.z||-n>b.max.z)continue;
-  const hole=STAIRS.some(st=>(st.bld+'_'+st.to===k||k==='site'&&st.floor==='B1')&&inR({x0:st.core[0],n0:st.core[1],x1:st.core[2],n1:st.core[3]},x,n));if(!hole)cand.push(W.e);}
- if(!STAIRS.some(st=>st.floor==='B1'&&inR({x0:st.core[0],n0:st.core[1],x1:st.core[2],n1:st.core[3]},x,n)))cand.push(0);for(const y of cand)if(y<=feet+0.45&&y>best)best=y;return best===-1e9?feet:best;}
+  const hole=STAIRS.some(st=>st.bld+'_'+st.to===k&&inR({x0:st.core[0],n0:st.core[1],x1:st.core[2],n1:st.core[3]},x,n));if(!hole)cand.push(W.e);}
+ cand.push(0);for(const y of cand)if(y<=feet+0.45&&y>best)best=y;return best===-1e9?feet:best;}
 window.__surface=(x,n,f)=>surfaceAt(x,n,f);
 const railMat=new THREE.MeshStandardMaterial({color:0x8a9aa6,metalness:0.4,roughness:0.5,transparent:true,opacity:0.85});
 const NOSE_M=new THREE.MeshStandardMaterial({color:0x3a3d42,roughness:0.6}),STR_M=new THREE.MeshStandardMaterial({color:0xd9d6cf,roughness:0.7}),HR_M=new THREE.MeshStandardMaterial({color:0x8a5a32,roughness:0.45});
@@ -204,7 +204,7 @@ function decorate(){try{buildDado();}catch(err){console.error('dado',err);}build
   const m=(g,mt,px,py,pz)=>{const o=new THREE.Mesh(g,mt);o.position.set(px,py,pz);o.castShadow=o.receiveShadow=true;G.add(o);return o;};
   m(new THREE.BoxGeometry(2.6,2.5,2.4),wall,0,1.25,0);m(new THREE.BoxGeometry(3.0,0.18,2.8),roof,0,2.59,0);
   for(const sx of [-1,1])m(new THREE.BoxGeometry(0.02,0.9,1.6),glass,sx*1.31,1.55,0);m(new THREE.BoxGeometry(1.8,0.9,0.02),glass,0,1.55,1.21);m(new THREE.BoxGeometry(1.8,0.9,0.02),glass,0,1.55,-1.21);
-  const lb=textPlane(gi?'후문보안관실':'정문보안관실',2.2,0.38,{w:1024,h:180,font:'bold 120px NanumGothic, sans-serif',fg:'#fff',bg:'#24456e'});for(const sz of[1,-1]){const q=lb.clone();q.position.set(0,2.2,sz*1.215);if(sz<0)q.rotation.y=Math.PI;G.add(q);}
+  const lb=textPlane(n<0?'정문보안관실':'후문보안관실',2.2,0.38,{w:1024,h:180,font:'bold 120px NanumGothic, sans-serif',fg:'#fff',bg:'#24456e'});for(const sz of[1,-1]){const q=lb.clone();q.position.set(0,2.2,sz*1.215);if(sz<0)q.rotation.y=Math.PI;G.add(q);}
   chunks.site.group.add(G);});
  (man.gates||[]).forEach(([x,n])=>{const t=textPlane('서울가동초등학교',4.6,0.6,{w:1536,h:200,font:'bold 140px NanumGothic, sans-serif',fg:'#5a4a34'});t.position.set(x,1.3,-n+0.42);chunks.site?.group.add(t);const t2=t.clone();t2.rotation.y=Math.PI;t2.position.z=-n-0.42;chunks.site?.group.add(t2);
   const w=new THREE.Mesh(new THREE.BoxGeometry(4.8,1.6,0.8),M.stone);w.position.set(x,0.8,-n);chunks.site?.group.add(w);});}
@@ -228,11 +228,11 @@ const BLD_LABELS=[['본관(교사동)',2,22,18],['정보화동',-47,14,-25],['�
 const bldSprites=BLD_LABELS.map(([t,x,y,n])=>{const s=mkLabel(t);s.position.set(x,y,-n);labelGroup.add(s);return s;});
 function sizeLabels(){const k=MOBILE?0.045:0.032;labels.concat(bldSprites).forEach(s=>s.scale.set(k*s.userData.aspect*innerHeight/innerWidth*(innerWidth/innerHeight),k,1));}
 // ---------- floors / visibility ----------
-const FLOORS=['all','B1','1F','2F','3F','4F','5F'];let curFloor='all',cut=true,showLabels=true;
-const ELEV={'B1':-3.6,'1F':0,'2F':3.6,'3F':7.2,'4F':10.8,'5F':14.4};
+const FLOORS=['all','1F','2F','3F','4F','5F'];let curFloor='all',cut=true,showLabels=true;
+const ELEV={'1F':0,'2F':3.6,'3F':7.2,'4F':10.8,'5F':14.4};
 function applyFloor(){window.__shDirty=true;const thr=curFloor==='all'?1e9:ELEV[curFloor];
  for(const k in chunks){const c=chunks[k];let vis=true;
-  if(walk&&curFloor!=='all'&&curFloor!=='B1'){vis=c.kind==='site'||c.elev<=cam.position.y+2.2;}else if(c.kind==='roof')vis=curFloor==='all';else if(c.kind==='floor'||c.kind==='porch'){vis=c.floor==='all'?(curFloor==='all'||thr>=0):c.elev<=thr+0.01;if(curFloor==='B1')vis=c.floor==='B1';}
+  if(walk&&curFloor!=='all'){vis=c.kind==='site'||c.elev<=cam.position.y+2.2;}else if(c.kind==='roof')vis=curFloor==='all';else if(c.kind==='floor'||c.kind==='porch'){vis=c.floor==='all'?(curFloor==='all'||thr>=0):c.elev<=thr+0.01;if(curFloor==='B1')vis=c.floor==='B1';}
   c.group.visible=vis;
   const top=!walk&&curFloor!=='all'&&cut&&Math.abs(c.elev-thr)<0.01;
   c.group.traverse(o=>{if(o.isMesh&&(o.userData.mat==='ceil'))o.visible=!top||walk;if(o.isInstancedMesh&&['led','ac'].includes(o.userData.furnType))o.visible=!top||walk;});
