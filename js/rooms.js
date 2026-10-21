@@ -34,7 +34,7 @@ export function buildRooms(chunks,WALLS,logoTex,man){
  add('info_2F',(R)=>{const tile=S({map:rep(cv(256,256,(x,w,h)=>{x.fillStyle='#d9ccb2';x.fillRect(0,0,w,h);x.strokeStyle='#bfb197';x.lineWidth=3;x.strokeRect(0,0,w,h);for(let i=0;i<400;i++){x.fillStyle=`rgba(120,100,70,${Math.random()*0.08})`;x.fillRect(Math.random()*w,Math.random()*h,3,3);}}),20,44),roughness:0.5});
   R.plane(tile,-53.85,-42.25,-41.35,-15.0,0.012);const grey=S({color:0x4a4d52,roughness:0.85});
   R.wallp(grey,'z',-41.3,-15.2,-42.3,2.1,2.95,-1);R.wallp(grey,'x',-53.8,-42.3,-41.33,2.1,2.95,1);
-  const sh=S({color:0xf2f2ef,roughness:0.55});const books=S({map:rep(cv(256,64,(x,w,h)=>{for(let i=0;i<w;i+=6){x.fillStyle=`hsl(${Math.random()*360},45%,${40+Math.random()*25}%)`;x.fillRect(i,6+Math.random()*10,5,h);}}),6,1)});
+  const sh=lightWood;const books=S({map:rep(cv(256,64,(x,w,h)=>{for(let i=0;i<w;i+=6){x.fillStyle=`hsl(${Math.random()*360},45%,${40+Math.random()*25}%)`;x.fillRect(i,6+Math.random()*10,5,h);}}),6,1)});
   for(const[a,b]of[[-40.9,-31],[-29.5,-17.5]]){R.box(sh,-42.75,-42.3,a,b,0,1.95);for(let y=0.08;y<1.9;y+=0.47){R.box(books,-42.74,-42.73,a+0.1,b-0.1,y,y+0.34).rotation.y=0;}R.rects.push([-42.8,a,-42.3,b]);}
   R.box(sh,-53.3,-43.3,-41.3,-40.85,0,1.95);R.wallp(books,'x',-53.2,-43.4,-40.84,0.1,1.9,1);R.rects.push([-53.3,-41.3,-43.3,-40.85]);
   const lime=S({color:0xa9cf3c,roughness:0.6});const tb=[];const ch=[];
@@ -71,6 +71,32 @@ export function buildRooms(chunks,WALLS,logoTex,man){
   const steel=S({color:0x9aa3ab,roughness:0.45,metalness:0.6});const top=10.4-e;
   for(let n=-50.5;n<=-19.5;n+=4.4){R.box(steel,45.4,64.5,n-0.08,n+0.08,top-1.6,top-1.45);R.box(steel,45.4,64.5,n-0.08,n+0.08,top-0.15,top);for(let x=46;x<64.4;x+=1.6){R.box(steel,x-0.04,x+0.04,n-0.05,n+0.05,top-1.45,top-0.15);const d=new THREE.Mesh(new THREE.BoxGeometry(0.05,1.7,0.05),steel);d.position.set(x+0.8,e+top-0.8,-n);d.rotation.z=0.78;chunks.hall_2F.group.add(d);}}
   for(let x=47;x<64;x+=3)R.box(steel,x-0.05,x+0.05,-52.4,-19.1,top-0.25,top-0.1);});
+
+ // 7) 과학실1/2 (본관 1F/2F x 52.2..59.65, n 5.05..18.2) per album photo: white lab benches, grey tops, teal chairs
+ for(const ck of ['main_1F','main_2F'])add(ck,(R)=>{const wh=S({color:0xf1f1ee,roughness:0.5}),gp=S({color:0xb5b9bc,roughness:0.5}),top=S({color:0xd9dcdc,roughness:0.25}),teal=S({color:0x6fb4c2,roughness:0.5}),sink=S({color:0x3a3d40,roughness:0.3}),steel=S({color:0xc8ccd0,metalness:0.8,roughness:0.25});
+  R.plane(S({color:0xc9cbc8,roughness:0.4,polygonOffset:true,polygonOffsetFactor:-2}),52.25,59.6,5.1,18.15,0.03);
+  const at=[],ch=[];for(const n of[7.3,10.2,13.1])for(const x of[54.4,57.6]){at.push([x,n]);ch.push([x-0.45,n-0.85,0],[x+0.45,n-0.85,0],[x-0.45,n+0.85,Math.PI],[x+0.45,n+0.85,Math.PI]);R.rects.push([x-0.95,n-0.55,x+0.95,n+0.55]);}
+  R.inst([[1.8,0.78,1.0,0,0.39,0,wh],[1.82,0.5,1.02,0,0.45,0,gp],[1.86,0.04,1.06,0,0.8,0,top],[0.35,0.02,0.3,0,0.83,0,sink],[0.03,0.3,0.03,0,0.97,0.1,steel],[0.03,0.03,0.18,0,1.11,0.02,steel]],at);
+  R.inst(chairParts(teal,metal),ch);
+  R.box(wh,54.3,57.7,15.6,16.4,0,0.85);R.box(top,54.25,57.75,15.55,16.45,0.85,0.89);R.rects.push([54.3,15.6,57.7,16.4]);
+  R.box(dark,55.6,56.2,15.8,16.2,0.89,1.25);
+  R.wallp(S({color:0xfafafa,roughness:0.2}),'x',53.2,58.6,18.12,0.9,2.2,-1);R.box(gp,53.1,58.7,18.0,18.12,0.85,0.9);
+  const gl=S({color:0xa9c6cf,roughness:0.05,metalness:0.2,transparent:true,opacity:0.5});for(let n=6.2;n<14;n+=1.25){R.box(wh,52.25,52.75,n,n+1.2,0,0.85);R.box(gl,52.27,52.7,n+0.02,n+1.18,0.9,2.1);}R.rects.push([52.25,6.2,52.75,14]);
+  leds(R,52.4,59.4,5.3,18,2.86,2.4,2.4);});
+ // 8) 방송실 (본관 1F x -33.55..-29.25, n 13.1..20.2): console desk, monitors, chair, studio glass
+ add('main_1F',(R)=>{const wh=S({color:0xf0f0ed,roughness:0.5}),blk=S({color:0x1b1c1e,roughness:0.4}),scr=S({color:0x223344,emissive:0x2a4a6a,emissiveIntensity:0.5,roughness:0.2}),frame=S({map:rep(woodTex('#c08a55'),1,1),roughness:0.6});
+  R.box(wh,-33.5,-32.75,13.8,17.6,0,0.74);R.box(S({color:0xe8e8e4,roughness:0.3}),-33.52,-32.7,13.78,17.62,0.74,0.77);R.rects.push([-33.5,13.8,-32.75,17.6]);
+  for(const n of[14.6,15.5,16.6]){R.box(blk,-33.35,-33.3,n-0.4,n+0.4,0.95,1.45);R.box(scr,-33.3,-33.29,n-0.37,n+0.37,0.98,1.42);R.box(blk,-33.4,-33.25,n-0.08,n+0.08,0.77,0.95);}
+  R.box(blk,-33.2,-32.9,15.2,15.9,0.77,0.8);
+  R.inst([[0.5,0.08,0.5,0,0.48,0,blk],[0.5,0.55,0.06,0,0.85,-0.24,blk],[0.06,0.44,0.06,0,0.24,0,metal],[0.6,0.04,0.6,0,0.04,0,metal]],[[-32.2,15.5,Math.PI/2]]);
+  R.box(frame,-33.5,-29.3,18.55,18.7,0,0.9);R.box(frame,-33.5,-29.3,18.55,18.7,2.2,2.9);for(const x of[-33.5,-31.45,-29.4])R.box(frame,x,x+0.1,18.55,18.7,0.9,2.2);
+  R.box(S({color:0xbcd6e0,roughness:0.05,transparent:true,opacity:0.35}),-33.4,-29.3,18.6,18.64,0.9,2.2);R.rects.push([-33.55,18.5,-29.25,18.75]);
+  leds(R,-33.4,-29.4,13.3,18.4,2.86,2.0,2.4);});
+ // 9) 주리홀(학생식당) (다목적강당 1F x 45.3..65.15, n -60.25..-34.05): rows of tables + stools
+ add('hall_1F',(R)=>{const wh=S({color:0xf3f3f0,roughness:0.4}),yel=S({color:0xf2b233,roughness:0.5}),grn=S({color:0x7cbf5a,roughness:0.5});const at=[],sa=[],sb=[];
+  for(let x=47.6;x<63.6;x+=2.7)for(let n=-57.8;n<-36.5;n+=2.4){at.push([x,n]);for(const dx of[-0.5,0.5]){sa.push([x+dx,n-0.62]);sb.push([x+dx,n+0.62]);}R.rects.push([x-0.95,n-0.45,x+0.95,n+0.45]);}
+  R.inst([[1.8,0.04,0.75,0,0.7,0,wh],[0.06,0.68,0.06,-0.8,0.34,-0.3,metal],[0.06,0.68,0.06,0.8,0.34,-0.3,metal],[0.06,0.68,0.06,-0.8,0.34,0.3,metal],[0.06,0.68,0.06,0.8,0.34,0.3,metal]],at);
+  const stool=m=>[[0.34,0.04,0.34,0,0.44,0,m],[0.04,0.42,0.04,0,0.21,0,metal],[0.3,0.02,0.3,0,0.01,0,metal]];R.inst(stool(yel),sa);R.inst(stool(grn),sb);});
  // 6) 운동장 dressing: striped shade canopies, flagpoles, 가동문화관 sign
  const site=chunks.site;if(site){const g=new THREE.Group();g.name='playground';const stripes=cv(512,64,(x,w,h)=>{const cs=['#e53935','#fdd835','#43a047','#1e88e5','#fb8c00','#ffffff','#8e24aa'];for(let i=0;i<16;i++){x.fillStyle=cs[i%cs.length];x.fillRect(i*w/16,0,w/16,h);}});const sm=S({map:stripes,side:THREE.DoubleSide,roughness:0.8});const post=S({color:0x6b6f74,metalness:0.5,roughness:0.4});
   for(const[x0,x1]of[[-40.2,-5.6],[6.7,42.4]]){const len=x1-x0;const roof=new THREE.Mesh(new THREE.PlaneGeometry(len,7.4),sm);roof.material.map.wrapS=THREE.RepeatWrapping;roof.material.map.repeat.set(len/8,1);roof.rotation.x=-Math.PI/2+0.14;roof.position.set((x0+x1)/2,4.6,15.45);roof.castShadow=true;g.add(roof);

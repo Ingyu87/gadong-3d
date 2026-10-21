@@ -190,6 +190,13 @@ function decorate(){buildStairs();buildFixtures();buildColumns();buildSigns();bu
  const lg=new THREE.Mesh(new THREE.PlaneGeometry(1.6,1.6),new THREE.MeshStandardMaterial({map:logoTex(),transparent:true}));lg.position.set(cx-(n.length-1)/2*sp-sp*0.5,s.y,-(s.n-0.26));g.add(lg);
  g.userData.kind='roofdeco';chunks.main_roof?.group.add(g);}
  buildPorch();
+ (man.gates||[]).forEach(([x,n],gi)=>{if(!chunks.site)return;const G=new THREE.Group();G.name='guard'+gi;const bx=x+5.5*Math.sign(-x||1),bn=n+4*Math.sign(-n||1);G.position.set(bx,0,-bn);
+  const wall=std({color:0xeeeeea,roughness:0.7}),glass=std({color:0x6f8fa0,roughness:0.1,metalness:0.2}),roof=std({color:0x3c4a5a,roughness:0.5});
+  const m=(g,mt,px,py,pz)=>{const o=new THREE.Mesh(g,mt);o.position.set(px,py,pz);o.castShadow=o.receiveShadow=true;G.add(o);return o;};
+  m(new THREE.BoxGeometry(2.6,2.5,2.4),wall,0,1.25,0);m(new THREE.BoxGeometry(3.0,0.18,2.8),roof,0,2.59,0);
+  for(const sx of [-1,1])m(new THREE.BoxGeometry(0.02,0.9,1.6),glass,sx*1.31,1.55,0);m(new THREE.BoxGeometry(1.8,0.9,0.02),glass,0,1.55,1.21);m(new THREE.BoxGeometry(1.8,0.9,0.02),glass,0,1.55,-1.21);
+  const lb=textPlane(gi?'후문보안관실':'정문보안관실',2.2,0.38,{w:1024,h:180,font:'bold 120px NanumGothic, sans-serif',fg:'#fff',bg:'#24456e'});for(const sz of[1,-1]){const q=lb.clone();q.position.set(0,2.2,sz*1.215);if(sz<0)q.rotation.y=Math.PI;G.add(q);}
+  chunks.site.group.add(G);});
  (man.gates||[]).forEach(([x,n])=>{const t=textPlane('서울가동초등학교',4.6,0.6,{w:1536,h:200,font:'bold 140px NanumGothic, sans-serif',fg:'#5a4a34'});t.position.set(x,1.3,-n+0.42);chunks.site?.group.add(t);const t2=t.clone();t2.rotation.y=Math.PI;t2.position.z=-n-0.42;chunks.site?.group.add(t2);
   const w=new THREE.Mesh(new THREE.BoxGeometry(4.8,1.6,0.8),M.stone);w.position.set(x,0.8,-n);chunks.site?.group.add(w);});}
 const ORDER=c=>c.kind==='site'?0:c.kind==='roof'?2:(c.bld==='main'?1:3);
