@@ -1,0 +1,32 @@
+<!doctype html><html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<title>서울가동초등학교 3D</title><link rel="preconnect" href="https://fonts.googleapis.com"><link href="https://fonts.googleapis.com/css2?family=Nanum+Gothic:wght@400;700&display=swap" rel="stylesheet">
+<style>
+html,body{margin:0;height:100%;overflow:hidden;font-family:'Nanum Gothic','NanumGothic',sans-serif;background:#e6ecf0;touch-action:none}
+#view{position:fixed;inset:0}
+#bar{position:fixed;left:8px;right:8px;top:8px;display:flex;flex-wrap:wrap;gap:6px;align-items:center;pointer-events:none}
+#bar>*{pointer-events:auto}
+.card{background:#fffffff0;border-radius:12px;box-shadow:0 2px 10px #0002;padding:6px 8px}
+h1{font-size:15px;margin:0 6px 0 2px;color:#1f3d6b;white-space:nowrap}
+button{font:inherit;font-size:13px;border:1px solid #c9d3de;background:#fff;border-radius:9px;padding:6px 9px;margin:1px;color:#1f3d6b;cursor:pointer}
+button.on{background:#1f3d6b;color:#fff;border-color:#1f3d6b}
+#floors{display:flex;flex-wrap:wrap}
+#panel{position:fixed;right:8px;top:62px;bottom:8px;width:min(320px,calc(100% - 16px));display:none;flex-direction:column}
+#panel.open{display:flex}#q{font:inherit;padding:8px;border-radius:9px;border:1px solid #c9d3de;margin-bottom:6px}
+#res{overflow:auto;flex:1}#res h4{margin:8px 2px 4px;font-size:12px;color:#5a6b7d}#res button{font-size:12px}
+#prog{position:fixed;left:50%;bottom:16px;transform:translateX(-50%)}
+#joy{position:fixed;left:24px;bottom:24px;width:120px;height:120px;border-radius:50%;background:#ffffff55;border:2px solid #ffffffaa;display:none;touch-action:none}
+#joy i{position:absolute;left:35px;top:35px;width:50px;height:50px;border-radius:50%;background:#1f3d6bcc}
+body.walk #joy{display:block}#hint{position:fixed;right:10px;bottom:10px;font-size:11px;color:#344}
+body.shot #bar,body.shot #prog,body.shot #hint{display:none}
+@media (max-width:760px){h1{font-size:13px;width:100%}button{font-size:12px;padding:6px 8px}#panel{top:auto;height:60%}}
+</style>
+<script type="importmap">{"imports":{"three":"./vendor/three/build/three.module.js","three/addons/":"./vendor/three/examples/jsm/"}}</script></head>
+<body><div id="view"></div>
+<div id="bar"><div class="card" style="display:flex;flex-wrap:wrap;align-items:center"><h1>서울가동초등학교 3D</h1>
+<button id="home">조감</button><button id="front">정면</button><button id="walkbtn">🚶 걷기</button><button id="jump">🔎 실 찾기</button><button id="cut" class="on">단면</button><button id="lbl" class="on">이름표</button></div>
+<div class="card" id="floors"></div></div>
+<div id="panel" class="card"><input id="q" placeholder="실 이름 검색 (예: 교실 210, 교무실)"><div id="res"></div></div>
+<div id="joy"><i></i></div><div id="prog" class="card">불러오는 중…</div>
+<div id="hint">드래그: 회전 · 휠/핀치: 확대 · 걷기: WASD/조이스틱 + 드래그로 시선 · 자료: 서울가동초 CAD 도면(2017)</div>
+<script>if(location.search.includes('shot'))document.body.classList.add('shot')</script>
+<script type="module" src="js/app.js"></script></body></html>
