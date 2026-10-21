@@ -45,7 +45,7 @@ const M={
  glass:new THREE.MeshPhysicalMaterial({color:0x2f6680,roughness:0.05,metalness:0.2,transparent:true,opacity:0.85,envMapIntensity:1.6,side:THREE.DoubleSide,depthWrite:false}),
  glassIn:new THREE.MeshPhysicalMaterial({color:0xcfe6ee,roughness:0.05,transparent:true,opacity:0.25,depthWrite:false,side:THREE.DoubleSide}),
  frost:std({color:0xdde9ee,roughness:0.3,transparent:true,opacity:0.8}),green:std({color:0x3b6b55,roughness:0.55,metalness:0.25}),roofMetal:std({color:0x3e6e58,roughness:0.5,metalness:0.3}),
- stone:tri(std({map:T.noise('#d9cdb4',0.07,2),roughness:0.8}),2),slab:std({color:0xe9e8e4}),corrFloor:tri(std({map:T.noise('#cfcac0',0.1,1),roughness:0.35}),1),
+ stone:tri(std({map:T.noise('#d9cdb4',0.07,2),roughness:0.8}),2),slab:std({color:0xe9e8e4}),corrFloor:tri(std({map:T.terrazzo(),roughness:0.22,metalness:0.05,envMapIntensity:1.2}),1.2),mint:std({color:0xcfe8dd,roughness:0.7}),skirt:std({color:0x5a5550,roughness:0.6}),
  woodF:tri(std({map:T.wood('#83562f',0.09,0.9,1.2),roughness:0.3}),1.2),woodLight:tri(std({map:T.wood('#d8c39c',0.6,2.4,2.4),roughness:0.6}),2.4),
  woodFrame:tri(std({map:T.wood('#a8743f',0.1,1,1),roughness:0.55}),1),door:tri(std({map:T.wood('#9c6a3a',0.25,2.2,2.2),roughness:0.6}),2.2),
  ceil:tri(std({map:T.ceilTile(),emissive:0xffffff,emissiveIntensity:0.07}),0.6),led:new THREE.MeshBasicMaterial({color:0xffffff}),

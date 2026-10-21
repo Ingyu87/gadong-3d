@@ -22,3 +22,6 @@ export const flag=()=>cv(600,400,(x)=>{x.fillStyle='#fff';x.fillRect(0,0,600,400
  x.fillStyle='#000';[[1,1],[-1,1],[1,-1],[-1,-1]].forEach(([a,b])=>{x.save();x.translate(300+a*190,200+b*125);x.rotate(-a*b*Math.atan2(2,3)+Math.PI/2);for(let i=0;i<3;i++)x.fillRect(-50,-36+i*26,100,16);x.restore();});});
 export const board=()=>cv(512,340,(x)=>{x.fillStyle='#f7f7f4';x.fillRect(0,0,512,340);x.strokeStyle='#b9bcc0';x.lineWidth=14;x.strokeRect(0,0,512,340);
  const cols=['#f2d16b','#9fd3e8','#f4a6a6','#c8e6a0','#ffffff'];for(let i=0;i<9;i++){x.fillStyle=cols[i%5];x.fillRect(30+(i%5)*92,40+Math.floor(i/5)*130,70,95);x.fillStyle='#555';for(let k=0;k<5;k++)x.fillRect(38+(i%5)*92,55+Math.floor(i/5)*130+k*14,50,4);}});
+export const terrazzo=()=>{const t=cv(1024,1024,(x,w,h)=>{x.fillStyle='#c9c5bb';x.fillRect(0,0,w,h);const cols=['#8d8a84','#e9e6df','#6f6a62','#b3aa98','#d8d2c4','#4f4c48','#a39a8a'];
+ for(let i=0;i<14000;i++){x.fillStyle=cols[(rnd()*cols.length)|0];x.globalAlpha=0.5+rnd()*0.5;const r=1+rnd()*rnd()*7;x.beginPath();x.ellipse(rnd()*w,rnd()*h,r,r*(0.5+rnd()*0.5),rnd()*3,0,7);x.fill();}
+ x.globalAlpha=1;x.strokeStyle='rgba(80,80,80,0.35)';x.lineWidth=3;x.strokeRect(0,0,w,h);});t.repeat.set(1/1.2,1/1.2);return t;};
