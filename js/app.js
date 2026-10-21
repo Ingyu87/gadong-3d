@@ -108,12 +108,15 @@ function buildStairs(){const byChunk={};for(const st of STAIRS){const k=st.bld+'
   }
   const im=new THREE.InstancedMesh(new THREE.BoxGeometry(1,1,1),M.stair,mats.length);mats.forEach((m,i)=>im.setMatrixAt(i,m));im.instanceMatrix.needsUpdate=true;im.computeBoundingSphere();im.castShadow=!MOBILE;im.receiveShadow=true;im.userData.mat='stair';im.userData.isStair=true;c.group.add(im);}
 }
+let COLS=[];const colReady=fetch('columns.json').then(r=>r.json()).then(d=>COLS=d).catch(()=>{});
+function buildColumns(){const by={};for(const c of COLS){const k=c.bld+'_'+c.floor;if(!chunks[k])continue;(by[k]=by[k]||[]).push(c);}for(const k in by){const ch=chunks[k];const e=(man.chunks.find(c=>c.name===k)||{}).elev||0;const h=(man.chunks.find(c=>c.name===k)||{}).h||3.6;const ms=by[k].map(c=>new THREE.Matrix4().compose(new THREE.Vector3(c.x,e+h/2-0.1,-c.n),new THREE.Quaternion(),new THREE.Vector3(c.w+0.04,h-0.2,c.d+0.04)));const im=new THREE.InstancedMesh(new THREE.BoxGeometry(1,1,1),colMat,ms.length);ms.forEach((m,i)=>im.setMatrixAt(i,m));im.instanceMatrix.needsUpdate=true;im.computeBoundingSphere();im.userData.kind='column';ch.group.add(im);}}
+const colMat=new THREE.MeshStandardMaterial({color:0xe9e7e1,roughness:0.85});
 let FIXT=[];const fixtReady=fetch('fixtures.json').then(r=>r.json()).then(d=>FIXT=d).catch(()=>{});
 const fixMat=std({color:0xf4f6f6,roughness:0.3});
 function buildFixtures(){const by={};for(const f of FIXT){let ck=null;for(const k in chunks){const c=chunks[k];if(c.floor!==f.floor||c.kind!=='floor')continue;if(!c.box)c.box=new THREE.Box3().setFromObject(c.group);if(c.box.containsPoint(new THREE.Vector3(f.x,f.e+0.5,-f.n))){ck=k;break;}}if(!ck)continue;(by[ck]=by[ck]||[]).push(f);}
  for(const k in by){const ms=by[k].map(f=>{const h=/PART/.test(f.kind)?1.9:/URIN/.test(f.kind)?0.6:/UNIT/.test(f.kind)?0.42:0.82;const y=/PART/.test(f.kind)?f.e+0.12+h/2:/URIN/.test(f.kind)?f.e+0.45+h/2:/UNIT/.test(f.kind)?f.e+0.62:f.e+h/2;return new THREE.Matrix4().compose(new THREE.Vector3(f.x,y,-f.n),new THREE.Quaternion().setFromEuler(new THREE.Euler(0,THREE.MathUtils.degToRad(f.rot),0)),new THREE.Vector3(f.w,h,f.d));});
   const im=new THREE.InstancedMesh(new THREE.BoxGeometry(1,1,1),fixMat,ms.length);ms.forEach((m,i)=>im.setMatrixAt(i,m));im.instanceMatrix.needsUpdate=true;im.computeBoundingSphere();chunks[k].group.add(im);}}
-function decorate(){buildStairs();buildFixtures();const s=man.sign;if(s){const g=new THREE.Group();const n=[...s.text];const cx=(s.x0+s.x1)/2;const sp=Math.min(5.4,(s.x1-s.x0)/(n.length+1.5));
+function decorate(){buildStairs();buildFixtures();buildColumns();const s=man.sign;if(s){const g=new THREE.Group();const n=[...s.text];const cx=(s.x0+s.x1)/2;const sp=Math.min(5.4,(s.x1-s.x0)/(n.length+1.5));
  n.forEach((ch,i)=>{const p=textPlane(ch,1.6,1.6,{w:256,h:256,font:'bold 230px NanumGothic, sans-serif'});p.position.set(cx+(i-(n.length-1)/2)*sp+sp*0.6,s.y,-(s.n-0.26));g.add(p);});
  const lg=new THREE.Mesh(new THREE.PlaneGeometry(1.6,1.6),new THREE.MeshStandardMaterial({map:logoTex(),transparent:true}));lg.position.set(cx-(n.length-1)/2*sp-sp*0.5,s.y,-(s.n-0.26));g.add(lg);
  g.userData.kind='roofdeco';chunks.main_roof?.group.add(g);}
@@ -125,7 +128,7 @@ const ORDER=c=>c.kind==='site'?0:c.kind==='roof'?2:(c.bld==='main'?1:3);
 const list=[...man.chunks].sort((a,b)=>ORDER(a)-ORDER(b)||a.elev-b.elev);
 async function loadChunk(c){const g=await loader.loadAsync(c.file);const grp=new THREE.Group();grp.name=c.name;
  g.scene.traverse(o=>{if(o.isMesh){if(!o.geometry.attributes.normal){o.geometry=o.geometry.toNonIndexed();o.geometry.computeVertexNormals();}const n=(o.material&&o.material.name)||'';const mm=M[n]||M.white;o.material=mm;o.castShadow=!MOBILE&&!mm.transparent&&c.kind!=='site';o.receiveShadow=true;o.userData.mat=n;}});
- await doorsReady;await stairsReady;await fixtReady;if(c.kind!=='site'){const rm=[];g.scene.traverse(o=>{if(o.isMesh&&o.userData.mat==='door')rm.push(o);});rm.forEach(o=>o.removeFromParent());buildDoors(c,grp);}
+ await doorsReady;await stairsReady;await fixtReady;await colReady;if(c.kind!=='site'){const rm=[];g.scene.traverse(o=>{if(o.isMesh&&o.userData.mat==='door')rm.push(o);});rm.forEach(o=>o.removeFromParent());buildDoors(c,grp);}
  grp.add(g.scene);const fg=new THREE.Group();fg.name='furn';if(c.kind==='site')fg.add(trees(c.furn));else addFurn(fg,classOnly(c,c.furn));grp.add(fg);
  root.add(grp);chunks[c.name]={...c,group:grp};loaded++;prog.textContent=`불러오는 중 ${loaded}/${list.length}`;if(loaded===list.length){prog.style.display='none';decorate();applyFloor();SITEB=null;if(!userMoved&&!walk)defaultView(false);window.__loaded=true;}
  render();}
@@ -329,4 +332,4 @@ document.querySelectorAll('#pad [data-k]').forEach(b=>{const k=b.dataset.k;const
  b.addEventListener('pointerdown',on);b.addEventListener('pointerup',off);b.addEventListener('pointercancel',off);b.addEventListener('pointerleave',off);});
 document.getElementById('pReset').onclick=()=>{if(walk){pitch=-0.22;cam.fov=72;cam.updateProjectionMatrix();cam.rotation.set(pitch,yaw,0,'YXZ');render();}else{curFloor='all';applyFloor();defaultView(true);}};
 document.getElementById('pDoor').onclick=()=>{if(!walk)return;const d=nearestDoor();if(d)openDoor(d,true);};
-window.__camDbg=()=>({detailMode,camAnim:!!camAnim,t:ctl.target.toArray(),p:cam.position.toArray()});window.__dbgMove=(dx,dz)=>{const v=new THREE.Vector3(dx,0,dz);const p=cam.position.clone().add(v);return {free:freeDist(v,v.length()),ok:okStep(p),surf:surfaceAt(p.x,-p.z,cam.position.y-EYE),cur:curChunks()};};
+window.__camDbg=()=>({detailMode,camAnim:!!camAnim,t:ctl.target.toArray(),p:cam.position.toArray()});window.__cols=()=>{let n=0;scene.traverse(o=>{if(o.userData.kind==='column')n+=o.count;});return n;};window.__dbgMove=(dx,dz)=>{const v=new THREE.Vector3(dx,0,dz);const p=cam.position.clone().add(v);return {free:freeDist(v,v.length()),ok:okStep(p),surf:surfaceAt(p.x,-p.z,cam.position.y-EYE),cur:curChunks()};};
