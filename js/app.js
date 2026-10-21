@@ -91,8 +91,9 @@ function surfaceAt(x,n,feet){let best=-1e9;const cand=[];
   const hole=STAIRS.some(st=>st.bld+'_'+st.to===k&&inR({x0:st.core[0],n0:st.core[1],x1:st.core[2],n1:st.core[3]},x,n));if(!hole)cand.push(W.e);}
  cand.push(0);for(const y of cand)if(y<=feet+0.45&&y>best)best=y;return best===-1e9?feet:best;}
 window.__surface=(x,n,f)=>surfaceAt(x,n,f);
+const railMat=new THREE.MeshStandardMaterial({color:0x8a9aa6,metalness:0.4,roughness:0.5,transparent:true,opacity:0.85});
 function buildStairs(){const byChunk={};for(const st of STAIRS){const k=st.bld+'_'+st.floor;(byChunk[k]=byChunk[k]||[]).push(st);}
- for(const k in byChunk){const c=chunks[k];if(!c)continue;const mats=[];
+ for(const k in byChunk){const c=chunks[k];if(!c)continue;const mats=[],rails=[];
   for(const st of byChunk[k])for(const f of st.flights){if(f.kind==='landing'){const m=new THREE.Matrix4().compose(new THREE.Vector3((f.x0+f.x1)/2,f.y0-0.1,-(f.n0+f.n1)/2),new THREE.Quaternion(),new THREE.Vector3(f.x1-f.x0,0.2,f.n1-f.n0));mats.push(m);continue;}
    const run=st.run==='x'?f.x1-f.x0:f.n1-f.n0;const N=Math.max(4,Math.round((f.y1-f.y0)/0.16));const tw=run/N;
    for(let i=0;i<N;i++){const top=f.y0+(i+1)*(f.y1-f.y0)/N;const h=Math.max(0.16,top-f.y0+0.05);// step i from start end
@@ -104,9 +105,14 @@ function buildStairs(){const byChunk={};for(const st of STAIRS){const k=st.bld+'
    const ang=Math.atan2(f.y1-f.y0,run);const L=Math.hypot(run,f.y1-f.y0);const mid=[(f.x0+f.x1)/2,(f.y0+f.y1)/2-0.25,(f.n0+f.n1)/2];
    const q=new THREE.Quaternion().setFromEuler(st.run==='x'?new THREE.Euler(0,0,(f.start==='hi'?-1:1)*ang):new THREE.Euler((f.start==='hi'?1:-1)*ang,0,0));
    mats.push(new THREE.Matrix4().compose(new THREE.Vector3(mid[0],mid[1],-mid[2]),q,new THREE.Vector3(st.run==='x'?L:f.x1-f.x0,0.15,st.run==='x'?f.n1-f.n0:L)));
-   // handrail posts along outer side
+   {const cxC=(st.core[0]+st.core[2])/2,cnC=(st.core[1]+st.core[3])/2;const sides=[];
+    if(st.run==='x'){const inn=Math.abs(f.n0-cnC)<Math.abs(f.n1-cnC)?f.n0:f.n1;sides.push(inn);if(st.ext||st.flights.filter(g=>g.kind==='flight').length<2)sides.push(inn===f.n0?f.n1:f.n0);}
+    else{const inn=Math.abs(f.x0-cxC)<Math.abs(f.x1-cxC)?f.x0:f.x1;sides.push(inn);if(st.ext||st.flights.filter(g=>g.kind==='flight').length<2)sides.push(inn===f.x0?f.x1:f.x0);}
+    for(const sv of sides){const yy=(f.y0+f.y1)/2;const P_=st.run==='x'?new THREE.Vector3(mid[0],yy+0.5,-sv):new THREE.Vector3(sv,yy+0.5,-mid[2]);
+     rails.push(new THREE.Matrix4().compose(P_,q,st.run==='x'?new THREE.Vector3(L,0.85,0.03):new THREE.Vector3(0.03,0.85,L)));
+     const T_=P_.clone();T_.y+=0.45;rails.push(new THREE.Matrix4().compose(T_,q,st.run==='x'?new THREE.Vector3(L,0.06,0.07):new THREE.Vector3(0.07,0.06,L)));}}
   }
-  const im=new THREE.InstancedMesh(new THREE.BoxGeometry(1,1,1),M.stair,mats.length);mats.forEach((m,i)=>im.setMatrixAt(i,m));im.instanceMatrix.needsUpdate=true;im.computeBoundingSphere();im.castShadow=!MOBILE;im.receiveShadow=true;im.userData.mat='stair';im.userData.isStair=true;c.group.add(im);}
+  const im=new THREE.InstancedMesh(new THREE.BoxGeometry(1,1,1),M.stair,mats.length);mats.forEach((m,i)=>im.setMatrixAt(i,m));im.instanceMatrix.needsUpdate=true;im.computeBoundingSphere();im.castShadow=!MOBILE;im.receiveShadow=true;im.userData.mat='stair';im.userData.isStair=true;c.group.add(im);if(rails.length){const rm=new THREE.InstancedMesh(new THREE.BoxGeometry(1,1,1),railMat,rails.length);rails.forEach((m,i)=>rm.setMatrixAt(i,m));rm.instanceMatrix.needsUpdate=true;rm.computeBoundingSphere();rm.userData.isStair=true;c.group.add(rm);}}
 }
 let COLS=[];const colReady=fetch('columns.json').then(r=>r.json()).then(d=>COLS=d).catch(()=>{});
 function buildColumns(){const by={};for(const c of COLS){const k=c.bld+'_'+c.floor;if(!chunks[k])continue;(by[k]=by[k]||[]).push(c);}for(const k in by){const ch=chunks[k];const e=(man.chunks.find(c=>c.name===k)||{}).elev||0;const h=(man.chunks.find(c=>c.name===k)||{}).h||3.6;const ms=by[k].map(c=>new THREE.Matrix4().compose(new THREE.Vector3(c.x,e+h/2-0.1,-c.n),new THREE.Quaternion(),new THREE.Vector3(c.w+0.04,h-0.2,c.d+0.04)));const im=new THREE.InstancedMesh(new THREE.BoxGeometry(1,1,1),colMat,ms.length);ms.forEach((m,i)=>im.setMatrixAt(i,m));im.instanceMatrix.needsUpdate=true;im.computeBoundingSphere();im.userData.kind='column';ch.group.add(im);}}
@@ -120,8 +126,8 @@ function decorate(){buildStairs();buildFixtures();buildColumns();const s=man.sig
  n.forEach((ch,i)=>{const p=textPlane(ch,1.6,1.6,{w:256,h:256,font:'bold 230px NanumGothic, sans-serif'});p.position.set(cx+(i-(n.length-1)/2)*sp+sp*0.6,s.y,-(s.n-0.26));g.add(p);});
  const lg=new THREE.Mesh(new THREE.PlaneGeometry(1.6,1.6),new THREE.MeshStandardMaterial({map:logoTex(),transparent:true}));lg.position.set(cx-(n.length-1)/2*sp-sp*0.5,s.y,-(s.n-0.26));g.add(lg);
  g.userData.kind='roofdeco';chunks.main_roof?.group.add(g);}
- const p=man.porch;if(p&&chunks.main_porch){const b=textPlane('고운마음 ✿ 바른행동',8.6,0.7,{w:2048,h:160,font:'bold 120px NanumGothic, sans-serif',fg:'#6b5a3e'});b.position.set(p.x,3.75,-(p.n)+0.01);chunks.main_porch.group.add(b);
-  const lg=new THREE.Mesh(new THREE.PlaneGeometry(0.8,0.8),new THREE.MeshStandardMaterial({map:logoTex(),transparent:true}));lg.position.set(p.x,3.75,-(p.n)+0.02);chunks.main_porch.group.add(lg);}
+ const p=man.porch;if(p&&chunks.main_porch){const b=textPlane('고운마음 ✿ 바른행동',8.6,0.7,{w:2048,h:160,font:'bold 120px NanumGothic, sans-serif',fg:'#6b5a3e'});b.position.set(p.x,p.sign??3.75,p.front!==undefined?-(p.front-0.08):-(p.n)+0.01);chunks.main_porch.group.add(b);
+  const lg=new THREE.Mesh(new THREE.PlaneGeometry(0.8,0.8),new THREE.MeshStandardMaterial({map:logoTex(),transparent:true}));lg.position.set(p.x-4.9,p.sign??3.75,p.front!==undefined?-(p.front-0.09):-(p.n)+0.02);chunks.main_porch.group.add(lg);}
  (man.gates||[]).forEach(([x,n])=>{const t=textPlane('서울가동초등학교',4.6,0.6,{w:1536,h:200,font:'bold 140px NanumGothic, sans-serif',fg:'#5a4a34'});t.position.set(x,1.3,-n+0.42);chunks.site?.group.add(t);const t2=t.clone();t2.rotation.y=Math.PI;t2.position.z=-n-0.42;chunks.site?.group.add(t2);
   const w=new THREE.Mesh(new THREE.BoxGeometry(4.8,1.6,0.8),M.stone);w.position.set(x,0.8,-n);chunks.site?.group.add(w);});}
 const ORDER=c=>c.kind==='site'?0:c.kind==='roof'?2:(c.bld==='main'?1:3);
@@ -225,7 +231,7 @@ function clickAt(e){
  const nY=h.face?h.face.normal.clone().transformDirection(h.object.matrixWorld).y:0;
  if(nY>0.7&&Math.abs(h.point.y-(cam.position.y-EYE))<2.0)glideTo(h.point.clone().setY(h.point.y+EYE));
  else{const p=h.point.clone().setY(cam.position.y);const dir=p.clone().sub(cam.position);const L=Math.max(0,dir.length()-0.8);glideTo(cam.position.clone().addScaledVector(dir.normalize(),L));}}
-function enterLobby(){curFloor='1F';applyFloor();const p=man.porch;for(const im of doorIMs)for(const d of im.userData.doors)if(d.ext&&d.c==='main_1F'&&d.tgt===0){d.tgt=Math.PI/2*0.95;d.from=0;d.t0=performance.now();}loop();setWalk(true,[p.x-2.45,EYE,-(p.n-4)],0);setTimeout(()=>glideTo(new THREE.Vector3(p.x-2.45,EYE,-(p.n+3.2)),true),600);}
+function enterLobby(){curFloor='1F';applyFloor();const p=man.porch;for(const im of doorIMs)for(const d of im.userData.doors)if(d.ext&&d.c==='main_1F'&&d.tgt===0){d.tgt=Math.PI/2*0.95;d.from=0;d.t0=performance.now();}loop();const dx=p.door??(p.x-2.45);setWalk(true,[dx,EYE,-(p.n-4)],0);setTimeout(()=>glideTo(new THREE.Vector3(dx,EYE,-(p.n+3.2)),true),600);}
 window.__enterLobby=enterLobby;window.__clickAt=(x,y)=>clickAt({clientX:x,clientY:y});
 addEventListener('keydown',e=>{if(walk&&(e.code==='Enter'||e.code==='Space')){const d=nearestDoor();if(d)openDoor(d,true);}});
 const J=document.getElementById('joy'),Jk=J.querySelector('i');let jid=null,jc=null;
