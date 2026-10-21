@@ -2,6 +2,10 @@ import * as THREE from 'three';
 import {OrbitControls} from 'three/addons/controls/OrbitControls.js';
 import {GLTFLoader} from 'three/addons/loaders/GLTFLoader.js';
 import {MeshoptDecoder} from 'three/addons/libs/meshopt_decoder.module.js';
+import {EffectComposer} from 'three/addons/postprocessing/EffectComposer.js';
+import {RenderPass} from 'three/addons/postprocessing/RenderPass.js';
+import {GTAOPass} from 'three/addons/postprocessing/GTAOPass.js';
+import {OutputPass} from 'three/addons/postprocessing/OutputPass.js';
 import {RoomEnvironment} from 'three/addons/environments/RoomEnvironment.js';
 import {mergeGeometries} from 'three/addons/utils/BufferGeometryUtils.js';
 import * as T from './tex.js';
@@ -46,7 +50,7 @@ const M={
  glassIn:new THREE.MeshPhysicalMaterial({color:0xcfe6ee,roughness:0.05,transparent:true,opacity:0.25,depthWrite:false,side:THREE.DoubleSide}),
  frost:std({color:0xdde9ee,roughness:0.3,transparent:true,opacity:0.8}),green:std({color:0x3b6b55,roughness:0.55,metalness:0.25}),roofMetal:std({color:0x3e6e58,roughness:0.5,metalness:0.3}),
  stone:tri(std({map:T.noise('#d9cdb4',0.07,2),roughness:0.8}),2),slab:std({color:0xe9e8e4}),corrFloor:tri(std({map:T.terrazzo(),roughness:0.22,metalness:0.05,envMapIntensity:1.2}),1.2),mint:std({color:0xcfe8dd,roughness:0.7}),skirt:std({color:0x5a5550,roughness:0.6}),
- woodF:tri(std({map:T.wood('#83562f',0.09,0.9,1.2),roughness:0.3}),1.2),woodLight:tri(std({map:T.wood('#d8c39c',0.6,2.4,2.4),roughness:0.6}),2.4),
+ woodF:tri(std({map:T.wood('#9a6a3f',0.09,0.9,1.2),roughness:0.35}),1.2),woodLight:tri(std({map:T.wood('#d8c39c',0.6,2.4,2.4),roughness:0.6}),2.4),
  woodFrame:tri(std({map:T.wood('#a8743f',0.1,1,1),roughness:0.55}),1),door:tri(std({map:T.wood('#9c6a3a',0.25,2.2,2.2),roughness:0.6}),2.2),
  ceil:tri(std({map:T.ceilTile(),emissive:0xffffff,emissiveIntensity:0.07}),0.6),led:new THREE.MeshBasicMaterial({color:0xffffff}),
  stair:tri(std({map:T.noise('#bdb8ae',0.1,1),roughness:0.5}),1),metalPanel:tri(std({map:metalTex,roughness:0.5,metalness:0.3}),3),
@@ -308,8 +312,11 @@ function step(){const dt=Math.min(clock.getDelta(),0.25);let moving=false;
   cam.rotation.set(pitch,yaw,0,'YXZ');}
  else{if(stepAnim())moving=true;else{if(orbitKeys(dt))moving=true;if(ctl.update())moving=true;if(ctl._panOffset&&ctl._panOffset.lengthSq()>1e-6)moving=true;if(!detailMode&&!camAnim&&Math.abs(ctl.target.y)>0.01){const dy=ctl.target.y;ctl.target.y=0;cam.position.y-=dy;ctl.update();}if(!detailMode&&!camAnim&&cam.position.y<6){cam.position.y=6;ctl.update();}}}
  if(animDoors(dt))moving=true;if(walk){const key=cam.position.toArray().map(v=>v.toFixed(1)).join()+(yaw).toFixed(1);if(key!==chev.userData.key&&!glide){chev.userData.key=key;updateChevrons();}}
- r.render(scene,cam);return moving;}
+ draw();return moving;}
 function loop(){if(looping)return;looping=true;clock.getDelta();const tick=()=>{const mv=step();if(mv||jid!==null||glide||camAnim||Object.values(KV).some(v=>v>0.01)||Object.values(keys).some(Boolean))requestAnimationFrame(tick);else{looping=false;}};requestAnimationFrame(tick);}
+let composer=null;const AO_ON=!MOBILE&&!SHOT&&Q.get('ao')!=='0';
+function draw(){if(AO_ON&&walk){if(!composer){composer=new EffectComposer(r);composer.addPass(new RenderPass(scene,cam));const ao=new GTAOPass(scene,cam,innerWidth,innerHeight);ao.updateGtaoMaterial({radius:0.6,distanceExponent:1.5,thickness:1.0,scale:1.0,samples:12});ao.blendIntensity=0.8;composer.addPass(ao);composer.addPass(new OutputPass());composer.setPixelRatio(Math.min(devicePixelRatio,1.25));}composer.render();}else r.render(scene,cam);}
+addEventListener('resize',()=>{if(composer)composer.setSize(innerWidth,innerHeight);});
 function render(){if(SHOT){r.render(scene,cam);return;}loop();}
 ctl.addEventListener('start',loop);
 // ---------- views ----------
