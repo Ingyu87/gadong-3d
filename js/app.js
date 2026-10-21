@@ -136,8 +136,24 @@ const colMat=new THREE.MeshStandardMaterial({color:0xe9e7e1,roughness:0.85});
 let FIXT=[];const fixtReady=fetch('fixtures.json').then(r=>r.json()).then(d=>FIXT=d).catch(()=>{});
 const fixMat=std({color:0xf4f6f6,roughness:0.3});
 function buildFixtures(){const by={};for(const f of FIXT){let ck=null;for(const k in chunks){const c=chunks[k];if(c.floor!==f.floor||c.kind!=='floor')continue;if(!c.box)c.box=new THREE.Box3().setFromObject(c.group);if(c.box.containsPoint(new THREE.Vector3(f.x,f.e+0.5,-f.n))){ck=k;break;}}if(!ck)continue;(by[ck]=by[ck]||[]).push(f);}
- for(const k in by){const ms=by[k].map(f=>{const h=/PART/.test(f.kind)?1.9:/URIN/.test(f.kind)?0.6:/UNIT/.test(f.kind)?0.42:0.82;const y=/PART/.test(f.kind)?f.e+0.12+h/2:/URIN/.test(f.kind)?f.e+0.45+h/2:/UNIT/.test(f.kind)?f.e+0.62:f.e+h/2;return new THREE.Matrix4().compose(new THREE.Vector3(f.x,y,-f.n),new THREE.Quaternion().setFromEuler(new THREE.Euler(0,THREE.MathUtils.degToRad(f.rot),0)),new THREE.Vector3(f.w,h,f.d));});
-  const im=new THREE.InstancedMesh(new THREE.BoxGeometry(1,1,1),fixMat,ms.length);ms.forEach((m,i)=>im.setMatrixAt(i,m));im.instanceMatrix.needsUpdate=true;im.computeBoundingSphere();chunks[k].group.add(im);}}
+ const por=std({color:0xf7f7f5,roughness:0.15}),steel=std({color:0xb8bcc0,metalness:0.8,roughness:0.25}),lam=std({color:0xb9cad6,roughness:0.45}),lamD=std({color:0x9fb4c4,roughness:0.45}),seat=std({color:0xeeeeea,roughness:0.3});
+ const cyl=new THREE.CylinderGeometry(0.5,0.42,1,20),box=new THREE.BoxGeometry(1,1,1);
+ // parts: [geo,mat, sx,sy,sz (fractions of w,h(abs),d), ox,oy(abs),oz (fractions)]
+ const P={WC:[[cyl,por,0.95,0.38,0.62,0,0.19,-0.08],[cyl,seat,0.98,0.03,0.64,0,0.4,-0.08],[box,por,0.95,0.38,0.3,0,0.62,0.35],[box,steel,0.2,0.03,0.05,0,0.82,0.35]],
+  BAS:[[box,por,1,0.16,0.9,0,0.78,0],[box,steel,0.08,0.18,0.08,0,0.95,0.32],[cyl,por,0.25,0.62,0.25,0,0.39,0.25]],
+  URI:[[box,por,0.9,0.62,0.7,0,0.78,0.15],[box,std({color:0xe2e6e8,roughness:0.2}),0.7,0.45,0.05,0,0.75,-0.2],[box,steel,0.1,0.25,0.1,0,1.25,0.4]]};
+ for(const k in by){const groups={};const add=(key,geo,mat,m)=>{(groups[key]=groups[key]||{geo,mat,ms:[]}).ms.push(m);};
+  const fr=by[k].filter(f=>f.kind==='PART'&&f.d<=0.06);
+  for(const f of by[k]){const q=new THREE.Quaternion().setFromEuler(new THREE.Euler(0,THREE.MathUtils.degToRad(f.rot),0));
+   if(f.kind==='PART'){add('part',box,lam,new THREE.Matrix4().compose(new THREE.Vector3(f.x,f.e+0.15+0.95,-f.n),q,new THREE.Vector3(Math.max(f.w,0.04),1.9,Math.max(f.d,0.04))));continue;}
+   const T=/LAXA/.test(f.kind)?'WC':/URIN/.test(f.kind)?'URI':'BAS';
+   P[T].forEach(([g,m,sx,sy,sz,ox,oy,oz],i)=>{const off=new THREE.Vector3(ox*f.w,oy,oz*f.d).applyQuaternion(q);add(T+i,g,m,new THREE.Matrix4().compose(new THREE.Vector3(f.x,f.e,-f.n).add(off),q,new THREE.Vector3(sx*f.w,sy,sz*f.d)));});}
+  // stall doors between front pilasters on the same line
+  const lines={};for(const f of fr){const key=f.w>f.d?'x'+f.n.toFixed(2):'n'+f.x.toFixed(2);(lines[key]=lines[key]||[]).push(f);}
+  for(const key in lines){const L=lines[key].sort((a,b)=>key[0]==='x'?a.x-b.x:a.n-b.n);for(let i=0;i+1<L.length;i++){const a=L[i],b=L[i+1];const g=key[0]==='x'?(b.x-b.w/2)-(a.x+a.w/2):(b.n-b.d/2)-(a.n+a.d/2);if(g<0.5||g>1.05)continue;
+    const c=key[0]==='x'?new THREE.Vector3((a.x+a.w/2+b.x-b.w/2)/2,a.e+0.15+0.9,-a.n):new THREE.Vector3(a.x,a.e+0.15+0.9,-(a.n+a.d/2+b.n-b.d/2)/2);
+    add('door',box,lamD,new THREE.Matrix4().compose(c,new THREE.Quaternion(),key[0]==='x'?new THREE.Vector3(g-0.02,1.8,0.035):new THREE.Vector3(0.035,1.8,g-0.02)));}}
+  for(const key in groups){const G=groups[key];const im=new THREE.InstancedMesh(G.geo,G.mat,G.ms.length);G.ms.forEach((m,i)=>im.setMatrixAt(i,m));im.instanceMatrix.needsUpdate=true;im.computeBoundingSphere();im.castShadow=true;im.receiveShadow=true;im.userData.kind='fixture';chunks[k].group.add(im);}}}
 
 function buildPorch(){const p=man.porch,C=chunks.main_porch;if(!p||!C)return;C.group.traverse(o=>{if(o.isMesh)o.visible=false;});const G=new THREE.Group();
  const X0=-2.6,X1=7.2,H=5.1,NF=7.4,NB=12.5,SP=1.9;const arches=[[-1.8,1.9],[2.5,6.6]];
@@ -199,9 +215,9 @@ const FLOORS=['all','B1','1F','2F','3F','4F','5F'];let curFloor='all',cut=true,s
 const ELEV={'B1':-3.6,'1F':0,'2F':3.6,'3F':7.2,'4F':10.8,'5F':14.4};
 function applyFloor(){const thr=curFloor==='all'?1e9:ELEV[curFloor];
  for(const k in chunks){const c=chunks[k];let vis=true;
-  if(c.kind==='roof')vis=curFloor==='all';else if(c.kind==='floor'||c.kind==='porch'){vis=c.floor==='all'?(curFloor==='all'||thr>=0):c.elev<=thr+0.01;if(curFloor==='B1')vis=c.floor==='B1';}
+  if(walk&&curFloor!=='all'&&curFloor!=='B1'){vis=c.kind==='site'||c.elev<=cam.position.y+2.2;}else if(c.kind==='roof')vis=curFloor==='all';else if(c.kind==='floor'||c.kind==='porch'){vis=c.floor==='all'?(curFloor==='all'||thr>=0):c.elev<=thr+0.01;if(curFloor==='B1')vis=c.floor==='B1';}
   c.group.visible=vis;
-  const top=curFloor!=='all'&&cut&&Math.abs(c.elev-thr)<0.01;
+  const top=!walk&&curFloor!=='all'&&cut&&Math.abs(c.elev-thr)<0.01;
   c.group.traverse(o=>{if(o.isMesh&&(o.userData.mat==='ceil'))o.visible=!top||walk;if(o.isInstancedMesh&&['led','ac'].includes(o.userData.furnType))o.visible=!top||walk;});
   if(c.name==='baseball'){c.group.traverse(o=>{if(o.isMesh&&o.userData.mat==='roofMetal')o.visible=curFloor==='all';});}
  }
@@ -209,10 +225,10 @@ function applyFloor(){const thr=curFloor==='all'?1e9:ELEV[curFloor];
  bldSprites.forEach(s=>s.visible=showLabels&&curFloor==='all');
  document.querySelectorAll('#floors button').forEach(b=>b.classList.toggle('on',b.dataset.f===curFloor));render();}
 // ---------- controls ----------
-const ctl=new OrbitControls(cam,r.domElement);ctl.enableDamping=true;ctl.dampingFactor=0.12;ctl.minDistance=45;ctl.maxDistance=420;ctl.minPolarAngle=0.30;ctl.maxPolarAngle=1.31;ctl.addEventListener('change',render);ctl.screenSpacePanning=false;ctl.zoomToCursor=true;ctl.panSpeed=1.0;ctl.rotateSpeed=0.6;ctl.zoomSpeed=0.8;ctl.mouseButtons={LEFT:THREE.MOUSE.PAN,MIDDLE:THREE.MOUSE.DOLLY,RIGHT:THREE.MOUSE.ROTATE};ctl.touches={ONE:THREE.TOUCH.PAN,TWO:THREE.TOUCH.DOLLY_ROTATE};
+const ctl=new OrbitControls(cam,r.domElement);ctl.enableDamping=true;ctl.dampingFactor=0.12;ctl.minDistance=45;ctl.maxDistance=420;ctl.minPolarAngle=0.30;ctl.maxPolarAngle=1.31;ctl.addEventListener('change',render);ctl.screenSpacePanning=false;ctl.zoomToCursor=true;ctl.panSpeed=1.0;ctl.rotateSpeed=0.6;ctl.zoomSpeed=0.8;ctl.mouseButtons={LEFT:THREE.MOUSE.ROTATE,MIDDLE:THREE.MOUSE.DOLLY,RIGHT:THREE.MOUSE.PAN};ctl.touches={ONE:THREE.TOUCH.ROTATE,TWO:THREE.TOUCH.DOLLY_PAN};
 let walk=false,yaw=0,pitch=0;const keys={};const joy={x:0,y:0};
 addEventListener('keydown',e=>{keys[e.code]=true;loop();});addEventListener('keyup',e=>keys[e.code]=false);
-let lookId=null,last=null,downAt=null,dragged=false;const ptrs=new Map();let pinch0=null,twist0=null;const EYE=1.5;
+let lookId=null,last=null,downAt=null,dragged=false;const ptrs=new Map();let pinch0=null,twist0=null;const EYE=1.6;
 r.domElement.addEventListener('contextmenu',e=>e.preventDefault());
 r.domElement.addEventListener('pointerdown',e=>{downAt=[e.clientX,e.clientY];dragged=false;ptrs.set(e.pointerId,[e.clientX,e.clientY]);if(!walk)return;
  if(ptrs.size===2){const v=[...ptrs.values()];pinch0={d:Math.hypot(v[0][0]-v[1][0],v[0][1]-v[1][1]),fov:cam.fov};lookId=null;return;}
@@ -272,6 +288,7 @@ function visibleMeshes(){const a=[];const cc=walk?curChunks():null;const tops=wa
 let hovT=0;function hoverCursor(e){if(!e||!walk){if(cursor.visible){cursor.visible=false;render();}return;}const now=performance.now();if(now-hovT<150)return;hovT=now;
  const h=pick(e,visibleMeshes())[0];if(h&&h.face&&h.face.normal.clone().transformDirection(h.object.matrixWorld).y>0.7&&Math.abs(h.point.y-(cam.position.y-EYE))<0.8){cursor.visible=true;cursor.position.copy(h.point).setY(h.point.y+0.02);}else cursor.visible=false;render();}
 function clickAt(e){
+ if(!walk&&labelGroup.visible){const b_=r.domElement.getBoundingClientRect();let best=null,bd=40;for(const sp of labels){if(!sp.visible)continue;const v=sp.position.clone().project(cam);if(v.z>1)continue;const sx=(v.x+1)/2*b_.width+b_.left,sy=(1-v.y)/2*b_.height+b_.top;const d=Math.hypot(sx-e.clientX,sy-e.clientY);if(d<bd){bd=d;best=sp;}}if(best){roomFocus(best.userData.l);return;}}
  if(walk&&!MOBILE&&!document.pointerLockElement&&!window.__noLock){try{r.domElement.requestPointerLock();}catch(_){}}
  if(!walk){const h=pick(e,visibleMeshes())[0];if(h){let o=h.object,ch=null;while(o){if(o.name&&chunks[o.name])ch=o.name;o=o.parent;}if(ch==='main_porch'||(h.object.isInstancedMesh&&h.object.userData.isDoor)&&false||ch==='main_1F'&&h.point.y<4&&Math.abs(h.point.x-man.porch.x)<6&&Math.abs(-h.point.z-man.porch.n)<2.5)enterLobby();}return;}
  const b_=r.domElement.getBoundingClientRect();let cm=null,cd=55;for(const c of chev.children){if(!c.visible)continue;const v=c.position.clone().project(cam);if(v.z>1)continue;const sx=(v.x+1)/2*b_.width+b_.left,sy=(1-v.y)/2*b_.height+b_.top;const dd=Math.hypot(sx-e.clientX,sy-e.clientY);if(dd<cd){cd=dd;cm=c;}}
@@ -316,8 +333,8 @@ function clampOrbit(force){if(walk)return;if(walk||camAnim)return;const SB=siteB
  if(SB){const old=t.clone();t.x=Math.max(SB.min.x,Math.min(SB.max.x,t.x));t.z=Math.max(SB.min.z,Math.min(SB.max.z,t.z));if(!old.equals(t))cam.position.add(t.clone().sub(old));}
  if(Math.abs(t.y)>1e-6&&!detailMode){const dy=-t.y;t.y=0;cam.position.y+=dy;}
  if(detailMode)t.y=Math.max(0,Math.min(22,t.y));
- {const off=cam.position.clone().sub(t);const sp=new THREE.Spherical().setFromVector3(off);if(lastD&&Math.abs(sp.radius-lastD)>0.05&&!detailMode){const want=1.18-Math.min(1,(sp.radius-45)/215)*0.55;sp.phi+= (want-sp.phi)*0.35;sp.phi=Math.max(ctl.minPolarAngle,Math.min(ctl.maxPolarAngle,sp.phi));cam.position.copy(t).add(off.setFromSpherical(sp));}lastD=sp.radius;}
- const minY=detailMode?2:6;if(cam.position.y<minY)cam.position.y=minY;
+ {const off=cam.position.clone().sub(t);const sp=new THREE.Spherical().setFromVector3(off);lastD=sp.radius;}
+ const minY=detailMode?2:6;if(cam.position.y<minY){const off=cam.position.clone().sub(t);if(off.y>0.01){cam.position.copy(t).addScaledVector(off,(minY-t.y)/off.y);}else cam.position.y=minY;}
  if(force){const now=performance.now();lastClampRay=now;const dir=cam.position.clone().sub(t);const L=dir.length();dir.normalize();rc.set(t.clone().addScaledVector(dir,0.5),dir);rc.far=L;
   const objs=[];for(const k in chunks){const c=chunks[k];if(c.kind==='site'||!c.group.visible)continue;c.group.traverseVisible(o=>{if(o.isMesh&&!(o.parent&&o.parent.name==='furn')&&!['glass','glassIn','line','led'].includes(o.userData.mat))objs.push(o);});}
   const hs=rc.intersectObjects(objs,false);if(hs.length&&!detailMode){// building between target and camera: rise above it smoothly instead of diving in
@@ -326,7 +343,12 @@ function clampOrbit(force){if(walk)return;if(walk||camAnim)return;const SB=siteB
 function guard(){if(walk||camAnim)return;const SB=siteBox();if(!SB)return;const t=ctl.target;const far=SB.distanceToPoint(t)>10;const d=cam.position.distanceTo(t);
  if(far||cam.position.y<1.5||!isFinite(d)){defaultView(true);}}
 
-ctl.addEventListener('change',()=>clampOrbit(false));ctl.addEventListener('end',()=>{setTimeout(()=>{clampOrbit(true);render();},400);});ctl.addEventListener('start',()=>{userMoved=true;camAnim=null;if(ctl._panOffset)ctl._panOffset.set(0,0,0);if(ctl._sphericalDelta)ctl._sphericalDelta.set(0,0,0);if(ctl.getDistance()>40)detailMode=false;});
+ctl.addEventListener('change',()=>clampOrbit(false));function orbitRot(dyaw,dpitch){const t=ctl.target;const o=cam.position.clone().sub(t);const sp=new THREE.Spherical().setFromVector3(o);sp.theta+=dyaw;sp.phi=Math.max(ctl.minPolarAngle,Math.min(ctl.maxPolarAngle,sp.phi+dpitch));cam.position.copy(t).add(o.setFromSpherical(sp));cam.lookAt(t);userMoved=true;camAnim=null;render();}
+r.domElement.addEventListener('wheel',e=>{if(walk||!e.ctrlKey)return;e.preventDefault();e.stopImmediatePropagation();orbitRot(0,e.deltaY*0.0015);},{passive:false,capture:true});
+let cdrag=null;r.domElement.addEventListener('pointerdown',e=>{if(walk||!e.ctrlKey||e.button!==0)return;e.stopImmediatePropagation();cdrag=[e.clientX,e.clientY];ctl.enabled=false;try{r.domElement.setPointerCapture(e.pointerId)}catch(_){}},{capture:true});
+r.domElement.addEventListener('pointermove',e=>{if(!cdrag)return;e.stopImmediatePropagation();orbitRot(-(e.clientX-cdrag[0])*0.006,-(e.clientY-cdrag[1])*0.004);cdrag=[e.clientX,e.clientY];},{capture:true});
+const cend=e=>{if(!cdrag)return;e.stopImmediatePropagation();cdrag=null;ctl.enabled=!walk;};r.domElement.addEventListener('pointerup',cend,{capture:true});r.domElement.addEventListener('pointercancel',cend,{capture:true});
+let wheelAt=0;r.domElement.addEventListener('wheel',()=>{wheelAt=performance.now();},{passive:true,capture:true});ctl.addEventListener('end',()=>{setTimeout(()=>{clampOrbit(performance.now()-wheelAt>800);render();},400);});ctl.addEventListener('start',()=>{userMoved=true;camAnim=null;if(ctl._panOffset)ctl._panOffset.set(0,0,0);if(ctl._sphericalDelta)ctl._sphericalDelta.set(0,0,0);if(ctl.getDistance()>40)detailMode=false;});
 window.__check=()=>{const p=cam.position;let inWall=false;if(walk){const R=0.12;for(const k of curChunks()){for(const r of WALLS[k].r)if(p.x>r[0]+R&&p.x<r[2]-R&&-p.z>r[1]+R&&-p.z<r[3]-R)inWall=true;}}else{for(const b of bldBoxes()){if(b.containsPoint(p)&&!b.containsPoint(ctl.target))inWall=true;}}return {y:p.y,walk,inWall,below:p.y<0.3};};
 
 function colliders(){const a=[];for(const k in chunks){const g=chunks[k].group;if(!g.visible)continue;g.traverse(o=>{if(o.isMesh&&!o.isInstancedMesh&&o.visible&&!['glass','glassIn','led','ceil','line'].includes(o.userData.mat)&&!(o.parent&&o.parent.name==='furn'))a.push(o);});}for(const im of doorIMs)if(im.parent&&im.parent.visible)a.push(im);return a;}
@@ -343,9 +365,9 @@ function step(){const dt=Math.min(clock.getDelta(),0.25);let moving=false;
  if(walk){const f=new THREE.Vector3(-Math.sin(yaw),0,-Math.cos(yaw)),rt=new THREE.Vector3(-f.z,0,f.x);let mf=-joy.y,mr=joy.x;if(glide){const k=Math.min(1,(performance.now()-glide.t0)/1000/glide.dur),q=k*k*(3-2*k);{const y_=cam.position.y,prev=cam.position.clone();cam.position.lerpVectors(glide.from,glide.to,q);cam.position.y=y_;if(!okStep(cam.position)){cam.position.copy(prev);glide=null;}}if(k>=1)glide=null;moving=true;}
   if(keys.KeyW||keys.ArrowUp)mf+=1;if(keys.KeyS||keys.ArrowDown)mf-=1;if(keys.KeyD||keys.ArrowRight)mr+=1;if(keys.KeyA||keys.ArrowLeft)mr-=1;if(keys.KeyQ){yaw+=1.6*dt;moving=true;}if(keys.KeyR){pitch=Math.min(1.2,pitch+1.2*dt);moving=true;}if(keys.KeyF){pitch=Math.max(-1.2,pitch-1.2*dt);moving=true;}if(keys.Equal||keys.NumpadAdd){cam.fov=Math.max(30,cam.fov-40*dt);cam.updateProjectionMatrix();moving=true;}if(keys.Minus||keys.NumpadSubtract){cam.fov=Math.min(90,cam.fov+40*dt);cam.updateProjectionMatrix();moving=true;}
   const sp=((keys.ShiftLeft||keys.ShiftRight||runOn)?5.5:2.6)*dt;if(mf||mr){const mv=new THREE.Vector3().addScaledVector(f,mf*sp).addScaledVector(rt,mr*sp);tryMove(mv);moving=true;}{const feet=cam.position.y-EYE-jumpH;const sY=surfaceAt(cam.position.x,-cam.position.z,feet);if(jumpV||jumpH>0){for(let t=0;t<dt-1e-6;t+=1/120){const h=Math.min(1/120,dt-t);jumpV-=9.8*h;jumpH+=jumpV*h;if(jumpH<=0){jumpH=0;jumpV=0;break;}}window.__jumpMax=Math.max(window.__jumpMax||0,jumpH);moving=true;}const ty=sY+EYE;const cy=cam.position.y-jumpH;if(Math.abs(ty-cy)>0.002){cam.position.y=cy+(ty>cy?1:Math.min(1,dt*10))*(ty-cy)+jumpH;moving=true;}else cam.position.y=ty+jumpH;
-  const fN0=Object.entries(ELEV).filter(([k,v])=>v<=sY+0.3).sort((a,b)=>b[1]-a[1])[0];const fN=fN0&&(outdoors(cam.position)?['all']:fN0);if(fN&&fN[0]!==curFloor){curFloor=fN[0];applyFloor();colCache=null;}}
+  const fN0=Object.entries(ELEV).filter(([k,v])=>v<=sY+0.3).sort((a,b)=>b[1]-a[1])[0];const fN=fN0&&(outdoors(cam.position)?['all']:fN0);const vk=Math.floor((cam.position.y+2.2)/3.6);if(walk&&vk!==window.__vk){window.__vk=vk;applyFloor();}if(fN&&fN[0]!==curFloor){curFloor=fN[0];applyFloor();colCache=null;}}
   cam.rotation.set(pitch,yaw,0,'YXZ');}
- else{if(stepAnim())moving=true;else{if(orbitKeys(dt))moving=true;if(ctl.update())moving=true;if(ctl._panOffset&&ctl._panOffset.lengthSq()>1e-6)moving=true;if(!detailMode&&!camAnim&&Math.abs(ctl.target.y)>0.01){const dy=ctl.target.y;ctl.target.y=0;cam.position.y-=dy;ctl.update();}if(!detailMode&&!camAnim&&cam.position.y<6){cam.position.y=6;ctl.update();}}}
+ else{if(stepAnim())moving=true;else{if(orbitKeys(dt))moving=true;if(ctl.update())moving=true;if(ctl._panOffset&&ctl._panOffset.lengthSq()>1e-6)moving=true;if(!detailMode&&!camAnim&&Math.abs(ctl.target.y)>0.01){const dy=ctl.target.y;ctl.target.y=0;cam.position.y-=dy;ctl.update();}if(!detailMode&&!camAnim&&cam.position.y<6){const off=cam.position.clone().sub(ctl.target);if(off.y>0.01)cam.position.copy(ctl.target).addScaledVector(off,(6-ctl.target.y)/off.y);else cam.position.y=6;ctl.update();}}}
  if(animDoors(dt))moving=true;if(walk){const key=cam.position.toArray().map(v=>v.toFixed(1)).join()+(yaw).toFixed(1);if(key!==chev.userData.key&&!glide){chev.userData.key=key;updateChevrons();}}
  draw();return moving;}
 function loop(){if(looping)return;looping=true;clock.getDelta();const tick=()=>{const mv=step();if(mv||jid!==null||glide||camAnim||Object.values(KV).some(v=>v>0.01)||Object.values(keys).some(Boolean))requestAnimationFrame(tick);else{looping=false;}};requestAnimationFrame(tick);}
@@ -363,7 +385,7 @@ window.setView=v=>{if(v!=='bird'){detailMode=true;}const pp=cam.position.clone()
 function roomFocus(l){const fl=l.floor==='site'?'all':(l.floor==='roof'?'all':l.floor);curFloor=fl;applyFloor();
  if(l.room&&l.type&&l.type!=='poi'){const [x0,n0,x1,n1]=l.room;const e=l.pos[1];const alongX=(x1-x0)>=(n1-n0);
   // stand at back, look to front
-  if(alongX)setWalk(true,[x1-1.0,e+1.55,-(n0+n1)/2+((n1-n0)/2-1.2)],Math.PI/2-0.35);else setWalk(true,[(x0+x1)/2+((x1-x0)/2-1.2),e+1.55,-(n0+1.0)],0.35);}
+  if(alongX)setWalk(true,[x1-1.0,e+EYE,-(n0+n1)/2+((n1-n0)/2-1.2)],Math.PI/2-0.35);else setWalk(true,[(x0+x1)/2+((x1-x0)/2-1.2),e+EYE,-(n0+1.0)],0.35);}
  else{setWalk(false);detailMode=true;const T_=new THREE.Vector3(l.pos[0],l.pos[1],-l.pos[2]),P=new THREE.Vector3(l.pos[0]+22,l.pos[1]+24,-l.pos[2]+22);if(SHOT){cam.fov=50;ctl.target.copy(T_);cam.position.copy(P);cam.updateProjectionMatrix();ctl.update();}else animTo(P,T_,50,0.9);}
  render();closePanel();}
 window.roomFocus=roomFocus;window.chunksDbg=chunks;
@@ -389,9 +411,12 @@ sizeLabels();setView('bird');applyFloor();
 window.__api={setFloor:f=>{curFloor=f;applyFloor();},setWalk,roomFocus,labels:man.labels,render:()=>r.render(scene,cam),cam,ctl,setCut:v=>{cut=v;applyFloor();},info:()=>r.info.render,scene};
 
 // ---------- on-screen pad ----------
-document.querySelectorAll('#pad [data-k]').forEach(b=>{const k=b.dataset.k;const on=e=>{e.preventDefault();e.stopPropagation();keys[k]=true;t0=performance.now();loop();try{b.setPointerCapture(e.pointerId)}catch(_){}};let t0=0;const off=e=>{const el=performance.now()-t0;setTimeout(()=>{keys[k]=false;},Math.max(0,220-el));};
+document.querySelectorAll('[data-k]').forEach(b=>{const k=b.dataset.k;const on=e=>{e.preventDefault();e.stopPropagation();keys[k]=true;t0=performance.now();loop();try{b.setPointerCapture(e.pointerId)}catch(_){}};let t0=0;const off=e=>{const el=performance.now()-t0;setTimeout(()=>{keys[k]=false;},Math.max(0,220-el));};
  b.addEventListener('pointerdown',on);b.addEventListener('pointerup',off);b.addEventListener('pointercancel',off);b.addEventListener('pointerleave',off);});
 document.getElementById('pReset').onclick=()=>{if(walk){pitch=-0.22;cam.fov=72;cam.updateProjectionMatrix();cam.rotation.set(pitch,yaw,0,'YXZ');render();}else{curFloor='all';applyFloor();defaultView(true);}};
+function orbitZoom(k){const t=ctl.target;const o=cam.position.clone().sub(t);const L=Math.max(ctl.minDistance,Math.min(ctl.maxDistance,o.length()*k));cam.position.copy(t).addScaledVector(o.normalize(),L);userMoved=true;camAnim=null;ctl.update();render();}
+document.getElementById('oL').onclick=()=>orbitRot(0.35,0);document.getElementById('oR').onclick=()=>orbitRot(-0.35,0);document.getElementById('oIn').onclick=()=>orbitZoom(0.75);document.getElementById('oOut').onclick=()=>orbitZoom(1.33);
+document.getElementById('oReset').onclick=()=>{curFloor='all';applyFloor();defaultView(true);};
 document.getElementById('pDoor').onclick=()=>{if(!walk)return;const d=nearestDoor();if(d)openDoor(d,true);};
 document.getElementById('pJump').onpointerdown=e=>{e.preventDefault();e.stopPropagation();jump();};document.getElementById('pRun').onclick=e=>{runOn=!runOn;e.currentTarget.classList.toggle('on',runOn);};
 window.__camDbg=()=>({detailMode,camAnim:!!camAnim,t:ctl.target.toArray(),p:cam.position.toArray()});window.__wallsAt=(x,n,m=0.8)=>{const o=[];for(const k in WALLS){for(const r of WALLS[k].r||[])if(x>r[0]-m&&x<r[2]+m&&n>r[1]-m&&n<r[3]+m)o.push([k,r]);for(const s of WALLS[k].s||[])o.push(null);}return o.filter(Boolean);};window.__cols=()=>{let n=0;scene.traverse(o=>{if(o.userData.kind==='column')n+=o.count;});return n;};window.__dbgMove=(dx,dz)=>{const v=new THREE.Vector3(dx,0,dz);const p=cam.position.clone().add(v);return {free:freeDist(v,v.length()),ok:okStep(p),surf:surfaceAt(p.x,-p.z,cam.position.y-EYE),cur:curChunks()};};
