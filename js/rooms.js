@@ -51,7 +51,7 @@ export function buildRooms(chunks,WALLS,logoTex,man){
   const bn=text('서울가동초등학교',4.6,0.42,{fg:'#ffffff',bg:'#1d4f9a',font:'bold 110px NanumGothic, sans-serif'});bn.position.set(-48,2.72,41.2);bn.rotation.y=Math.PI;chunks.info_1F.group.add(bn);
   const seatR=S({color:0xb3212f,roughness:0.7}),seatW=S({color:0xf3f1ec,roughness:0.5});const at=[];
   for(let r=0;r<12;r++){const n=-35.6+r*1.0,lift=r*0.12;for(let x=-53.2;x<=-42.8;x+=0.56){if(Math.abs(x+48)<0.55)continue;at.push([x,n,Math.PI]);}R.rects.push([-53.5,n-0.3,-48.6,n+0.35],[-47.4,n-0.3,-42.4,n+0.35]);}
-  R.inst([[0.5,0.08,0.45,0,0.45,0,seatR],[0.5,0.6,0.06,0,0.75,-0.22,seatW],[0.05,0.5,0.4,-0.26,0.3,0,dark]],at);
+  R.inst([[0.5,0.08,0.45,0,0.45,0,seatR],[0.5,0.6,0.06,0,0.75,-0.22,seatR],[0.05,0.5,0.4,-0.26,0.3,0,dark]],at);
   leds(R,-53.6,-42.4,-37,-21.2);});
  // 4) 뮤지컬실 = 본관 2F (x -57.3..-50.3, n -3.9..13.7)
  add('main_2F',(R)=>{const blk=S({color:0x141416,roughness:0.95});
@@ -64,6 +64,8 @@ export function buildRooms(chunks,WALLS,logoTex,man){
  add('hall_2F',(R,e)=>{const court=S({map:cv(1024,2048,(x,w,h)=>{const g=woodTex('#cf9a5c',40).image;for(let i=0;i<4;i++)x.drawImage(g,0,i*h/4,w,h/4);x.lineWidth=8;x.strokeStyle='#f4f4f4';x.strokeRect(60,90,w-120,h-180);x.beginPath();x.moveTo(60,h/2);x.lineTo(w-60,h/2);x.stroke();x.beginPath();x.arc(w/2,h/2,150,0,7);x.stroke();x.strokeStyle='#e8433a';x.beginPath();x.arc(w/2,90,330,0,Math.PI);x.stroke();x.beginPath();x.arc(w/2,h-90,330,Math.PI,0);x.stroke();x.strokeStyle='#2c6fd1';x.strokeRect(20,30,w-40,h-60);}),roughness:0.35});
   R.plane(court,45.4,64.5,-52.4,-19.1,0.012);
   const stg=S({map:rep(woodTex('#a06a3a'),3,2),roughness:0.5});R.box(stg,50.45,60.0,-52.35,-49.2,0,1.0);R.box(stg,49.3,50.45,-51.6,-49.2,0,0.5);R.rects.push([50.4,-52.4,60.0,-49.2]);
+  const dwood=S({map:rep(woodTex('#4a2c17',6),3,1),roughness:0.55});R.box(dwood,50.45,60.0,-49.24,-49.18,0,1.0);R.box(dwood,49.3,50.45,-49.24,-49.18,0,0.5);R.box(S({color:0x2e1a0d,roughness:0.5}),50.4,60.05,-49.26,-49.14,0.96,1.04);
+  const gb=text('서울가동초등학교',6.4,0.75,{fg:'#ffffff',bg:'#1f7a3a',font:'bold 120px NanumGothic, sans-serif'});gb.position.set(55.2,e+4.75,52.1);gb.rotation.y=Math.PI;chunks.hall_2F.group.add(gb);
   const maroon=S({color:0x7a1626,roughness:0.95});R.box(maroon,50.5,59.95,-52.35,-52.15,1.0,6.0);R.box(maroon,50.5,59.95,-52.3,-52.0,5.3,6.1);
   const pan=S({map:rep(woodTex('#b98552',5),2,3),roughness:0.6});R.box(pan,45.45,50.45,-52.35,-52.15,0,6.1);R.box(pan,60.0,64.45,-52.35,-52.15,0,6.1);R.box(S({color:0xe9e2d4}),45.45,64.45,-52.35,-52.15,6.1,6.9);
   const t=text('2007년 4월 25일',4.2,0.5,{fg:'#5a3b1e',font:'bold 100px NanumGothic, sans-serif'});t.position.set(55.6,e+6.5,52.13);t.rotation.y=Math.PI;chunks.hall_2F.group.add(t);
