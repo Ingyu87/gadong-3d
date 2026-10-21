@@ -55,7 +55,7 @@ export function buildRooms(chunks,WALLS,logoTex,man){
   leds(R,-53.6,-42.4,-37,-21.2);});
  // 4) 뮤지컬실 = 본관 2F (x -57.3..-50.3, n -3.9..13.7)
  add('main_2F',(R)=>{const blk=S({color:0x141416,roughness:0.95});
-  R.wallp(blk,'z',-3.9,13.7,-50.35,0,2.88,-1);R.wallp(blk,'x',-57.2,-50.4,13.68,0,2.88,-1);R.plane(blk,-57.3,-50.3,-3.9,13.7,2.87);
+  {let a0=-3.9;for(const[g0,g1]of[[-2.98,-1.93],[2.72,3.72],[6.02,7.07],[11.72,12.72]]){R.wallp(blk,'z',a0,g0,-50.35,0,2.88,-1);R.wallp(blk,'z',g0,g1,-50.35,2.15,2.88,-1);a0=g1;}R.wallp(blk,'z',a0,13.7,-50.35,0,2.88,-1);}R.wallp(blk,'x',-57.2,-50.4,13.68,0,2.88,-1);R.plane(blk,-57.3,-50.3,-3.9,13.7,2.87);
   const curt=S({color:0x0b0b0c,roughness:1});const cg=new THREE.Mesh(new THREE.BoxGeometry(0.12,2.85,17.4),curt);cg.position.set(-57.15,3.6+1.43,-4.9);chunks.main_2F.group.add(cg);
   const fl=S({map:rep(cv(1024,1024,(x,w,h)=>{const g=woodTex('#d0a876').image;x.drawImage(g,0,0,w,h);x.strokeStyle='#f1c40f';x.lineWidth=6;for(const f of[0.25,0.5,0.75]){x.beginPath();x.moveTo(f*w,0);x.lineTo(f*w,h);x.stroke();}x.beginPath();x.moveTo(0,h/2);x.lineTo(w,h/2);x.stroke();}),1,2),roughness:0.45});R.plane(fl,-57.3,-50.3,-3.9,13.7,0.012);
   const stp=S({map:rep(woodTex('#b98a55'),2,1),roughness:0.55});for(let i=0;i<3;i++)R.box(stp,-56.8,-50.8,11.0+i*0.85,13.65,0,0.4*(i+1));R.rects.push([-56.8,11.0,-50.8,13.65]);
