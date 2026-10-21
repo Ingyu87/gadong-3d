@@ -161,17 +161,17 @@ function applyFloor(){const thr=curFloor==='all'?1e9:ELEV[curFloor];
 const ctl=new OrbitControls(cam,r.domElement);ctl.enableDamping=true;ctl.dampingFactor=0.12;ctl.minDistance=45;ctl.maxDistance=420;ctl.minPolarAngle=0.30;ctl.maxPolarAngle=1.31;ctl.addEventListener('change',render);ctl.screenSpacePanning=false;ctl.zoomToCursor=true;ctl.panSpeed=1.0;ctl.rotateSpeed=0.6;ctl.zoomSpeed=0.8;ctl.mouseButtons={LEFT:THREE.MOUSE.PAN,MIDDLE:THREE.MOUSE.DOLLY,RIGHT:THREE.MOUSE.ROTATE};ctl.touches={ONE:THREE.TOUCH.PAN,TWO:THREE.TOUCH.DOLLY_ROTATE};
 let walk=false,yaw=0,pitch=0;const keys={};const joy={x:0,y:0};
 addEventListener('keydown',e=>{keys[e.code]=true;loop();});addEventListener('keyup',e=>keys[e.code]=false);
-let lookId=null,last=null,downAt=null,dragged=false;const ptrs=new Map();let pinch0=null;const EYE=1.5;
+let lookId=null,last=null,downAt=null,dragged=false;const ptrs=new Map();let pinch0=null,twist0=null;const EYE=1.5;
 r.domElement.addEventListener('contextmenu',e=>e.preventDefault());
 r.domElement.addEventListener('pointerdown',e=>{downAt=[e.clientX,e.clientY];dragged=false;ptrs.set(e.pointerId,[e.clientX,e.clientY]);if(!walk)return;
  if(ptrs.size===2){const v=[...ptrs.values()];pinch0={d:Math.hypot(v[0][0]-v[1][0],v[0][1]-v[1][1]),fov:cam.fov};lookId=null;return;}
  lookId=e.pointerId;last=[e.clientX,e.clientY];try{r.domElement.setPointerCapture(e.pointerId)}catch(_){}});
 r.domElement.addEventListener('pointermove',e=>{if(ptrs.has(e.pointerId))ptrs.set(e.pointerId,[e.clientX,e.clientY]);if(downAt&&Math.hypot(e.clientX-downAt[0],e.clientY-downAt[1])>6)dragged=true;
- if(!walk){hoverCursor(null);return;}
+ if(!walk){if(ptrs.size===2&&e.pointerType==='touch'){const v=[...ptrs.values()];const an=Math.atan2(v[1][1]-v[0][1],v[1][0]-v[0][0]);if(twist0!==null){let d=an-twist0;if(d>Math.PI)d-=2*Math.PI;if(d<-Math.PI)d+=2*Math.PI;if(Math.abs(d)<0.5){const o=cam.position.clone().sub(ctl.target);o.applyAxisAngle(new THREE.Vector3(0,1,0),-d);cam.position.copy(ctl.target).add(o);cam.lookAt(ctl.target);ctl.update();render();}}twist0=an;}else twist0=null;hoverCursor(null);return;}
  if(pinch0&&ptrs.size===2){const v=[...ptrs.values()];const d=Math.hypot(v[0][0]-v[1][0],v[0][1]-v[1][1]);cam.fov=Math.max(30,Math.min(90,pinch0.fov*pinch0.d/d));cam.updateProjectionMatrix();render();return;}
  if(e.pointerId===lookId&&last){const k=0.0045*cam.fov/72;yaw+=(e.clientX-last[0])*k;pitch=Math.max(-1.2,Math.min(1.2,pitch+(e.clientY-last[1])*k));last=[e.clientX,e.clientY];cam.rotation.set(pitch,yaw,0,'YXZ');hoverCursor(null);render();}
  else if(e.pointerType==='mouse')hoverCursor(e);});
-const pend=e=>{ptrs.delete(e.pointerId);if(ptrs.size<2)pinch0=null;if(e.pointerId===lookId){lookId=null;last=null;}
+const pend=e=>{ptrs.delete(e.pointerId);if(ptrs.size<2){pinch0=null;twist0=null;}if(e.pointerId===lookId){lookId=null;last=null;}
  if(e.type==='pointerup'&&downAt&&!dragged&&e.button!==2)clickAt(e);downAt=null;};
 r.domElement.addEventListener('pointerup',pend);r.domElement.addEventListener('pointercancel',pend);
 r.domElement.addEventListener('wheel',e=>{if(!walk)return;cam.fov=Math.max(30,Math.min(90,cam.fov+e.deltaY*0.03));cam.updateProjectionMatrix();render();},{passive:true});
