@@ -96,6 +96,9 @@ export function buildRooms(chunks,WALLS,logoTex,man){
   R.box(dark,55.6,56.2,15.8,16.2,0.89,1.25);
   R.wallp(S({color:0xfafafa,roughness:0.2}),'x',53.2,58.6,18.12,0.9,2.2,-1);R.box(gp,53.1,58.7,18.0,18.12,0.85,0.9);
   const gl=S({color:0xa9c6cf,roughness:0.05,metalness:0.2,transparent:true,opacity:0.5});for(let n=6.2;n<14;n+=1.25){R.box(wh,52.25,52.75,n,n+1.2,0,0.85);R.box(gl,52.27,52.7,n+0.02,n+1.18,0.9,2.1);}R.rects.push([52.25,6.2,52.75,14]);
+  // clboard 과학실 137-138: pink band along the top of the walls, black display beside the whiteboard, tall white glass-door cabinets
+  {const pk=S({color:0xf2b8c6,roughness:0.6});R.wallp(pk,'x',52.3,59.6,18.1,2.45,2.85,-1);R.wallp(pk,'x',52.3,59.6,5.1,2.45,2.85,1);R.wallp(pk,'z',5.1,18.1,59.6,2.45,2.85,-1);R.wallp(pk,'z',5.1,18.1,52.27,2.45,2.85,1);
+   R.wallp(S({color:0x111214,roughness:0.2}),'x',58.7,59.5,18.1,1.0,2.1,-1);for(let n=6.2;n<14;n+=1.25)R.box(wh,52.25,52.7,n+0.02,n+1.18,2.1,2.4);}
   leds(R,52.4,59.4,5.3,18,2.86,2.4,2.4);});
  // 8) 방송실 (본관 1F x -33.55..-29.25, n 13.1..20.2): console desk, monitors, chair, studio glass
  add('main_1F',(R)=>{const wh=S({color:0xf0f0ed,roughness:0.5}),blk=S({color:0x1b1c1e,roughness:0.4}),scr=S({color:0x223344,emissive:0x2a4a6a,emissiveIntensity:0.5,roughness:0.2}),frame=S({map:rep(woodTex('#c08a55'),1,1),roughness:0.6});
