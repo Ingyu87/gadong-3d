@@ -103,10 +103,13 @@ export function buildRooms(chunks,WALLS,logoTex,man){
   R.box(S({color:0xbcd6e0,roughness:0.05,transparent:true,opacity:0.35}),-33.4,-29.3,18.6,18.64,0.9,2.2);R.rects.push([-33.55,18.5,-29.25,18.75]);
   leds(R,-33.4,-29.4,13.3,18.4,2.86,2.0,2.4);});
  // 9) 주리홀(학생식당) (다목적강당 1F x 45.3..65.15, n -60.25..-34.05): rows of tables + stools
- add('hall_1F',(R)=>{const wh=S({color:0xf3f3f0,roughness:0.4}),yel=S({color:0xf2b233,roughness:0.5}),grn=S({color:0x7cbf5a,roughness:0.5});const at=[],sa=[],sb=[];
-  for(let x=47.6;x<63.6;x+=2.7)for(let n=-57.8;n<-36.5;n+=2.4){at.push([x,n]);for(const dx of[-0.5,0.5]){sa.push([x+dx,n-0.62]);sb.push([x+dx,n+0.62]);}R.rects.push([x-0.95,n-0.45,x+0.95,n+0.45]);}
-  R.inst([[1.8,0.04,0.75,0,0.7,0,wh],[0.06,0.68,0.06,-0.8,0.34,-0.3,metal],[0.06,0.68,0.06,0.8,0.34,-0.3,metal],[0.06,0.68,0.06,-0.8,0.34,0.3,metal],[0.06,0.68,0.06,0.8,0.34,0.3,metal]],at);
-  const stool=m=>[[0.34,0.04,0.34,0,0.44,0,m],[0.04,0.42,0.04,0,0.21,0,metal],[0.3,0.02,0.3,0,0.01,0,metal]];R.inst(stool(yel),sa);R.inst(stool(grn),sb);});
+ add('hall_1F',(R)=>{// clboard 급식실 104-123: long rows of white-marble tables with orange round swing-arm stools, light grey floor, mint lower walls + cream upper, cream columns
+  const mar=S({map:rep(cv(256,256,(x,w,h)=>{x.fillStyle='#e9e9e6';x.fillRect(0,0,w,h);for(let i=0;i<900;i++){x.fillStyle=`rgba(110,110,110,${Math.random()*0.12})`;x.fillRect(Math.random()*w,Math.random()*h,2,2);}}),4,1),roughness:0.25}),org=S({color:0xf07a1e,roughness:0.45}),gr=S({color:0x55595d,metalness:0.5,roughness:0.4});const at=[],st=[];
+  R.plane(S({color:0xdfe1df,roughness:0.3,polygonOffset:true,polygonOffsetFactor:-2}),45.4,65.1,-60.2,-34.1,0.02);
+  {const mn=S({color:0xbfe5c8,roughness:0.6});R.wallp(mn,'z',-60.1,-34.2,45.37,0,1.3,1);R.wallp(mn,'z',-60.1,-34.2,65.1,0,1.3,-1);}
+  for(let x=47.4;x<64;x+=2.05){for(let n=-58.2;n<-37;n+=4.6){at.push([x,n]);for(const dn of[-1.6,-0.53,0.53,1.6])for(const dx of[-0.52,0.52])st.push([x+dx,n+dn]);}R.rects.push([x-0.35,-59.3,x+0.35,-36]);}
+  R.inst([[0.78,0.04,4.3,0,0.72,0,mar],[0.06,0.68,0.06,0,0.36,-1.9,gr],[0.06,0.68,0.06,0,0.36,1.9,gr],[0.06,0.06,4.0,0,0.3,0,gr]],at);
+  R.inst([[0.32,0.05,0.32,0,0.44,0,org],[0.04,0.4,0.04,0,0.24,0,gr]],st);});
 
  // 6) 운동장 dressing: striped shade canopies, flagpoles, 가동문화관 sign
  const site=chunks.site;if(site){const g=new THREE.Group();g.name='playground';const stripes=cv(512,64,(x,w,h)=>{const cs=['#e53935','#fdd835','#43a047','#1e88e5','#fb8c00','#ffffff','#8e24aa'];for(let i=0;i<16;i++){x.fillStyle=cs[i%cs.length];x.fillRect(i*w/16,0,w/16,h);}});const sm=S({map:stripes,side:THREE.DoubleSide,roughness:0.8});const post=S({color:0x6b6f74,metalness:0.5,roughness:0.4});
