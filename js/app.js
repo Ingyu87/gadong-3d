@@ -8,9 +8,9 @@ import {GTAOPass} from 'three/addons/postprocessing/GTAOPass.js';
 import {OutputPass} from 'three/addons/postprocessing/OutputPass.js';
 import {RoomEnvironment} from 'three/addons/environments/RoomEnvironment.js';
 import {mergeGeometries} from 'three/addons/utils/BufferGeometryUtils.js';
-import {buildRooms} from './rooms.js?v=202610221630';
-import * as T from './tex.js?v=202610221630';
-import {buildInstanced} from './furn.js?v=202610221630';
+import {buildRooms} from './rooms.js?v=202610221643';
+import * as T from './tex.js?v=202610221643';
+import {buildInstanced} from './furn.js?v=202610221643';
 const Q=new URLSearchParams(location.search);const SHOT=Q.has('shot');
 const MOBILE=matchMedia('(pointer:coarse)').matches||innerWidth<760;
 await document.fonts.load('bold 40px NanumGothic').catch(()=>{});
@@ -54,7 +54,7 @@ const M={
  woodF:tri(std({map:T.wood('#9a6a3f',0.09,0.9,1.2),roughness:0.35}),1.2),woodLight:tri(std({map:T.wood('#d8c39c',0.6,2.4,2.4),roughness:0.6}),2.4),
  woodFrame:tri(std({map:T.wood('#a8743f',0.1,1,1),roughness:0.55}),1),door:tri(std({map:T.wood('#9c6a3a',0.25,2.2,2.2),roughness:0.6}),2.2),
  ceil:tri(std({map:T.ceilTile(),emissive:0xffffff,emissiveIntensity:0.07}),0.6),led:new THREE.MeshBasicMaterial({color:0xffffff}),
- stair:tri(std({map:T.noise('#bdb8ae',0.1,1),roughness:0.5}),1),metalPanel:tri(std({map:metalTex,roughness:0.5,metalness:0.3}),3),
+ stair:tri(std({map:T.noise('#a7a8a4',0.08,1),roughness:0.5}),1),metalPanel:tri(std({map:metalTex,roughness:0.5,metalness:0.3}),3),
  asphalt:tri(std({map:T.noise('#5d5f61',0.12,2),roughness:0.95}),2),dirt:tri(std({map:T.noise('#c8ae86',0.12,3),roughness:1}),3),paving:tri(std({map:T.noise('#b9b4aa',0.1,1),roughness:0.9}),1),
  grass:std({color:0x6f8f45,roughness:1}),fence:std({color:0x2f5a48,metalness:0.4,roughness:0.5}),concrete:tri(std({map:T.noise('#bdbab3',0.08,2)}),2),line:std({color:0xf4f4f0}),
  yellow:std({color:0xe8b81f}),red:std({color:0xc9382c}),darkglass:std({color:0x2a3036,roughness:0.2}),
@@ -98,10 +98,58 @@ function surfaceAt(x,n,feet){let best=-1e9;const cand=[];
   const hole=STAIRS.some(st=>st.bld+'_'+st.to===k&&inR({x0:st.core[0],n0:st.core[1],x1:st.core[2],n1:st.core[3]},x,n));if(!hole)cand.push(W.e);}
  cand.push(0);for(const y of cand)if(y<=feet+0.45&&y>best)best=y;return best===-1e9?feet:best;}
 window.__surface=(x,n,f)=>surfaceAt(x,n,f);
-const railMat=new THREE.MeshStandardMaterial({color:0x8a9aa6,metalness:0.4,roughness:0.5,transparent:true,opacity:0.85});
-const NOSE_M=new THREE.MeshStandardMaterial({color:0x3a3d42,roughness:0.6}),STR_M=new THREE.MeshStandardMaterial({color:0xd9d6cf,roughness:0.7}),HR_M=new THREE.MeshStandardMaterial({color:0x8a5a32,roughness:0.45});
+const railMat=new THREE.MeshStandardMaterial({color:0xc9ced3,metalness:0.75,roughness:0.3});
+const NOSE_M=new THREE.MeshStandardMaterial({color:0x3a3d42,roughness:0.6}),STR_M=new THREE.MeshStandardMaterial({color:0xa9aaa6,roughness:0.6}),HR_M=new THREE.MeshStandardMaterial({color:0xc9ced3,metalness:0.75,roughness:0.3});
+// stairwell dressing per 중앙계단 photos (green/lime walls, floor numbers, poster, window, tactile tiles, banner, bin, terrazzo, riser labels)
+const _cvT=(w,h,f)=>{const c=document.createElement('canvas');c.width=w;c.height=h;f(c.getContext('2d'),w,h);const t=new THREE.CanvasTexture(c);t.colorSpace=THREE.SRGBColorSpace;t.anisotropy=4;return t;};
+const SS={};function ssMats(){if(SS.g)return SS;const sm=(o)=>new THREE.MeshStandardMaterial(Object.assign({roughness:0.8},o));
+ SS.g=sm({color:0x1f9a5c});SS.l=sm({color:0xc4cf6a});SS.base=sm({color:0x8d9196});SS.yel=sm({color:0xd9a520,roughness:0.6});SS.bin=sm({color:0x9aa1a8,roughness:0.5});SS.frame=sm({color:0x1e3b2c,roughness:0.5});SS.glass=sm({color:0xbfd6e0,roughness:0.15,metalness:0.1,transparent:true,opacity:0.55});SS.ss=new THREE.MeshStandardMaterial({color:0xc9ced3,metalness:0.75,roughness:0.3});
+ SS.terr=sm({map:_cvT(256,256,(x,w,h)=>{x.fillStyle='#d7d4cd';x.fillRect(0,0,w,h);for(let i=0;i<2600;i++){const v=Math.random();x.fillStyle=v<0.5?'#8f8b84':v<0.8?'#f2f0ea':v<0.93?'#6d6962':'#b9a98f';x.fillRect(Math.random()*w,Math.random()*h,1+Math.random()*2.2,1+Math.random()*2.2);}x.strokeStyle='rgba(120,120,120,.5)';x.lineWidth=2;x.strokeRect(0,0,w,h);}),roughness:0.35});SS.terr.map.wrapS=SS.terr.map.wrapT=THREE.RepeatWrapping;
+ SS.hj=sm({map:_cvT(256,48,(x,w,h)=>{x.fillStyle='#f4f4f0';x.fillRect(0,0,w,h);x.strokeStyle='#666';x.lineWidth=3;x.strokeRect(2,2,w-4,h-4);x.fillStyle='#222';x.font='bold 30px serif';x.textAlign='center';x.textBaseline='middle';x.fillText('右側通行 安全第一',w/2,h/2+2);})});
+ SS.poster=sm({roughness:0.4,map:_cvT(512,384,(x,w,h)=>{const g=x.createLinearGradient(0,0,0,h);g.addColorStop(0,'#1b5fc4');g.addColorStop(1,'#0b2e6e');x.fillStyle=g;x.fillRect(0,0,w,h);x.fillStyle='#ffe14d';x.font='bold 40px NanumGothic, sans-serif';x.textAlign='center';x.fillText('바다! 무한한 힘의 원천',w/2,52);
+  const C=['#c98b4a','#3a8fd0','#e6e6e6','#58a35a','#8a5b3a','#1d3f7a'];for(let i=0;i<6;i++){const X=30+(i%3)*160,Y=90+Math.floor(i/3)*140;x.fillStyle='#fff';x.fillRect(X-3,Y-3,136,96);x.fillStyle=C[i];x.fillRect(X,Y,130,90);x.fillStyle='rgba(255,255,255,.85)';for(let k=0;k<3;k++)x.fillRect(X,Y+98+k*9,110-k*20,4);}})});
+ SS.banner=sm({roughness:0.5,map:_cvT(1024,200,(x,w,h)=>{const C=['#e7a33a','#d4553d','#3b6fb6','#7cbf6a','#f0d34a','#8a5aa8','#e98aa0'];for(let i=0;i<14;i++){x.fillStyle=C[i%7];x.beginPath();const X=i*80-40;x.moveTo(X,0);x.lineTo(X+150,0);x.lineTo(X+60,h);x.lineTo(X-90,h);x.fill();}x.fillStyle='rgba(0,0,0,.25)';x.fillRect(0,0,w,h);x.fillStyle='#fff';x.font='bold 58px NanumGothic, sans-serif';x.textAlign='center';x.fillText('사랑이 담긴 인사 한 마디가',w/2,82);x.fillText('하루를 빛나게 합니다',w/2,158);})});
+ SS.num={};return SS;}
+function numMat(t){if(SS.num[t])return SS.num[t];SS.num[t]=new THREE.MeshStandardMaterial({transparent:true,roughness:0.6,map:_cvT(256,256,(x,w,h)=>{x.font='bold 230px sans-serif';x.textAlign='center';x.textBaseline='middle';x.lineWidth=9;x.strokeStyle='#fff';x.strokeText(t,w/2,h/2+10);x.lineWidth=3;x.strokeStyle='#1f9a5c';x.strokeText(t,w/2,h/2+10);})});return SS.num[t];}
+function styleStairs(){ssMats();const GRP={};
+ for(const st of STAIRS){const c=chunks[st.bld+'_'+st.floor];if(!c)continue;const fl=st.flights.filter(f=>f.kind!=='landing'&&f.start);if(!fl.length)continue;
+  const e=Math.min(...st.flights.map(f=>f.y0??0)),top=Math.max(...st.flights.map(f=>f.y1??f.y0??0)),H=top-e;const [X0,N0,X1,N1]=st.core;const g=new THREE.Group();g.userData.isStair=true;
+  const P=(mat,w,h,x,y,n,ry)=>{const m=new THREE.Mesh(new THREE.PlaneGeometry(w,h),mat);m.position.set(x,y,-n);m.rotation.y=ry;g.add(m);return m;};
+  const B=(mat,x0,x1,y0,y1,n0,n1)=>{const m=new THREE.Mesh(new THREE.BoxGeometry(x1-x0,y1-y0,n1-n0),mat);m.position.set((x0+x1)/2,(y0+y1)/2,-(n0+n1)/2);g.add(m);return m;};
+  const fu=st.flights.filter(f=>f.kind!=='landing');const twoFl=fl.length>=2;const land=st.flights.find(f=>!f.start&&f.kind!=='landing')||st.flights.find(f=>f.kind==='landing');
+  // terrazzo floor at this level
+  {const m=P(SS.terr,X1-X0,N1-N0,(X0+X1)/2,e+0.008,(N0+N1)/2,0);m.rotation.x=-Math.PI/2;SS.terr.map.repeat.set(1,1);}
+  if(land){const ly=(land.y0??land.y1);const m=P(SS.terr,land.x1-land.x0,land.n1-land.n0,(land.x0+land.x1)/2,ly+0.006,(land.n0+land.n1)/2,0);m.rotation.x=-Math.PI/2;}
+  // tactile tiles at each flight bottom/top
+  for(const f of fl){const hi=f.start==='hi';const d=0.3;
+   if(st.run==='x'){const b=hi?f.x1:f.x0,t=hi?f.x0:f.x1,s=hi?1:-1;B(SS.yel,Math.min(b,b+s*d),Math.max(b,b+s*d),f.y0,f.y0+0.012,f.n0+0.05,f.n1-0.05);B(SS.yel,Math.min(t,t-s*d),Math.max(t,t-s*d),f.y1,f.y1+0.012,f.n0+0.05,f.n1-0.05);}
+   else{const b=hi?f.n1:f.n0,t=hi?f.n0:f.n1,s=hi?1:-1;B(SS.yel,f.x0+0.05,f.x1-0.05,f.y0,f.y0+0.012,Math.min(b,b+s*d),Math.max(b,b+s*d));B(SS.yel,f.x0+0.05,f.x1-0.05,f.y1,f.y1+0.012,Math.min(t,t-s*d),Math.max(t,t-s*d));}}
+  const flr=st.floor.replace('F','');const upTop=!STAIRS.some(o=>o.bld===st.bld&&o.floor===st.to&&Math.abs(o.core[0]-X0)<0.3&&Math.abs(o.core[1]-N0)<0.3);
+  if(twoFl&&st.bld!=='hall'){const i=0.025,wh=H-0.12;const yc=e+0.12+wh/2;
+   // faces: run x -> entrance n0, back n1, landing end x0|x1; run n -> entrance n1|n0 (first flight start), long x0/x1, landing end opposite
+   let landEnd,entr;if(st.run==='x'){landEnd=Math.abs(land.x0-X0)<0.2?'x0':'x1';entr='n0';}else{landEnd=Math.abs(land.n0-N0)<0.2?'n0':'n1';entr=landEnd==='n0'?'n1':'n0';}
+   const face=(k,mat,y0,y1,a0,a1)=>{const h=y1-y0,y=(y0+y1)/2;if(k==='n1')return P(mat,a1-a0,h,(a0+a1)/2,y,N1-i,0);if(k==='n0')return P(mat,a1-a0,h,(a0+a1)/2,y,N0+i,Math.PI);if(k==='x0')return P(mat,a1-a0,h,X0+i,y,(a0+a1)/2,Math.PI/2);return P(mat,a1-a0,h,X1-i,y,(a0+a1)/2,-Math.PI/2);};
+   const span=k=>k[0]==='n'?[X0,X1]:[N0,N1];
+   const greens=st.run==='x'?['n1',landEnd==='x0'?'x1':'x0']:['x0','x1'];
+   for(const k of greens){const [a,b]=span(k);face(k,SS.g,e+0.12,top,a,b);face(k,SS.base,e,e+0.12,a,b);}
+   {const [a,b]=span(landEnd);face(landEnd,SS.l,e+0.12,top,a,b);face(landEnd,SS.base,e,e+0.12,a,b);
+    const ly=land.y0??(e+H/2),m=(a+b)/2,ww=Math.min(1.6,(b-a)*0.5);face(landEnd,SS.frame,ly+0.95,ly+2.15,m-ww/2,m+ww/2).position.addScaledVector(new THREE.Vector3(),0);const gl=face(landEnd,SS.glass,ly+1.0,ly+2.1,m-ww/2+0.05,m+ww/2-0.05);gl.translateZ(0.01);const mu=face(landEnd,SS.frame,ly+1.0,ly+2.1,m-0.025,m+0.025);mu.translateZ(0.015);const tr=face(landEnd,SS.frame,ly+1.55,ly+1.6,m-ww/2,m+ww/2);tr.translateZ(0.015);}
+   // floor number on back/long wall near the entrance end
+   const numK=st.run==='x'?'n1':(Math.abs((fl[0].x0+fl[0].x1)/2-X1)<Math.abs((fl[0].x0+fl[0].x1)/2-X0)?'x1':'x0');
+   const [a,b]=span(numK);const along=st.run==='x'?(landEnd==='x0'?a+(b-a)*0.35:b-(b-a)*0.35):(entr==='n1'?b-(b-a)*0.3:a+(b-a)*0.3);
+   const nm=face(numK,numMat(flr),e+1.9,e+2.8,along-0.45,along+0.45);nm.translateZ(0.005);
+   if(upTop){const n2=face(numK,numMat(st.to.replace('F','')),top+1.9,top+2.8,along-0.45,along+0.45);n2.translateZ(0.005);}
+   if(st.bld==='main'&&st.run==='x'){const pa=landEnd==='x0'?b-1.55:a+0.15;const p=face(numK,SS.poster,e+1.05,e+2.1,pa,pa+1.4);p.translateZ(0.006);}
+   // banner + stainless frame over the doorless entrance, on the corridor side
+   {const [a2,b2]=span(entr);const o=0.03;const ban=face(entr,SS.banner,e+2.3,e+2.85,a2+0.1,b2-0.1);ban.rotateY(Math.PI);ban.translateZ(2*i+o);const lin=face(entr,SS.ss,e+2.22,e+2.3,a2+0.1,b2-0.1);lin.rotateY(Math.PI);lin.translateZ(2*i+o);}
+   // small trash bin by the entrance corner
+   {const bx=entr==='n0'||entr==='n1'?(landEnd==='x0'?X0+0.3:X1-0.3):X0+0.25,bn=entr==='n0'?N0+0.3:entr==='n1'?N1-0.3:(N0+N1)/2;if(st.run==='x')B(SS.bin,bx-0.14,bx+0.14,e,e+0.42,bn-0.11,bn+0.11);else B(SS.bin,X1-0.3,X1-0.08,e,e+0.42,bn-0.14,bn+0.14);}
+  }
+  c.group.add(g);}
+}
+
 function buildStairs(){const byChunk={};for(const st of STAIRS){const k=st.bld+'_'+st.floor;(byChunk[k]=byChunk[k]||[]).push(st);}
- for(const k in byChunk){const c=chunks[k];if(!c)continue;const mats=[],rails=[],nos=[],strs=[],hrs=[];
+ for(const k in byChunk){const c=chunks[k];if(!c)continue;const mats=[],rails=[],nos=[],strs=[],hrs=[],hjs=[];
   for(const st of byChunk[k])for(const f of st.flights){if(f.kind==='landing'){const m=new THREE.Matrix4().compose(new THREE.Vector3((f.x0+f.x1)/2,f.y0-0.1,-(f.n0+f.n1)/2),new THREE.Quaternion(),new THREE.Vector3(f.x1-f.x0,0.2,f.n1-f.n0));mats.push(m);continue;}
    const run=st.run==='x'?f.x1-f.x0:f.n1-f.n0;const N=Math.max(4,Math.round((f.y1-f.y0)/0.16));const tw=run/N;
    for(let i=0;i<N;i++){const top=f.y0+(i+1)*(f.y1-f.y0)/N;const h=Math.max(0.16,top-f.y0+0.05);// step i from start end
@@ -109,6 +157,7 @@ function buildStairs(){const byChunk={};for(const st of STAIRS){const k=st.bld+'
     const sx=st.run==='x'?tw:f.x1-f.x0,sn=st.run==='x'?f.n1-f.n0:tw;const hh=Math.min(h,0.6);
     mats.push(new THREE.Matrix4().compose(new THREE.Vector3(cx,top-hh/2,-cn),new THREE.Quaternion(),new THREE.Vector3(sx,hh,sn)));
     {const fe=f.start==='hi'?s0+tw-0.025:s0+0.025;nos.push(new THREE.Matrix4().compose(st.run==='x'?new THREE.Vector3(fe,top-0.012,-cn):new THREE.Vector3(cx,top-0.012,-fe),new THREE.Quaternion(),st.run==='x'?new THREE.Vector3(0.05,0.03,sn+0.002):new THREE.Vector3(sx+0.002,0.03,0.05)));}
+    {const hi_=f.start==='hi';const fr=hi_?s0+tw+0.004:s0-0.004;const ry=st.run==='x'?(hi_?Math.PI/2:-Math.PI/2):(hi_?Math.PI:0);const off=st.run==='x'?(f.n1-f.n0)*0.22:(f.x1-f.x0)*0.22;const P2=st.run==='x'?new THREE.Vector3(fr,top-0.095,-(cn+off)):new THREE.Vector3(cx+off,top-0.095,-fr);hjs.push(new THREE.Matrix4().compose(P2,new THREE.Quaternion().setFromEuler(new THREE.Euler(0,ry,0)),new THREE.Vector3(0.36,0.068,1)));}
     // underside slab
    }
    const ang=Math.atan2(f.y1-f.y0,run);const L=Math.hypot(run,f.y1-f.y0);const mid=[(f.x0+f.x1)/2,(f.y0+f.y1)/2-0.25,(f.n0+f.n1)/2];
@@ -121,10 +170,10 @@ function buildStairs(){const byChunk={};for(const st of STAIRS){const k=st.bld+'
      if(!sides.includes(sv0)){const sh=sv0+(k_?-0.07:0.07);const H_=st.run==='x'?new THREE.Vector3(mid[0],yy+0.9,-sh):new THREE.Vector3(sh,yy+0.9,-mid[2]);hrs.push(new THREE.Matrix4().compose(H_,q,st.run==='x'?new THREE.Vector3(L,0.045,0.045):new THREE.Vector3(0.045,0.045,L)));
       for(const t of[0.15,0.5,0.85]){const B_=st.run==='x'?new THREE.Vector3(f.x0+(f.x1-f.x0)*t,0,-(sh+(k_?0.035:-0.035))):new THREE.Vector3(sh+(k_?0.035:-0.035),0,-(f.n0+(f.n1-f.n0)*t));const tt=st.run==='x'?(f.start==='hi'?1-t:t):(f.start==='hi'?1-t:t);B_.y=f.y0+tt*(f.y1-f.y0)+0.84;hrs.push(new THREE.Matrix4().compose(B_,new THREE.Quaternion(),new THREE.Vector3(0.03,0.08,0.03).set(st.run==='x'?0.03:0.07,0.08,st.run==='x'?0.07:0.03)));}}}}
     for(const sv of sides){const yy=(f.y0+f.y1)/2;const P_=st.run==='x'?new THREE.Vector3(mid[0],yy+0.5,-sv):new THREE.Vector3(sv,yy+0.5,-mid[2]);
-     rails.push(new THREE.Matrix4().compose(P_,q,st.run==='x'?new THREE.Vector3(L,0.85,0.03):new THREE.Vector3(0.03,0.85,L)));
+     {const nb=Math.max(4,Math.round(L/0.13));for(let b=0;b<=nb;b++){const t=b/nb;const tt=f.start==='hi'?1-t:t;const B_=st.run==='x'?new THREE.Vector3(f.x0+(f.x1-f.x0)*t,f.y0+tt*(f.y1-f.y0)+0.5,-sv):new THREE.Vector3(sv,f.y0+tt*(f.y1-f.y0)+0.5,-(f.n0+(f.n1-f.n0)*t));rails.push(new THREE.Matrix4().compose(B_,new THREE.Quaternion(),new THREE.Vector3(0.022,0.9,0.022)));}const M_=P_.clone();M_.y-=0.3;rails.push(new THREE.Matrix4().compose(M_,q,st.run==='x'?new THREE.Vector3(L,0.03,0.03):new THREE.Vector3(0.03,0.03,L)));}
      const T_=P_.clone();T_.y+=0.45;rails.push(new THREE.Matrix4().compose(T_,q,st.run==='x'?new THREE.Vector3(L,0.06,0.07):new THREE.Vector3(0.07,0.06,L)));}}
   }
-  const im=new THREE.InstancedMesh(new THREE.BoxGeometry(1,1,1),M.stair,mats.length);mats.forEach((m,i)=>im.setMatrixAt(i,m));im.instanceMatrix.needsUpdate=true;im.computeBoundingSphere();im.castShadow=!MOBILE;im.receiveShadow=true;im.userData.mat='stair';im.userData.isStair=true;c.group.add(im);const addIM=(arr,mat)=>{if(!arr.length)return;const q=new THREE.InstancedMesh(new THREE.BoxGeometry(1,1,1),mat,arr.length);arr.forEach((m,i)=>q.setMatrixAt(i,m));q.instanceMatrix.needsUpdate=true;q.computeBoundingSphere();q.receiveShadow=true;q.userData.isStair=true;c.group.add(q);};addIM(nos,NOSE_M);addIM(strs,STR_M);addIM(hrs,HR_M);if(rails.length){const rm=new THREE.InstancedMesh(new THREE.BoxGeometry(1,1,1),railMat,rails.length);rails.forEach((m,i)=>rm.setMatrixAt(i,m));rm.instanceMatrix.needsUpdate=true;rm.computeBoundingSphere();rm.userData.isStair=true;c.group.add(rm);}}
+  const im=new THREE.InstancedMesh(new THREE.BoxGeometry(1,1,1),M.stair,mats.length);mats.forEach((m,i)=>im.setMatrixAt(i,m));im.instanceMatrix.needsUpdate=true;im.computeBoundingSphere();im.castShadow=!MOBILE;im.receiveShadow=true;im.userData.mat='stair';im.userData.isStair=true;c.group.add(im);const addIM=(arr,mat)=>{if(!arr.length)return;const q=new THREE.InstancedMesh(new THREE.BoxGeometry(1,1,1),mat,arr.length);arr.forEach((m,i)=>q.setMatrixAt(i,m));q.instanceMatrix.needsUpdate=true;q.computeBoundingSphere();q.receiveShadow=true;q.userData.isStair=true;c.group.add(q);};addIM(nos,NOSE_M);if(hjs.length){ssMats();const q=new THREE.InstancedMesh(new THREE.PlaneGeometry(1,1),SS.hj,hjs.length);hjs.forEach((m,i)=>q.setMatrixAt(i,m));q.instanceMatrix.needsUpdate=true;q.computeBoundingSphere();q.userData.isStair=true;c.group.add(q);}addIM(strs,STR_M);addIM(hrs,HR_M);if(rails.length){const rm=new THREE.InstancedMesh(new THREE.BoxGeometry(1,1,1),railMat,rails.length);rails.forEach((m,i)=>rm.setMatrixAt(i,m));rm.instanceMatrix.needsUpdate=true;rm.computeBoundingSphere();rm.userData.isStair=true;c.group.add(rm);}}
 }
 let SIGNS=[];const signReady=fetch(V('signs.json')).then(r=>r.json()).then(d=>SIGNS=d).catch(()=>{});
 function buildCorrLights(){for(const f of['1F','2F','3F','4F','5F']){const ch=chunks['main_'+f];if(!ch)continue;const e=(man.chunks.find(c=>c.name==='main_'+f)||{}).elev||0;const ms=[];for(let x=-45;x<=46;x+=3.0){if(Math.abs(x-2.5)<5&&f!=='1F')continue;ms.push(new THREE.Matrix4().compose(new THREE.Vector3(x,e+2.885,-21.8),new THREE.Quaternion(),new THREE.Vector3(1.2,0.03,0.3)));}
@@ -194,7 +243,7 @@ function buildPorch(){const p=man.porch,C=chunks.main_porch;if(!p||!C)return;C.g
  WALLS.main_porch={e:0,s:[],r:[[X0,NF,-1.8,NB],[1.9,NF,2.5,NB],[6.6,NF,X1,NB],...rr]};}
 function buildDado(){const trim=new THREE.MeshStandardMaterial({color:0x8fbfae,roughness:0.6});for(const ck in DADO){const c=chunks[ck];if(!c)continue;const e=DADO[ck].e,gs=[],ts=[];for(const[ax,a,b,cc]of DADO[ck].s){const L=b-a,m=(a+b)/2;const g=ax==='x'?new THREE.BoxGeometry(L,1.1,0.02):new THREE.BoxGeometry(0.02,1.1,L);const t=ax==='x'?new THREE.BoxGeometry(L,0.04,0.035):new THREE.BoxGeometry(0.035,0.04,L);if(ax==='x'){g.translate(m,e+0.55,-cc);t.translate(m,e+1.12,-cc);}else{g.translate(cc,e+0.55,-m);t.translate(cc,e+1.12,-m);}gs.push(g);ts.push(t);}
  if(!gs.length)continue;const me=new THREE.Mesh(mergeGeometries(gs),M.mint);me.receiveShadow=true;me.userData.mat='dado';const mt=new THREE.Mesh(mergeGeometries(ts),trim);mt.userData.mat='dado';c.group.add(me,mt);}}
-function decorate(){try{buildDado();}catch(err){console.error('dado',err);}buildStairs();buildFixtures();buildColumns();buildSigns();buildCorrLights();addFurnCollision();try{buildRooms(chunks,WALLS,logoTex,man);}catch(err){console.error('rooms',err);}const s=man.sign;if(s){const g=new THREE.Group();const n=[...s.text];const cx=(s.x0+s.x1)/2;const sp=Math.min(5.4,(s.x1-s.x0)/(n.length+1.5));
+function decorate(){try{buildDado();}catch(err){console.error('dado',err);}buildStairs();try{styleStairs();}catch(err){console.error('stairstyle',err);}buildFixtures();buildColumns();buildSigns();buildCorrLights();addFurnCollision();try{buildRooms(chunks,WALLS,logoTex,man);}catch(err){console.error('rooms',err);}const s=man.sign;if(s){const g=new THREE.Group();const n=[...s.text];const cx=(s.x0+s.x1)/2;const sp=Math.min(5.4,(s.x1-s.x0)/(n.length+1.5));
  n.forEach((ch,i)=>{const p=textPlane(ch,1.6,1.6,{w:256,h:256,font:'bold 230px NanumGothic, sans-serif'});p.position.set(cx+(i-(n.length-1)/2)*sp+sp*0.6,s.y,-(s.n-0.26));g.add(p);});
  const lg=new THREE.Mesh(new THREE.PlaneGeometry(1.6,1.6),new THREE.MeshStandardMaterial({map:logoTex(),transparent:true}));lg.position.set(cx-(n.length-1)/2*sp-sp*0.5,s.y,-(s.n-0.26));g.add(lg);
  g.userData.kind='roofdeco';chunks.main_roof?.group.add(g);}
