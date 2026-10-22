@@ -135,7 +135,7 @@ export function buildRooms(chunks,WALLS,logoTex,man){
    rail(bx0,bx1,z1-0.05,false);rail(z0+1.0,z1,bx0+0.05,true);rail(z0+1.0,z1,bx1-0.05,true);
    const wood=S({color:0xc0682c,roughness:0.55}),chrome=S({color:0xe4e8ec,metalness:0.95,roughness:0.12});const YC=4.6;
    for(const [x,z] of[[bx0+0.3,z0+0.4],[bx1-0.3,z0+0.4],[bx0+0.3,z1-0.6],[bx1-0.3,z1-0.6]]){const c=new THREE.Mesh(new THREE.CylinderGeometry(0.19,0.19,YC-H,14),wood);c.position.set(x,H+(YC-H)/2,z);g.add(c);const cb=new THREE.Mesh(new THREE.CylinderGeometry(0.23,0.27,0.4,14),chrome);cb.position.set(x,H+0.2,z);g.add(cb);const ct=new THREE.Mesh(new THREE.CylinderGeometry(0.22,0.2,0.25,14),chrome);ct.position.set(x,YC-0.05,z);g.add(ct);}
-   const span=(bx1-bx0)/2+1.4,R=span*1.6,ang=Math.asin(span/R),D=(z1-z0)+1.4;
+   const span=(bx1-bx0)/2+1.4,R=span*3.4,ang=Math.asin(span/R),D=(z1-z0)+1.4;
    const rain=cv(512,64,(x,w,h)=>{const cs=['#e53935','#fb8c00','#fdd835','#43a047','#1e88e5','#3949ab','#8e24aa'];for(let i=0;i<7;i++){x.fillStyle=cs[i];x.fillRect(i*w/7,0,w/7+1,h);}});
    {const mk=(r,mat)=>{const geo=new THREE.CylinderGeometry(r,r,D,40,1,true,Math.PI-ang,2*ang);geo.rotateX(Math.PI/2);const m=new THREE.Mesh(geo,mat);m.position.set(cx,YC+0.6-R,cz);g.add(m);return m;};
     mk(R,S({map:rain,roughness:0.5,side:THREE.FrontSide}));mk(R-0.05,S({color:0x6f757b,metalness:0.5,roughness:0.4,side:THREE.BackSide}));
