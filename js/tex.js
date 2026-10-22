@@ -25,8 +25,8 @@ export const board=()=>cv(512,340,(x)=>{x.fillStyle='#f7f7f4';x.fillRect(0,0,512
 export const terrazzo=()=>{const t=cv(1024,1024,(x,w,h)=>{x.fillStyle='#c4c6c4';x.fillRect(0,0,w,h);const cols=['#9a9c9c','#e4e6e5','#7d8080','#b2b5b4','#d3d5d4','#5f6262','#a7aaaa'];
  for(let i=0;i<9000;i++){x.fillStyle=cols[(rnd()*cols.length)|0];x.globalAlpha=0.5+rnd()*0.5;const r=1+rnd()*rnd()*7;x.beginPath();x.ellipse(rnd()*w,rnd()*h,r,r*(0.5+rnd()*0.5),rnd()*3,0,7);x.fill();}
  x.globalAlpha=1;x.strokeStyle='rgba(80,80,80,0.35)';x.lineWidth=3;x.strokeRect(0,0,w,h);x.beginPath();x.moveTo(w/2,0);x.lineTo(w/2,h);x.moveTo(0,h/2);x.lineTo(w,h/2);x.stroke();for(const[a,b]of[[0,0],[w/2,0],[0,h/2],[w/2,h/2]]){x.fillStyle=`rgba(${rnd()<.5?255:0},${rnd()<.5?255:0},${rnd()<.5?255:0},0.03)`;x.fillRect(a,b,w/2,h/2);}});t.repeat.set(1/1.2,1/1.2);return t;};
-export const slideDoor=()=>{const c=document.createElement('canvas');c.width=256;c.height=512;const x=c.getContext('2d');x.fillStyle='#d9dbd8';x.fillRect(0,0,256,512);
- for(let g=0;g<60;g++){x.strokeStyle=`rgba(90,90,90,${0.02+rnd()*0.03})`;x.lineWidth=1+rnd()*2;x.beginPath();const xx=rnd()*256;x.moveTo(xx,0);x.bezierCurveTo(xx+rnd()*8-4,170,xx+rnd()*8-4,340,xx,512);x.stroke();}
- x.strokeStyle='#9da2a3';x.lineWidth=10;x.strokeRect(5,5,246,502);x.fillStyle='#e9eef0';x.fillRect(58,70,140,150);x.fillStyle='#7f9fb0';x.fillRect(66,78,124,134);x.fillStyle='rgba(255,255,255,0.35)';x.beginPath();x.moveTo(66,78);x.lineTo(130,78);x.lineTo(66,150);x.fill();
- x.fillStyle='#c8ccd0';x.fillRect(212,250,14,60);x.fillStyle='rgba(60,60,60,0.15)';x.fillRect(5,440,246,62);
+export const slideDoor=()=>{const c=document.createElement('canvas');c.width=256;c.height=512;const x=c.getContext('2d');x.fillStyle='#c9a777';x.fillRect(0,0,256,512);
+ for(let g=0;g<70;g++){x.strokeStyle=`rgba(120,80,40,${0.04+rnd()*0.05})`;x.lineWidth=1+rnd()*2;x.beginPath();const xx=rnd()*256;x.moveTo(xx,0);x.bezierCurveTo(xx+rnd()*8-4,170,xx+rnd()*8-4,340,xx,512);x.stroke();}
+ x.strokeStyle='#9a6b3a';x.lineWidth=18;x.strokeRect(9,9,238,494);x.fillStyle='#eef1f1';x.fillRect(30,40,196,190);x.fillStyle='rgba(200,210,214,0.6)';x.fillRect(30,40,196,190);x.fillStyle='#9a6b3a';x.fillRect(20,230,216,14);
+ x.fillStyle='#8a8f93';x.fillRect(212,280,12,56);
  const t=new THREE.CanvasTexture(c);t.colorSpace=THREE.SRGBColorSpace;t.anisotropy=8;return t;};
