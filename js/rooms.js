@@ -75,7 +75,7 @@ export function buildRooms(chunks,WALLS,logoTex,man){
    x.strokeStyle='#2e7d4f';x.strokeRect(160,300,w-320,h-600);x.beginPath();x.moveTo(w/2,0);x.lineTo(w/2,h);x.stroke();x.strokeStyle='#f2c230';x.lineWidth=6;x.strokeRect(30,40,w-60,h-80);}),roughness:0.3});
   // clboard 느티홀 47-64: dark green lower walls (~1.8 m) under white walls, blue gym mats stacked along the side wall, white goals
   {const gw=S({color:0x1f5a3c,roughness:0.6});R.wallp(gw,'z',-52.3,-19.2,45.47,0,1.8,1);R.wallp(gw,'z',-52.3,-19.2,64.43,0,1.8,-1);R.wallp(gw,'x',45.5,64.4,-19.17,0,1.8,-1);
-   const bm=S({color:0x2a5fc0,roughness:0.8});for(let n=-46;n<-28;n+=2.2){R.box(bm,46.0,47.0,n,n+2.0,0,0.6);}R.rects.push([45.9,-46.1,47.05,-28.3]);
+   const bm=S({color:0x2a5fc0,roughness:0.8});for(let n=-50.5;n<-42;n+=2.2){R.box(bm,46.0,47.0,n,n+2.0,0,0.6);}R.rects.push([45.9,-50.6,47.05,-41.9]);
    const gol=S({color:0xf4f4f4,metalness:0.3,roughness:0.4});for(const n of[-20.0]){for(const x of[53.5,56.9])R.box(gol,x-0.04,x+0.04,n-0.04,n+0.04,0,2.0);R.box(gol,53.5,56.9,n-0.04,n+0.04,1.96,2.04);}}
   R.plane(court,45.4,64.5,-52.4,-19.1,0.012);
   const stg=S({map:rep(woodTex('#a06a3a'),3,2),roughness:0.5});R.box(stg,50.45,60.0,-52.35,-49.2,0,1.0);R.box(stg,49.3,50.45,-51.6,-49.2,0,0.5);R.rects.push([50.4,-52.4,60.0,-49.2]);
@@ -117,7 +117,7 @@ export function buildRooms(chunks,WALLS,logoTex,man){
   const mar=S({map:rep(cv(256,256,(x,w,h)=>{x.fillStyle='#e9e9e6';x.fillRect(0,0,w,h);for(let i=0;i<900;i++){x.fillStyle=`rgba(110,110,110,${Math.random()*0.12})`;x.fillRect(Math.random()*w,Math.random()*h,2,2);}}),4,1),roughness:0.25}),org=S({color:0xf07a1e,roughness:0.45}),gr=S({color:0x55595d,metalness:0.5,roughness:0.4});const at=[],st=[];
   R.plane(S({color:0xdfe1df,roughness:0.3,polygonOffset:true,polygonOffsetFactor:-2}),45.4,65.1,-60.2,-34.1,0.02);
   {const mn=S({color:0xbfe5c8,roughness:0.6});R.wallp(mn,'z',-60.1,-34.2,45.37,0,1.3,1);R.wallp(mn,'z',-60.1,-34.2,65.1,0,1.3,-1);}
-  for(let x=47.4;x<64;x+=2.05){for(let n=-58.2;n<-37;n+=4.6){at.push([x,n]);for(const dn of[-1.6,-0.53,0.53,1.6])for(const dx of[-0.52,0.52])st.push([x+dx,n+dn]);}R.rects.push([x-0.35,-59.3,x+0.35,-36]);}
+  for(let x=47.4;x<64;x+=2.05){for(let n=-58.2;n<-40;n+=4.6){at.push([x,n]);for(const dn of[-1.6,-0.53,0.53,1.6])for(const dx of[-0.52,0.52])st.push([x+dx,n+dn]);}R.rects.push([x-0.35,-59.3,x+0.35,-42.1]);}
   R.inst([[0.78,0.04,4.3,0,0.72,0,mar],[0.06,0.68,0.06,0,0.36,-1.9,gr],[0.06,0.68,0.06,0,0.36,1.9,gr],[0.06,0.06,4.0,0,0.3,0,gr]],at);
   R.inst([[0.32,0.05,0.32,0,0.44,0,org],[0.04,0.4,0.04,0,0.24,0,gr]],st);});
 
