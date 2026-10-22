@@ -206,7 +206,7 @@ export function buildRooms(chunks,WALLS,logoTex,man){
    R.box(steel,x0+2.2,x0+2.6,n0+0.4,n0+0.8,0,0.08);R.box(steel,x0+2.38,x0+2.42,n0+0.75,n0+0.8,0.08,1.1);
    const cr=S({map:cv(128,128,(x,w,h)=>{x.fillStyle='#fff';x.fillRect(0,0,w,h);x.fillStyle='#d32f2f';x.fillRect(48,20,32,88);x.fillRect(20,48,88,32);})});R.wallp(cr,'x',x0+3.0,x0+3.6,n0+0.06,1.6,2.2,1);});
   // 인쇄실: 2 copiers, paper shelf, work table
-  add('main_1F',(R)=>{const x0=-13.35,n0=20.5,x1=-9.05,n1=28.65;for(const n of[n0+1.3,n0+2.8]){R.box(copier,x0+0.3,x0+1.0,n-0.55,n+0.55,0,1.05);R.box(S({color:0x55606a}),x0+0.35,x0+0.95,n-0.5,n+0.5,1.05,1.12);R.box(S({color:0x6fa8dc,emissive:0x203040}),x0+0.9,x0+1.0,n-0.15,n+0.15,1.0,1.06);R.rects.push([x0+0.3,n-0.55,x0+1.0,n+0.55]);}
+  add('main_1F',(R)=>{const x0=-13.35,n0=23.3,x1=-9.05,n1=28.65; // room starts north of the 1F corridor (n<23.1 is corridor)for(const n of[n0+1.3,n0+2.8]){R.box(copier,x0+0.3,x0+1.0,n-0.55,n+0.55,0,1.05);R.box(S({color:0x55606a}),x0+0.35,x0+0.95,n-0.5,n+0.5,1.05,1.12);R.box(S({color:0x6fa8dc,emissive:0x203040}),x0+0.9,x0+1.0,n-0.15,n+0.15,1.0,1.06);R.rects.push([x0+0.3,n-0.55,x0+1.0,n+0.55]);}
    R.box(steel,x1-0.65,x1-0.2,n1-3.0,n1-0.5,0,1.9);for(let y=0.1;y<1.8;y+=0.45)R.box(paper,x1-0.62,x1-0.23,n1-2.9,n1-0.6,y,y+0.25);R.rects.push([x1-0.65,n1-3.0,x1-0.2,n1-0.5]);
    R.box(wd,x0+1.8,x0+3.0,n1-3.0,n1-1.4,0.85,0.9);R.box(metal,x0+1.85,x0+2.95,n1-2.95,n1-1.45,0,0.85);R.rects.push([x0+1.8,n1-3.0,x0+3.0,n1-1.4]);});
   // 실과실: 4 work tables with stools, sink counter
