@@ -43,7 +43,7 @@ export function buildRooms(chunks,WALLS,logoTex,man){
   {const cols=[0xf08a24,0xf6c21c,0x6cc04a];for(let i=0;i<3;i++){R.box(S({color:0xf3efe6,roughness:0.5}),-53.85,-48.2+i*-0.0,-23.0+i*0.9,-15.1,0,0.4*(i+1));R.box(S({color:cols[i],roughness:0.5}),-53.85,-48.2,-23.02+i*0.9,-22.98+i*0.9+0.02,0,0.4*(i+1)).scale.z=1;R.wallp(S({color:cols[i],roughness:0.5}),'x',-53.85,-48.2,-23.0+i*0.9,0.4*i,0.4*(i+1),-1);}
    R.rects.push([-53.85,-23.0,-48.2,-15.1]);R.box(S({color:0x2f8fd6,roughness:0.5}),-51.5,-49.5,-24.6,-23.9,0,0.42);R.box(S({color:0xc9a173,roughness:0.5}),-51.55,-49.45,-24.65,-23.85,0.42,0.47);R.rects.push([-51.5,-24.6,-49.5,-23.9]);
    const yt=S({color:0xf2cf2a,roughness:0.5}),gt=S({color:0x58b84a,roughness:0.5});const at=[],at2=[];for(const[x,n]of[[-50.8,-37],[-46.5,-37],[-50.8,-31.5],[-46.5,-31.5]])at.push([x,n]);at2.push([-48.6,-27.6]);
-   const rt=m=>{const g=new THREE.CylinderGeometry(0.75,0.75,0.04,24);return g;};const mk=(m,ps)=>ps.forEach(([x,n])=>{const t=new THREE.Mesh(rt(),m);t.position.set(INFO_SX[0]+(x-INFO_SX[0])*INFO_SX[1],e+0.42,-n);R.box(metal,x-0.04,x+0.04,n-0.04,n+0.04,0,0.42);chunks.info_2F.group.add(t);R.rects.push([x-0.6,n-0.6,x+0.6,n+0.6]);});mk(yt,at);mk(gt,at2);
+   const rt=m=>{const g=new THREE.CylinderGeometry(0.6,0.6,0.04,24);return g;};const mk=(m,ps)=>ps.forEach(([x,n])=>{const t=new THREE.Mesh(rt(),m);t.position.set(INFO_SX[0]+(x-INFO_SX[0])*INFO_SX[1],e+0.42,-n);R.box(metal,x-0.04,x+0.04,n-0.04,n+0.04,0,0.42);chunks.info_2F.group.add(t);R.rects.push([x-0.6,n-0.6,x+0.6,n+0.6]);});mk(yt,at);mk(gt,at2);
    sh.color&&0;}
   leds(R,-53.6,-42.4,-41,-15.2);},INFO_SX);
  // 3) 장미홀 = 정보화동 1F 시청각실 101 (x -53.9..-42.2, n -41.4..-21)

@@ -8,9 +8,9 @@ import {GTAOPass} from 'three/addons/postprocessing/GTAOPass.js';
 import {OutputPass} from 'three/addons/postprocessing/OutputPass.js';
 import {RoomEnvironment} from 'three/addons/environments/RoomEnvironment.js';
 import {mergeGeometries} from 'three/addons/utils/BufferGeometryUtils.js';
-import {buildRooms} from './rooms.js?v=202610221818';
-import * as T from './tex.js?v=202610221818';
-import {buildInstanced} from './furn.js?v=202610221818';
+import {buildRooms} from './rooms.js?v=202610221822';
+import * as T from './tex.js?v=202610221822';
+import {buildInstanced} from './furn.js?v=202610221822';
 const Q=new URLSearchParams(location.search);const SHOT=Q.has('shot');
 const MOBILE=matchMedia('(pointer:coarse)').matches||innerWidth<760;
 await document.fonts.load('bold 40px NanumGothic').catch(()=>{});
@@ -425,12 +425,22 @@ function buildDado(){const trim=new THREE.MeshStandardMaterial({color:0x5fb8a8,r
 function classDress(){const teal=new THREE.MeshStandardMaterial({color:0x2fa3b8,roughness:0.7}),cream=new THREE.MeshStandardMaterial({color:0xf1e6cf,roughness:0.55}),pink=new THREE.MeshStandardMaterial({color:0xeed9d3,roughness:0.55}),
  frame=new THREE.MeshStandardMaterial({color:0x2b2b2b}),pap=new THREE.MeshStandardMaterial({map:_cvT(512,128,(x,W,H)=>{x.fillStyle='#dfe9d2';x.fillRect(0,0,W,H);for(let i=0;i<16;i++)for(let j=0;j<2;j++){x.fillStyle=j?'#2a2a2a':'#f3f3f3';x.fillRect(6+i*31.5,8+j*56,26,48);}x.fillStyle='#9ccc65';x.fillRect(0,H-14,W,14);}),roughness:0.8});
  const ok=new Set();for(const l of man.labels){if(!l.room||!(l.type==='class'||/^교실/.test(l.name)))continue;const ck=l.bld+'_'+l.floor,c=chunks[ck];if(!c)continue;const key=ck+l.room.join();if(ok.has(key))continue;ok.add(key);
-  const e=(man.chunks.find(q=>q.name===ck)||{}).elev||0;const[x0,n0,x1,n1]=l.room;const L=n1-n0-2.6;if(L<2||x1-x0<4)continue;const xc=x1-0.06,nc=(n0+n1)/2;const g=new THREE.Group();
-  const P=(m,w,h,y)=>{const p=new THREE.Mesh(new THREE.PlaneGeometry(w,h),m);p.position.set(xc,e+y,-nc);p.rotation.y=-Math.PI/2;g.add(p);return p;};
-  P(teal,n1-n0-0.3,1.6,1.9);P(frame,L,0.95,1.75).position.x-=0.01;P(pap,L-0.1,0.85,1.75).position.x-=0.02;
-  const lk=new THREE.Mesh(new THREE.BoxGeometry(0.45,1.05,L),cream);lk.position.set(x1-0.28,e+0.525,-nc);g.add(lk);for(let k=0;k<L/0.38;k++){const d=new THREE.Mesh(new THREE.PlaneGeometry(0.34,0.48),k%3?cream:pink);d.position.set(x1-0.51,e+0.78,-(n0+1.3+0.19+k*0.38));d.rotation.y=-Math.PI/2;g.add(d);const d2=d.clone();d2.position.y=e+0.27;g.add(d2);}
-  (WALLS[ck]=WALLS[ck]||{e,s:[],r:[]}).r.push([x1-0.5,n0+1.3,x1,n1-1.3]);c.group.add(g);}}
-function decorate(){try{classDress();}catch(err){console.error('class',err);}try{buildDado();}catch(err){console.error('dado',err);}try{fillGaps();}catch(err){console.error('gaps',err);}buildStairs();try{styleStairs();}catch(err){console.error('stairstyle',err);}buildFixtures();buildColumns();buildSigns();buildCorrLights();try{photoDress();}catch(err){console.error('photo',err);}try{infoWalk();}catch(err){console.error('infowalk',err);}try{lobbyGarden();}catch(err){console.error('lobby',err);}try{mainInteriors();}catch(err){console.error('mainint',err);}try{hallExterior();}catch(err){console.error('hallext',err);}try{infoExterior();}catch(err){console.error('infoext',err);}try{hallEntrance();}catch(err){console.error('hallent',err);}addFurnCollision();try{buildRooms(chunks,WALLS,logoTex,man);}catch(err){console.error('rooms',err);}const s=man.sign;if(s){const g=new THREE.Group();const n=[...s.text];const cx=(s.x0+s.x1)/2;const sp=Math.min(5.4,(s.x1-s.x0)/(n.length+1.5));
+  const e=(man.chunks.find(q=>q.name===ck)||{}).elev||0;const[x0,n0,x1,n1]=l.room;
+  const near=(dx0,dx1,dn0,dn1)=>(DOORS||[]).some(d=>d.c===ck&&d.x1>dx0&&d.x0<dx1&&d.n1>dn0&&d.n0<dn1);
+  // candidate back walls: the wall line with no doors; prefer one perpendicular to the door (corridor) wall
+  const cand=[['x',x1,-1],['x',x0,1],['n',n1,-1],['n',n0,1]].filter(([ax,c])=>ax==='x'?!near(c-0.5,c+0.5,n0,n1):!near(x0,x1,c-0.5,c+0.5));
+  const doorX=near(x0-0.5,x0+0.5,n0,n1)||near(x1-0.5,x1+0.5,n0,n1);let pick=cand.find(q=>doorX?q[0]==='n':q[0]==='x')||cand[0];
+  const fr=((man.chunks.find(q=>q.name===ck)||{}).furn||[]).find(f=>f[0]==='front'&&f[1]>x0&&f[1]<x1&&f[3]>n0&&f[3]<n1);
+  if(fr){const d=[[fr[1]-x0,['x',x1,-1]],[x1-fr[1],['x',x0,1]],[fr[3]-n0,['n',n1,-1]],[n1-fr[3],['n',n0,1]]].sort((a,b)=>a[0]-b[0]);pick=d[0][1];}if(!pick)continue;
+  const[ax,cw,dir]=pick;const a0=ax==='x'?n0:x0,a1=ax==='x'?n1:x1,L=a1-a0-2.6,ac=(a0+a1)/2;if(L<2)continue;const g=new THREE.Group();
+  const pos=(off,y,a)=>ax==='x'?[cw+dir*off,e+y,-a]:[a,e+y,-(cw+dir*off)];const rot=ax==='x'?(dir>0?Math.PI/2:-Math.PI/2):(dir>0?Math.PI:0);
+  const P=(m,w,h,y,off)=>{const p=new THREE.Mesh(new THREE.PlaneGeometry(w,h),m);p.position.set(...pos(off,y,ac));p.rotation.y=rot;g.add(p);return p;};
+  P(teal,a1-a0-0.3,1.6,1.9,0.06);P(frame,L,0.95,1.75,0.07);P(pap,L-0.1,0.85,1.75,0.08);
+  const lk=new THREE.Mesh(ax==='x'?new THREE.BoxGeometry(0.45,1.05,L):new THREE.BoxGeometry(L,1.05,0.45),cream);lk.position.set(...pos(0.28,0.525,ac));g.add(lk);
+  for(let k=0;k<L/0.38-0.5;k++){const a=a0+1.3+0.19+k*0.38;for(const y of[0.78,0.27]){const d=new THREE.Mesh(new THREE.PlaneGeometry(0.34,0.48),k%3?cream:pink);d.position.set(...pos(0.515,y,a));d.rotation.y=rot;g.add(d);}}
+  const r=ax==='x'?[Math.min(cw,cw+dir*0.5),a0+1.3,Math.max(cw,cw+dir*0.5),a1-1.3]:[a0+1.3,Math.min(cw,cw+dir*0.5),a1-1.3,Math.max(cw,cw+dir*0.5)];
+  (WALLS[ck]=WALLS[ck]||{e,s:[],r:[]}).r.push(r);c.group.add(g);}}
+function decorate(){doorsReady.then(()=>{try{classDress();if(window.__api&&__api.render)__api.render();}catch(err){console.error('class',err);}});try{buildDado();}catch(err){console.error('dado',err);}try{fillGaps();}catch(err){console.error('gaps',err);}buildStairs();try{styleStairs();}catch(err){console.error('stairstyle',err);}buildFixtures();buildColumns();buildSigns();buildCorrLights();try{photoDress();}catch(err){console.error('photo',err);}try{infoWalk();}catch(err){console.error('infowalk',err);}try{lobbyGarden();}catch(err){console.error('lobby',err);}try{mainInteriors();}catch(err){console.error('mainint',err);}try{hallExterior();}catch(err){console.error('hallext',err);}try{infoExterior();}catch(err){console.error('infoext',err);}try{hallEntrance();}catch(err){console.error('hallent',err);}addFurnCollision();try{buildRooms(chunks,WALLS,logoTex,man);}catch(err){console.error('rooms',err);}const s=man.sign;if(s){const g=new THREE.Group();const n=[...s.text];const cx=(s.x0+s.x1)/2;const sp=Math.min(5.4,(s.x1-s.x0)/(n.length+1.5));
  n.forEach((ch,i)=>{const p=textPlane(ch,1.6,1.6,{w:256,h:256,font:'bold 230px NanumGothic, sans-serif'});p.position.set(cx+(i-(n.length-1)/2)*sp+sp*0.6,s.y,-(s.n-0.26));g.add(p);});
  const lg=new THREE.Mesh(new THREE.PlaneGeometry(1.6,1.6),new THREE.MeshStandardMaterial({map:logoTex(),transparent:true}));lg.position.set(cx-(n.length-1)/2*sp-sp*0.5,s.y,-(s.n-0.26));g.add(lg);
  g.userData.kind='roofdeco';chunks.main_roof?.group.add(g);}
