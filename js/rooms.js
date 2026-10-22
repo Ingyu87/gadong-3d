@@ -46,14 +46,14 @@ export function buildRooms(chunks,WALLS,logoTex,man){
  // 3) 장미홀 = 정보화동 1F 시청각실 101 (x -53.9..-42.2, n -41.4..-21)
  add('info_1F',(R)=>{const panel=S({map:rep(woodTex('#b0804e',4),1,3),roughness:0.6});
   R.wallp(panel,'z',-41.3,-21.2,-42.3,0,2.9,-1);R.wallp(panel,'z',-41.3,-21.2,-53.85,0,2.9,1);R.wallp(panel,'x',-53.8,-42.3,-41.33,0,2.9,1);
-  R.plane(S({color:0x8c5a3a,roughness:0.9}),-53.85,-42.25,-37.4,-21.2,0.012);
+  R.plane(S({color:0xe2e2de,roughness:0.35}),-53.85,-42.25,-37.4,-21.2,0.012);
   const stage=S({map:rep(woodTex('#9a6a3e'),3,3),roughness:0.5});R.box(stage,-53.85,-42.25,-41.3,-37.4,0,0.8);R.rects.push([-53.85,-41.3,-42.25,-37.4]);
   const maroon=S({color:0x6e1424,roughness:0.95});R.box(maroon,-53.8,-51.4,-41.2,-40.9,0.8,2.95);R.box(maroon,-44.6,-42.3,-41.2,-40.9,0.8,2.95);R.box(maroon,-53.8,-42.3,-37.6,-37.3,2.55,2.95);
   R.wallp(S({color:0xf6f6f6,roughness:0.4}),'x',-50.6,-45.4,-41.25,1.05,2.5,1);
   const bn=text('서울가동초등학교',4.6,0.42,{fg:'#ffffff',bg:'#1d4f9a',font:'bold 110px NanumGothic, sans-serif'});bn.position.set(-48.96,2.72,41.2);bn.rotation.y=Math.PI;chunks.info_1F.group.add(bn);
   const seatR=S({color:0xb3212f,roughness:0.7}),seatW=S({color:0xf3f1ec,roughness:0.5});const at=[];
   for(let r=0;r<12;r++){const n=-35.6+r*1.0,lift=r*0.12;for(let x=-53.2;x<=-44.2;x+=0.56){if(Math.abs(x+48)<0.55)continue;at.push([x,n,Math.PI]);}R.rects.push([-53.5,n-0.3,-48.6,n+0.35],[-47.4,n-0.3,-43.95,n+0.35]);}
-  R.inst([[0.5,0.08,0.45,0,0.45,0,seatR],[0.5,0.6,0.06,0,0.75,-0.22,seatR],[0.05,0.5,0.4,-0.26,0.3,0,dark]],at);
+  const seatG=S({color:0xc9cbc8,roughness:0.55});R.inst([[0.48,0.08,0.45,0,0.45,0,seatG],[0.48,0.62,0.07,0,0.76,-0.22,seatG],[0.05,0.62,0.48,-0.27,0.4,0,seatR]],at);
   leds(R,-53.6,-42.4,-37,-21.2);},INFO_SX);
  // 4) 뮤지컬실 = 본관 2F (x -57.3..-50.3, n -3.9..13.7)
  add('main_2F',(R)=>{const blk=S({color:0x141416,roughness:0.95});
