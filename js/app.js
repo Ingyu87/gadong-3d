@@ -8,9 +8,9 @@ import {GTAOPass} from 'three/addons/postprocessing/GTAOPass.js';
 import {OutputPass} from 'three/addons/postprocessing/OutputPass.js';
 import {RoomEnvironment} from 'three/addons/environments/RoomEnvironment.js';
 import {mergeGeometries} from 'three/addons/utils/BufferGeometryUtils.js';
-import {buildRooms} from './rooms.js?v=202610221804';
-import * as T from './tex.js?v=202610221804';
-import {buildInstanced} from './furn.js?v=202610221804';
+import {buildRooms} from './rooms.js?v=202610221813';
+import * as T from './tex.js?v=202610221813';
+import {buildInstanced} from './furn.js?v=202610221813';
 const Q=new URLSearchParams(location.search);const SHOT=Q.has('shot');
 const MOBILE=matchMedia('(pointer:coarse)').matches||innerWidth<760;
 await document.fonts.load('bold 40px NanumGothic').catch(()=>{});
@@ -233,12 +233,20 @@ function lobbyGarden(){const sm=(o)=>new THREE.MeshStandardMaterial(Object.assig
   g.userData.kind='photo';c.group.add(g);}
  // garden in front of the porch (between the courtyard planters x -2.3..6.8, n -5..7.4)
  const s=chunks.site;if(!s)return;const g=new THREE.Group();const wood=sm({color:0xb5864f}),stone=sm({color:0xa9a59c}),steel=sm({color:0x6c7177,metalness:0.5}),path=sm({color:0xc9bfae}),fence=sm({color:0x2f3338,metalness:0.4}),pine=sm({color:0x3f6b3a}),bark=sm({color:0x6a4b33}),shrub=sm({color:0x4f8a46});
- const pth=new THREE.Mesh(new THREE.PlaneGeometry(3.2,12.2),path);pth.rotation.x=-Math.PI/2;pth.position.set(2.25,0.02,-1.2);g.add(pth);
- for(let n=-4.6;n<=6.2;n+=2.7){for(const x of[0.55,3.95]){const p=new THREE.Mesh(new THREE.BoxGeometry(0.12,2.6,0.12),wood);p.position.set(x,1.3,-n);g.add(p);WALLS.site=WALLS.site||{e:0,s:[],r:[]};WALLS.site.r.push([x-0.08,n-0.08,x+0.08,n+0.08]);}
-  const a=new THREE.Mesh(new THREE.TorusGeometry(1.7,0.06,6,16,Math.PI),wood);a.position.set(2.25,2.6,-n);g.add(a);}
- for(const x of[0.25,4.25])for(let n=-4.8;n<=6.6;n+=0.9){const f=new THREE.Mesh(new THREE.TorusGeometry(0.22,0.012,4,10,Math.PI),fence);f.rotation.y=Math.PI/2;f.position.set(x,0.02,-n);g.add(f);}
- for(const [x,n] of[[-0.6,-1],[5.1,2.5]]){const b=new THREE.Mesh(new THREE.BoxGeometry(0.45,0.06,1.8),wood);b.position.set(x,0.45,-n);g.add(b);for(const d of[-0.6,0.6]){const l=new THREE.Mesh(new THREE.BoxGeometry(0.4,0.42,0.2),stone);l.position.set(x,0.21,-(n+d));g.add(l);}}
- for(const [x,n] of[[-1.4,6.8],[6.2,6.8]]){const p=new THREE.Mesh(new THREE.CylinderGeometry(0.05,0.07,4,8),steel);p.position.set(x,2,-n);g.add(p);const l=new THREE.Mesh(new THREE.SphereGeometry(0.18,10,8),sm({color:0xfff6d8,emissive:0x665c3a}));l.position.set(x,4.05,-n);g.add(l);}
+ // pergola-arch garden path (photos a593cbdd / 15a50954): runs WEST beside the 중앙현관 along the facade, paver path, white steel arches,
+ // low looped fence on a granite curb along the road side, benches under the arches, shrubs on the building side; lamp + flagpoles by the road
+ {const P0=-26,P1=-2.7,N0=8.6,N1=11.4,pv=sm({map:_cvT(128,128,(x,W,H)=>{x.fillStyle='#8f8a82';x.fillRect(0,0,W,H);x.strokeStyle='#6f6a63';x.lineWidth=2;for(let i=0;i<8;i++)for(let j=0;j<4;j++)x.strokeRect(i*16+(j%2)*8,j*32,16,32);})});pv.map.wrapS=pv.map.wrapT=THREE.RepeatWrapping;pv.map.repeat.set((P1-P0)/1.2,(N1-N0)/1.2);
+  const pth=new THREE.Mesh(new THREE.PlaneGeometry(P1-P0,N1-N0),pv);pth.rotation.x=-Math.PI/2;pth.position.set((P0+P1)/2,0.02,-(N0+N1)/2);g.add(pth);
+  const arch=sm({color:0x4a4f55,metalness:0.6,roughness:0.35});WALLS.site=WALLS.site||{e:0,s:[],r:[]};
+  for(let x=P0+1;x<=P1-0.5;x+=2.4){const t=new THREE.Mesh(new THREE.TorusGeometry((N1-N0)/2,0.04,6,20,Math.PI),arch);t.rotation.y=Math.PI/2;t.position.set(x,2.2,-(N0+N1)/2);g.add(t);for(const n of[N0+0.05,N1-0.05]){const p=new THREE.Mesh(new THREE.CylinderGeometry(0.04,0.04,2.2,8),arch);p.position.set(x,1.1,-n);g.add(p);}}
+  for(const n of[N0+0.05,N1-0.05]){const r=new THREE.Mesh(new THREE.CylinderGeometry(0.03,0.03,P1-P0-1,6),arch);r.rotation.z=Math.PI/2;r.position.set((P0+P1)/2,2.2,-n);g.add(r);const rt=new THREE.Mesh(new THREE.CylinderGeometry(0.03,0.03,P1-P0-1,6),arch);rt.rotation.z=Math.PI/2;rt.position.set((P0+P1)/2,2.2+(N1-N0)/2,-(N0+N1)/2);g.add(rt);}
+  const curb=new THREE.Mesh(new THREE.BoxGeometry(P1-P0+6,0.25,0.35),stone);curb.position.set((P0+P1)/2+3,0.12,-(N0-0.2));g.add(curb);WALLS.site.r.push([P0,N0-0.4,P1-0.2,N0-0.02]);
+  for(let x=P0;x<P1+5.5;x+=0.42){const f=new THREE.Mesh(new THREE.TorusGeometry(0.2,0.012,4,10,Math.PI),fence);f.position.set(x+0.2,0.25,-(N0-0.2));g.add(f);}
+  for(const x of[-22,-15,-8]){const b=new THREE.Mesh(new THREE.BoxGeometry(1.8,0.06,0.42),wood);b.position.set(x,0.45,-(N1-0.4));g.add(b);for(const d of[-0.65,0.65]){const l=new THREE.Mesh(new THREE.BoxGeometry(0.18,0.42,0.4),stone);l.position.set(x+d,0.21,-(N1-0.4));g.add(l);}WALLS.site.r.push([x-0.9,N1-0.62,x+0.9,N1-0.18]);}
+  for(let x=P0+0.8;x<P1;x+=2.2){const b=new THREE.Mesh(new THREE.SphereGeometry(0.6,10,8),shrub);b.scale.y=0.65;b.position.set(x,0.4,-(N1+0.55));g.add(b);}}
+ {const p=new THREE.Mesh(new THREE.CylinderGeometry(0.06,0.08,4.2,8),steel);p.position.set(-1.2,2.1,-7.9);g.add(p);const l=new THREE.Mesh(new THREE.SphereGeometry(0.2,10,8),sm({color:0xfff6d8,emissive:0x665c3a}));l.position.set(-1.2,4.25,-7.9);g.add(l);}
+ // red/purple mat on the porch steps
+ {const m=new THREE.Mesh(new THREE.BoxGeometry(3.8,0.02,1.4),sm({map:_cvT(64,64,(x,W,H)=>{x.fillStyle='#6a2a3c';x.fillRect(0,0,W,H);for(let i=0;i<W;i+=4){x.fillStyle=i%8?'#7d3248':'#4a2a5c';x.fillRect(i,0,2,H);}})}));m.position.set(4.55,0.32,-8.1);g.add(m);}
  // hexagonal tiered wood planter bench with a pine (바른행동 entrance photo)
  for(const [hx,hn] of[[-6.5,6.4],[11.0,6.4]]){for(const [r,y,h] of[[1.6,0,0.45],[1.15,0.45,0.35]]){const m=new THREE.Mesh(new THREE.CylinderGeometry(r,r,h,6),wood);m.position.set(hx,y+h/2,-hn);g.add(m);}const soil=new THREE.Mesh(new THREE.CylinderGeometry(1.3,1.3,0.05,6),sm({color:0x5a4030}));soil.position.set(hx,0.82,-hn);g.add(soil);
   const tr=new THREE.Mesh(new THREE.CylinderGeometry(0.12,0.18,1.6,8),bark);tr.position.set(hx,1.6,-hn);g.add(tr);for(const [dx,dy,r] of[[0,2.5,1.0],[0.7,2.1,0.7],[-0.7,2.2,0.7]]){const cp=new THREE.Mesh(new THREE.SphereGeometry(r,10,6),pine);cp.scale.y=0.45;cp.position.set(hx+dx,dy,-hn);g.add(cp);}
