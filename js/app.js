@@ -8,9 +8,9 @@ import {GTAOPass} from 'three/addons/postprocessing/GTAOPass.js';
 import {OutputPass} from 'three/addons/postprocessing/OutputPass.js';
 import {RoomEnvironment} from 'three/addons/environments/RoomEnvironment.js';
 import {mergeGeometries} from 'three/addons/utils/BufferGeometryUtils.js';
-import {buildRooms} from './rooms.js?v=202610221813';
-import * as T from './tex.js?v=202610221813';
-import {buildInstanced} from './furn.js?v=202610221813';
+import {buildRooms} from './rooms.js?v=202610221815';
+import * as T from './tex.js?v=202610221815';
+import {buildInstanced} from './furn.js?v=202610221815';
 const Q=new URLSearchParams(location.search);const SHOT=Q.has('shot');
 const MOBILE=matchMedia('(pointer:coarse)').matches||innerWidth<760;
 await document.fonts.load('bold 40px NanumGothic').catch(()=>{});
@@ -242,9 +242,12 @@ function lobbyGarden(){const sm=(o)=>new THREE.MeshStandardMaterial(Object.assig
   for(const n of[N0+0.05,N1-0.05]){const r=new THREE.Mesh(new THREE.CylinderGeometry(0.03,0.03,P1-P0-1,6),arch);r.rotation.z=Math.PI/2;r.position.set((P0+P1)/2,2.2,-n);g.add(r);const rt=new THREE.Mesh(new THREE.CylinderGeometry(0.03,0.03,P1-P0-1,6),arch);rt.rotation.z=Math.PI/2;rt.position.set((P0+P1)/2,2.2+(N1-N0)/2,-(N0+N1)/2);g.add(rt);}
   const curb=new THREE.Mesh(new THREE.BoxGeometry(P1-P0+6,0.25,0.35),stone);curb.position.set((P0+P1)/2+3,0.12,-(N0-0.2));g.add(curb);WALLS.site.r.push([P0,N0-0.4,P1-0.2,N0-0.02]);
   for(let x=P0;x<P1+5.5;x+=0.42){const f=new THREE.Mesh(new THREE.TorusGeometry(0.2,0.012,4,10,Math.PI),fence);f.position.set(x+0.2,0.25,-(N0-0.2));g.add(f);}
-  for(const x of[-22,-15,-8]){const b=new THREE.Mesh(new THREE.BoxGeometry(1.8,0.06,0.42),wood);b.position.set(x,0.45,-(N1-0.4));g.add(b);for(const d of[-0.65,0.65]){const l=new THREE.Mesh(new THREE.BoxGeometry(0.18,0.42,0.4),stone);l.position.set(x+d,0.21,-(N1-0.4));g.add(l);}WALLS.site.r.push([x-0.9,N1-0.62,x+0.9,N1-0.18]);}
+  for(const x of[-22,-15,-8]){const b=new THREE.Mesh(new THREE.BoxGeometry(1.8,0.09,0.42),sm({color:0xf2c230,roughness:0.55}));b.position.set(x,0.45,-(N1-0.4));g.add(b);for(const d of[-0.65,0.65]){const l=new THREE.Mesh(new THREE.BoxGeometry(0.18,0.42,0.4),stone);l.position.set(x+d,0.21,-(N1-0.4));g.add(l);}WALLS.site.r.push([x-0.9,N1-0.62,x+0.9,N1-0.18]);}
   for(let x=P0+0.8;x<P1;x+=2.2){const b=new THREE.Mesh(new THREE.SphereGeometry(0.6,10,8),shrub);b.scale.y=0.65;b.position.set(x,0.4,-(N1+0.55));g.add(b);}}
  {const p=new THREE.Mesh(new THREE.CylinderGeometry(0.06,0.08,4.2,8),steel);p.position.set(-1.2,2.1,-7.9);g.add(p);const l=new THREE.Mesh(new THREE.SphereGeometry(0.2,10,8),sm({color:0xfff6d8,emissive:0x665c3a}));l.position.set(-1.2,4.25,-7.9);g.add(l);}
+ // clboard 정원 photos 01/07/21: yellow benches on grey legs along the road-side fence; 05/12/18: row of white planter boxes east of the porch
+ {const yb=sm({color:0xf2c230,roughness:0.55}),gl=sm({color:0xb9bbbd});for(const x of[-20,-12]){const b=new THREE.Mesh(new THREE.BoxGeometry(2.0,0.09,0.45),yb);b.position.set(x,0.45,-7.75);g.add(b);for(const d of[-0.75,0.75]){const l=new THREE.Mesh(new THREE.BoxGeometry(0.2,0.42,0.42),gl);l.position.set(x+d,0.21,-7.75);g.add(l);}WALLS.site.r.push([x-1,7.5,x+1,8.0]);}
+  const wp=sm({color:0xf1f1ee,roughness:0.5});for(let x=8.5;x<20;x+=1.3){const b=new THREE.Mesh(new THREE.BoxGeometry(1.2,0.55,0.55),wp);b.position.set(x,0.28,-9.2);g.add(b);const f=new THREE.Mesh(new THREE.SphereGeometry(0.35,8,6),shrub);f.scale.set(1.5,0.6,0.7);f.position.set(x,0.7,-9.2);g.add(f);}WALLS.site.r.push([8,8.9,20.2,9.5]);}
  // red/purple mat on the porch steps
  {const m=new THREE.Mesh(new THREE.BoxGeometry(3.8,0.02,1.4),sm({map:_cvT(64,64,(x,W,H)=>{x.fillStyle='#6a2a3c';x.fillRect(0,0,W,H);for(let i=0;i<W;i+=4){x.fillStyle=i%8?'#7d3248':'#4a2a5c';x.fillRect(i,0,2,H);}})}));m.position.set(4.55,0.32,-8.1);g.add(m);}
  // hexagonal tiered wood planter bench with a pine (바른행동 entrance photo)
