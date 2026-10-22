@@ -105,9 +105,9 @@ export function buildRooms(chunks,WALLS,logoTex,man){
  // 6) 운동장 dressing: striped shade canopies, flagpoles, 가동문화관 sign
  const site=chunks.site;if(site){const g=new THREE.Group();g.name='playground';const stripes=cv(512,64,(x,w,h)=>{const cs=['#e53935','#fdd835','#43a047','#1e88e5','#fb8c00','#ffffff','#8e24aa'];for(let i=0;i<16;i++){x.fillStyle=cs[i%cs.length];x.fillRect(i*w/16,0,w/16,h);}});const sm=S({map:stripes,side:THREE.DoubleSide,roughness:0.8});const post=S({color:0x6b6f74,metalness:0.5,roughness:0.4});
   for(const[x0,x1]of[[-40.2,-5.6],[6.7,42.4]]){const len=x1-x0;const roof=new THREE.Mesh(new THREE.PlaneGeometry(len,7.4),sm);roof.material.map.wrapS=THREE.RepeatWrapping;roof.material.map.repeat.set(len/8,1);roof.rotation.x=-Math.PI/2+0.14;roof.position.set((x0+x1)/2,4.6,15.45);roof.castShadow=true;g.add(roof);
-   for(let x=x0;x<=x1+0.01;x+=len/Math.round(len/5)){for(const[z,h]of[[12.3,5.1],[18.6,4.1]]){const p=new THREE.Mesh(new THREE.CylinderGeometry(0.07,0.07,h,8),post);p.position.set(x,h/2,z);g.add(p);}}}
+   for(let x=x0;x<=x1+0.01;x+=len/Math.round(len/5)){for(const[z,h]of[[12.3,5.1],[18.6,4.1]]){const p=new THREE.Mesh(new THREE.CylinderGeometry(0.07,0.07,h,8),post);p.position.set(x,h/2,z);g.add(p);const cl=new THREE.Mesh(new THREE.CylinderGeometry(0.13,0.13,1.3,8),S({color:0xc77a3a,roughness:0.6}));cl.position.set(x,0.65,z);g.add(cl);}}}
   // 구령대 (podium) between the stands: brick stage + arched steel lattice canopy
-  {const bx0=-5.0,bx1=6.1,z0=12.3,z1=18.4,H=1.2,cx=(bx0+bx1)/2;const brick=S({map:rep(cv(256,128,(x,w,h)=>{x.fillStyle='#8f4a36';x.fillRect(0,0,w,h);x.fillStyle='#b9b2a6';for(let r=0;r<8;r++){x.fillRect(0,r*16,w,2);for(let c=0;c<8;c++)x.fillRect(((c+(r%2)*0.5)*32)%w,r*16,2,16);}}),6,2)});
+  {const bx0=-5.0,bx1=6.1,z0=12.3,z1=18.4,H=1.2,cx=(bx0+bx1)/2;const brick=S({map:rep(cv(256,128,(x,w,h)=>{x.fillStyle='#c9c3b8';x.fillRect(0,0,w,h);x.fillStyle='#9e978b';for(let r=0;r<8;r++){x.fillRect(0,r*16,w,2);for(let c=0;c<8;c++)x.fillRect(((c+(r%2)*0.5)*32)%w,r*16,2,16);}}),6,2)});
    const base=new THREE.Mesh(new THREE.BoxGeometry(bx1-bx0,H,z1-z0),brick);base.position.set(cx,H/2,(z0+z1)/2);base.castShadow=base.receiveShadow=true;g.add(base);
    const top=new THREE.Mesh(new THREE.BoxGeometry(bx1-bx0+0.1,0.06,z1-z0+0.1),S({color:0x9c9a94}));top.position.set(cx,H+0.03,(z0+z1)/2);g.add(top);
    for(let i=0;i<3;i++){const st=new THREE.Mesh(new THREE.BoxGeometry(3.2,0.4*(i+1),0.4),S({color:0xa9a59c}));st.position.set(cx,0.2*(i+1),z1+1.0-i*0.4);g.add(st);}
@@ -115,9 +115,10 @@ export function buildRooms(chunks,WALLS,logoTex,man){
    const arcPt=(t)=>new THREE.Vector3(cx-span*Math.cos(t),yb+rise*Math.sin(t),0);
    for(let z=z0;z<=z1+0.01;z+=(z1-z0)/4){for(const off of[0,0.45]){const pts=[];for(let k=0;k<=24;k++){const t=Math.PI*k/24;const p=arcPt(t);const r=span-off;pts.push(new THREE.Vector3(cx-r*Math.cos(t),yb+(rise-off)*Math.sin(t),z));}const tb=new THREE.Mesh(new THREE.TubeGeometry(new THREE.CatmullRomCurve3(pts),48,0.05,6),steelW);g.add(tb);}
     for(let k=1;k<24;k+=2){const t=Math.PI*k/24,t2=Math.PI*(k+1)/24;const a=new THREE.Vector3(cx-span*Math.cos(t),yb+rise*Math.sin(t),z),b_=new THREE.Vector3(cx-(span-0.45)*Math.cos(t2),yb+(rise-0.45)*Math.sin(t2),z);const d=new THREE.Mesh(new THREE.CylinderGeometry(0.025,0.025,a.distanceTo(b_),5),steelW);d.position.copy(a).add(b_).multiplyScalar(0.5);d.quaternion.setFromUnitVectors(new THREE.Vector3(0,1,0),b_.clone().sub(a).normalize());g.add(d);}
-    for(const sx of[-1,1]){const c=new THREE.Mesh(new THREE.CylinderGeometry(0.09,0.09,yb-H,8),steelW);c.position.set(cx+sx*span,H+(yb-H)/2,z);g.add(c);}}
+    for(const sx of[-1,1]){const c=new THREE.Mesh(new THREE.CylinderGeometry(0.17,0.17,yb-H,10),S({color:0xb5783f,roughness:0.6}));c.position.set(cx+sx*span,H+(yb-H)/2,z);g.add(c);const cb=new THREE.Mesh(new THREE.CylinderGeometry(0.21,0.23,0.35,12),S({color:0xe2e6ea,metalness:0.9,roughness:0.15}));cb.position.set(cx+sx*span,H+0.17,z);g.add(cb);}}
    for(let k=0;k<=12;k++){const t=Math.PI*k/12;const p=arcPt(t);const pl=new THREE.Mesh(new THREE.BoxGeometry(0.06,0.06,z1-z0),steelW);pl.position.set(p.x,p.y,(z0+z1)/2);g.add(pl);}
-   const vault=new THREE.Mesh(new THREE.CylinderGeometry(span,span,z1-z0,32,1,true,-Math.PI/2,Math.PI),new THREE.MeshStandardMaterial({color:0xe8eef2,transparent:true,opacity:0.35,side:THREE.DoubleSide,roughness:0.2}));vault.rotation.x=Math.PI/2;vault.scale.set(1,1,rise/span);vault.position.set(cx,yb,(z0+z1)/2);g.add(vault);
+   const vault=new THREE.Mesh(new THREE.CylinderGeometry(span,span,z1-z0,32,1,true,-Math.PI/2,Math.PI),sm);vault.rotation.x=Math.PI/2;vault.scale.set(1,1,rise/span);vault.position.set(cx,yb,(z0+z1)/2);g.add(vault);
+   {const rb=S({color:0x1c1d20,metalness:0.5,roughness:0.4});for(const [a0,a1,zz] of[[bx0,bx1,z0],[bx0,cx-1.7,z1],[cx+1.7,bx1,z1]]){const r=new THREE.Mesh(new THREE.BoxGeometry(a1-a0,0.04,0.04),rb);r.position.set((a0+a1)/2,H+1.0,zz);g.add(r);for(let x=a0;x<=a1+0.01;x+=0.12){const v=new THREE.Mesh(new THREE.BoxGeometry(0.02,1.0,0.02),rb);v.position.set(x,H+0.5,zz);g.add(v);}}for(const xx of[bx0,bx1]){const r=new THREE.Mesh(new THREE.BoxGeometry(0.04,0.04,z1-z0),rb);r.position.set(xx,H+1.0,(z0+z1)/2);g.add(r);}}
    WALLS.site=WALLS.site||{e:0,s:[],r:[]};WALLS.site.r.push([bx0,-z1,bx1,-z0]);}
   const fp=[[-1.8,19.6],[0.55,19.9],[2.9,19.6]];const fl=S({map:cv(300,200,(x,w,h)=>{x.fillStyle='#fff';x.fillRect(0,0,w,h);x.fillStyle='#cd2e3a';x.beginPath();x.arc(w/2,h/2,50,Math.PI,0);x.fill();x.fillStyle='#0047a0';x.beginPath();x.arc(w/2,h/2,50,0,Math.PI);x.fill();x.fillStyle='#000';[[50,40],[w-70,40],[50,h-60],[w-70,h-60]].forEach(([a,b])=>x.fillRect(a,b,20,20));}),side:THREE.DoubleSide});const fl2=S({color:0x2e7d32,side:THREE.DoubleSide});
   fp.forEach(([x,z],i)=>{const p=new THREE.Mesh(new THREE.CylinderGeometry(0.05,0.08,12,8),S({color:0xdedede,metalness:0.6,roughness:0.3}));p.position.set(x,6,z);g.add(p);const f=new THREE.Mesh(new THREE.PlaneGeometry(1.8,1.2),i===1?fl:fl2);f.position.set(x+0.95,11.2,z);g.add(f);});
@@ -144,36 +145,27 @@ export function buildRooms(chunks,WALLS,logoTex,man){
     for(const y of[0.15,1.2]){const r=new THREE.Mesh(new THREE.BoxGeometry(0.04,0.04,L),fb);r.position.set(-43.0,y,-c);g.add(r);}
     WALLS.site=WALLS.site||{e:0,s:[],r:[]};WALLS.site.r.push([-43.05,n0,-42.95,n1]);}
   }
-  // playground (놀이터) per photos playground_1/2 + mural_info_1: sand ground with painted multicolour kerb, red/blue climbing dome, blue slide on white frame,
-  // white bar jungle-gym, two white climbing arches, long flat wooden benches under trees. Placed west of the track, south of 정보화동 (x -60..-45, n -74..-49).
-  {const P0=-60,P1=-45,N0=-74,N1=-49;WALLS.site=WALLS.site||{e:0,s:[],r:[]};const col=(x0,n0,x1,n1)=>WALLS.site.r.push([x0,n0,x1,n1]);
-   const kc=[0xe53935,0x1e88e5,0xfdd835,0x43a047];let ki=0;const kerb=(x0,x1,n0,n1)=>{const L=Math.max(x1-x0,n1-n0),N=Math.round(L/0.8);for(let i=0;i<N;i++){const t0=i/N,t1=(i+1)/N;const b=new THREE.Mesh(new THREE.BoxGeometry(x1-x0>n1-n0?(x1-x0)/N:0.18,0.2,x1-x0>n1-n0?0.18:(n1-n0)/N),S({color:kc[ki++%4],roughness:0.6}));b.position.set(x1-x0>n1-n0?x0+(t0+t1)/2*(x1-x0):(x0+x1)/2,0.1,-(x1-x0>n1-n0?(n0+n1)/2:n0+(t0+t1)/2*(n1-n0)));g.add(b);}};
-   kerb(P0,P1,N0,N0+0.18);kerb(P0,P1,N1-0.18,N1);kerb(P0,P0+0.18,N0,N1);kerb(P1-0.18,P1,N0,-63);kerb(P1-0.18,P1,-59,N1);
-   const B=(m,x0,x1,y0,y1,n0,n1)=>{const b=new THREE.Mesh(new THREE.BoxGeometry(x1-x0,y1-y0,n1-n0),m);b.position.set((x0+x1)/2,(y0+y1)/2,-(n0+n1)/2);b.castShadow=b.receiveShadow=true;g.add(b);return b;};
-   const tube=(m,a,b_,r=0.035)=>{const d=new THREE.Mesh(new THREE.CylinderGeometry(r,r,a.distanceTo(b_),6),m);d.position.copy(a).add(b_).multiplyScalar(0.5);d.quaternion.setFromUnitVectors(new THREE.Vector3(0,1,0),b_.clone().sub(a).normalize());d.castShadow=true;g.add(d);};
-   const V3=(x,y,n)=>new THREE.Vector3(x,y,-n);const red=S({color:0xd8302f,roughness:0.5}),blue=S({color:0x2a64c8,roughness:0.5}),wht=S({color:0xf1f2f0,metalness:0.3,roughness:0.4}),wood=S({color:0x9a6b43,roughness:0.75});
-   // climbing dome (red arcs + blue rope rings)
-   {const cx=-56,cn=-53.5,R=2.3;for(let k=0;k<6;k++){const a=k*Math.PI/6;const pts=[];for(let i=0;i<=16;i++){const t=Math.PI*i/16;pts.push(V3(cx+R*Math.cos(t)*Math.cos(a),R*Math.sin(t),cn+R*Math.cos(t)*Math.sin(a)));}g.add(new THREE.Mesh(new THREE.TubeGeometry(new THREE.CatmullRomCurve3(pts),32,0.05,6),red));}
-    for(const y of[0.6,1.2,1.8]){const r=Math.sqrt(R*R-y*y);const m=new THREE.Mesh(new THREE.TorusGeometry(r,0.025,6,40),blue);m.rotation.x=Math.PI/2;m.position.set(cx,y,-cn);g.add(m);}col(cx-R,cn-R,cx+R,cn+R);}
-   // slide: white frame tower + blue chute + ladder
-   {const x0=-55,n0=-62.5;for(const[a,b_]of[[0,0],[1.2,0],[0,1.2],[1.2,1.2]])tube(wht,V3(x0+a,0,n0+b_),V3(x0+a,2.4,n0+b_),0.05);B(wht,x0,x0+1.2,1.5,1.56,n0,n0+1.2);
-    for(const b_ of[0,1.2])tube(wht,V3(x0,2.3,n0+b_),V3(x0+1.2,2.3,n0+b_));const ch=new THREE.Mesh(new THREE.BoxGeometry(3.4,0.05,0.62),blue);ch.position.set(x0+1.2+1.55,0.82,-(n0+0.6));ch.rotation.z=-0.43;ch.castShadow=true;g.add(ch);
-    for(const s_ of[-0.33,0.33]){const sd=new THREE.Mesh(new THREE.BoxGeometry(3.4,0.2,0.04),blue);sd.position.set(x0+1.2+1.55,0.9,-(n0+0.6+s_));sd.rotation.z=-0.43;g.add(sd);}
-    for(const s_ of[0.2,1.0])tube(wht,V3(x0-0.9,0,n0+s_),V3(x0,1.56,n0+s_),0.03);for(let k=1;k<6;k++){const t=k/6;tube(wht,V3(x0-0.9+0.9*t,1.56*t,n0+0.2),V3(x0-0.9+0.9*t,1.56*t,n0+1.0),0.02);}
-    col(x0-0.95,n0,x0+4.3,n0+1.25);}
-   // white bar jungle gym (3 x 1.5 x 1.8 grid) and two climbing arches
-   {const x0=-59,n0=-71.5;for(let i=0;i<=4;i++)for(let j=0;j<=2;j++)tube(wht,V3(x0+i*0.75,0,n0+j*0.75),V3(x0+i*0.75,1.8,n0+j*0.75),0.025);
-    for(const y of[0.6,1.2,1.8]){for(let j=0;j<=2;j++)tube(wht,V3(x0,y,n0+j*0.75),V3(x0+3,y,n0+j*0.75),0.02);for(let i=0;i<=4;i++)tube(wht,V3(x0+i*0.75,y,n0),V3(x0+i*0.75,y,n0+1.5),0.02);}col(x0,n0,x0+3,n0+1.5);
-    for(const xa of[-53.5,-51.5]){const pts=[];for(let i=0;i<=12;i++){const t=Math.PI*i/12;pts.push(V3(xa+0.7*Math.cos(t),1.3*Math.sin(t),-70));}for(const dn of[-0.3,0.3]){const q=pts.map(p=>p.clone().add(new THREE.Vector3(0,0,-dn)));g.add(new THREE.Mesh(new THREE.TubeGeometry(new THREE.CatmullRomCurve3(q),24,0.03,6),wht));}
-     for(let i=1;i<12;i+=2){const t=Math.PI*i/12;tube(wht,V3(xa+0.7*Math.cos(t),1.3*Math.sin(t),-70.3),V3(xa+0.7*Math.cos(t),1.3*Math.sin(t),-69.7),0.02);}col(xa-0.75,-70.35,xa+0.75,-69.65);}}
-   // long flat wooden benches (no back) under trees along the east and north edges
-   const bench=(x,n,alongN)=>{const L=2.4;for(let k=0;k<3;k++){const o=-0.12+k*0.12;alongN?B(wood,x+o-0.05,x+o+0.05,0.42,0.46,n-L/2,n+L/2):B(wood,x-L/2,x+L/2,0.42,0.46,n+o-0.05,n+o+0.05);}
-     for(const d of[-L/2+0.25,L/2-0.25])alongN?B(S({color:0x7d7f82}),x-0.17,x+0.17,0,0.42,n+d-0.04,n+d+0.04):B(S({color:0x7d7f82}),x+d-0.04,x+d+0.04,0,0.42,n-0.17,n+0.17);
-     alongN?col(x-0.2,n-L/2,x+0.2,n+L/2):col(x-L/2,n-0.2,x+L/2,n+0.2);};
-   for(const n of[-71,-67,-57,-53])bench(-46.2,n,true);for(const x of[-57.5,-53,-48.5])bench(x,-49.9,false);
-   const trunk=S({color:0x6a4b33,roughness:0.9}),lv=[S({color:0xb5402a,roughness:0.9}),S({color:0x5f8f3e,roughness:0.9}),S({color:0xd99a2b,roughness:0.9})];
-   for(const[x,n,k]of[[-46.5,-69,0],[-46.5,-55,1],[-55,-49.2,2],[-50.8,-49.2,1],[-60.5,-60,0]]){const t=new THREE.Mesh(new THREE.CylinderGeometry(0.14,0.2,2.6,8),trunk);t.position.set(x,1.3,-n);t.castShadow=true;g.add(t);const c=new THREE.Mesh(new THREE.SphereGeometry(1.9,12,10),lv[k]);c.position.set(x,3.6,-n);c.scale.y=0.8;c.castShadow=true;g.add(c);col(x-0.25,n-0.25,x+0.25,n+0.25);}
-  }
+   // playground along the far boundary fence (aerials + photo 611d228b): white steel climbing frame, platform with two grey metal slides,
+   // sloped steel bar frames, multicolour kerb, street lamps. Strip south of the track, x -18..30, n -96..-90.6
+   {const X0=-18,X1=30,N0=-96,N1=-90.6;WALLS.site=WALLS.site||{e:0,s:[],r:[]};const col=(x0,n0,x1,n1)=>WALLS.site.r.push([x0,n0,x1,n1]);
+    const B=(m,x0,x1,y0,y1,n0,n1)=>{const b=new THREE.Mesh(new THREE.BoxGeometry(x1-x0,y1-y0,n1-n0),m);b.position.set((x0+x1)/2,(y0+y1)/2,-(n0+n1)/2);b.castShadow=true;g.add(b);return b;};
+    const tube=(m,a,b_,r=0.035)=>{const d=new THREE.Mesh(new THREE.CylinderGeometry(r,r,a.distanceTo(b_),6),m);d.position.copy(a).add(b_).multiplyScalar(0.5);d.quaternion.setFromUnitVectors(new THREE.Vector3(0,1,0),b_.clone().sub(a).normalize());g.add(d);};
+    const V3=(x,y,n)=>new THREE.Vector3(x,y,-n);const wht=S({color:0xf1f2f0,metalness:0.4,roughness:0.4}),grey=S({color:0xa9aeb3,metalness:0.7,roughness:0.3}),sand=S({color:0xd9c49a,roughness:1});
+    {const s_=new THREE.Mesh(new THREE.PlaneGeometry(X1-X0,N1-N0),sand);s_.rotation.x=-Math.PI/2;s_.position.set((X0+X1)/2,0.01,-(N0+N1)/2);g.add(s_);}
+    const kc=[0xe53935,0x1e88e5,0xfdd835,0x43a047];let ki=0;for(let x=X0;x<X1-0.01;x+=0.8)B(S({color:kc[ki++%4],roughness:0.6}),x,x+0.78,0,0.2,N1-0.18,N1);
+    // white steel climbing frame (grid 4 x 1.6 x 2.0)
+    {const x0=-14,n0=-94.8;for(let i=0;i<=5;i++)for(let j=0;j<=2;j++)tube(wht,V3(x0+i*0.8,0,n0+j*0.8),V3(x0+i*0.8,2.0,n0+j*0.8),0.03);
+     for(const y of[0.5,1.0,1.5,2.0]){for(let j=0;j<=2;j++)tube(wht,V3(x0,y,n0+j*0.8),V3(x0+4,y,n0+j*0.8),0.022);for(let i=0;i<=5;i++)tube(wht,V3(x0+i*0.8,y,n0),V3(x0+i*0.8,y,n0+1.6),0.022);}col(x0,n0,x0+4,n0+1.6);}
+    // platform tower with two grey metal slides
+    {const x0=0,n0=-95.2;for(const[a,b_]of[[0,0],[1.6,0],[0,1.6],[1.6,1.6]])tube(wht,V3(x0+a,0,n0+b_),V3(x0+a,2.6,n0+b_),0.06);B(wht,x0,x0+1.6,1.6,1.68,n0,n0+1.6);
+     for(const b_ of[0,1.6])tube(wht,V3(x0,2.5,n0+b_),V3(x0+1.6,2.5,n0+b_));
+     for(const [s,dn] of[[1,0.3],[-1,1.3]]){const ch=new THREE.Mesh(new THREE.BoxGeometry(3.6,0.05,0.6),grey);const xs=s>0?x0+1.6+1.6:x0-1.6;ch.position.set(xs,0.85,-(n0+dn));ch.rotation.z=-s*0.46;g.add(ch);for(const e of[-0.3,0.3]){const sd=new THREE.Mesh(new THREE.BoxGeometry(3.6,0.18,0.03),grey);sd.position.set(xs,0.93,-(n0+dn+e));sd.rotation.z=-s*0.46;g.add(sd);}}
+     col(x0-3.4,n0,x0+5,n0+1.6);}
+    // sloped steel bar frames
+    for(const xa of[12,16,20]){for(const dn of[-94.8,-93.2])tube(wht,V3(xa,0,dn),V3(xa+2.6,1.8,dn),0.04);for(let k=0;k<=6;k++){const t=k/6;tube(wht,V3(xa+2.6*t,1.8*t,-94.8),V3(xa+2.6*t,1.8*t,-93.2),0.02);}tube(wht,V3(xa+2.6,0,-94.8),V3(xa+2.6,1.8,-94.8),0.04);tube(wht,V3(xa+2.6,0,-93.2),V3(xa+2.6,1.8,-93.2),0.04);col(xa,-94.9,xa+2.7,-93.1);}
+    // street lamps along the fence
+    for(const x of[-16,6,26]){tube(S({color:0x4a4f55,metalness:0.6}),V3(x,0,-95.6),V3(x,4.5,-95.6),0.06);const l=new THREE.Mesh(new THREE.SphereGeometry(0.2,10,8),S({color:0xfff6d8,emissive:0x665c3a}));l.position.set(x,4.6,95.6);g.add(l);}
+   }
   const tx=text('가동문화관',7.5,1.1,{fg:'#ffffff',font:'bold 130px NanumGothic, sans-serif'});tx.rotation.y=-Math.PI/2;tx.position.set(44.85,8.6,30.5);g.add(tx);
   const lg=new THREE.Mesh(new THREE.CircleGeometry(0.8,40),S({map:logoTex()}));lg.rotation.y=-Math.PI/2;lg.position.set(44.85,8.6,25.9);g.add(lg);
   site.group.add(g);}
