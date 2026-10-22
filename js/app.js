@@ -8,9 +8,9 @@ import {GTAOPass} from 'three/addons/postprocessing/GTAOPass.js';
 import {OutputPass} from 'three/addons/postprocessing/OutputPass.js';
 import {RoomEnvironment} from 'three/addons/environments/RoomEnvironment.js';
 import {mergeGeometries} from 'three/addons/utils/BufferGeometryUtils.js';
-import {buildRooms} from './rooms.js?v=202610221731';
-import * as T from './tex.js?v=202610221731';
-import {buildInstanced} from './furn.js?v=202610221731';
+import {buildRooms} from './rooms.js?v=202610221734';
+import * as T from './tex.js?v=202610221734';
+import {buildInstanced} from './furn.js?v=202610221734';
 const Q=new URLSearchParams(location.search);const SHOT=Q.has('shot');
 const MOBILE=matchMedia('(pointer:coarse)').matches||innerWidth<760;
 await document.fonts.load('bold 40px NanumGothic').catch(()=>{});
@@ -244,6 +244,39 @@ function lobbyGarden(){const sm=(o)=>new THREE.MeshStandardMaterial(Object.assig
   WALLS.site.r.push([hx-1.45,hn-1.3,hx+1.45,hn+1.3]);}
  for(const [x,n] of[[-1.6,-3.5],[6.1,-3.5],[-1.6,1.5],[6.1,1.5]]){const b=new THREE.Mesh(new THREE.SphereGeometry(0.55,10,8),shrub);b.scale.y=0.7;b.position.set(x,0.38,-n);g.add(b);}
  g.userData.kind='photo';s.group.add(g);}
+// elevator lobby (1F colour blocks / 3F stone alcove) in the west toilet recess, 나래3 corridor, 가동 나래꿈터 portal
+function mainInteriors(){const sm=(o)=>new THREE.MeshStandardMaterial(Object.assign({roughness:0.6},o));const ss=new THREE.MeshStandardMaterial({color:0xc9ced3,metalness:0.8,roughness:0.25});
+ for(const [f,e] of[['1F',0],['2F',3.6],['3F',7.2],['4F',10.8],['5F',14.4]]){const c=chunks['main_'+f];if(!c)continue;const g=new THREE.Group();
+  const P=(mat,w,h,x,y,n,ry)=>{const m=new THREE.Mesh(new THREE.PlaneGeometry(w,h),mat);m.position.set(x,y,-n);m.rotation.y=ry;g.add(m);return m;};
+  const BN=18.63;// back face of the recess (faces +n)
+  if(f==='1F'){const cols=[0xd83a2e,0xf2c230,0xf08a2a,0xf2c230,0xd83a2e,0xf08a2a];for(let i=0;i<6;i++)P(sm({color:cols[i]}),1.25,0.75,-41.6+i*1.25,2.5,BN+0.01,Math.PI);
+   const cart=sm({map:_cvT(512,320,(x,W,H)=>{x.fillStyle='#ef8fb0';x.fillRect(0,0,W,H);x.fillStyle='#bfe6f5';x.fillRect(24,24,W-48,H-48);x.fillStyle='#7cc46a';x.fillRect(24,H*0.62,W-48,H*0.38-24);for(let i=0;i<7;i++){x.fillStyle=['#ffd23f','#ff7aa2','#ffffff'][i%3];x.beginPath();x.arc(60+i*65,H*0.7,16,0,7);x.fill();}x.fillStyle='#ffcc00';x.beginPath();x.ellipse(W*0.5,H*0.35,34,24,0,0,7);x.fill();x.fillStyle='#222';for(let k=0;k<3;k++)x.fillRect(W*0.5-26+k*18,H*0.35-24,6,48);x.fillStyle='rgba(255,255,255,.8)';x.beginPath();x.ellipse(W*0.5-10,H*0.35-30,18,10,0,0,7);x.fill();})});
+   P(cart,1.1,0.8,-35.0,1.3,BN+0.21,Math.PI);
+  }else if(f==='3F'){const stoneW=sm({map:_cvT(256,256,(x,W,H)=>{x.fillStyle='#d8cdb6';x.fillRect(0,0,W,H);for(let i=0;i<500;i++){x.fillStyle=`rgba(150,130,100,${Math.random()*0.2})`;x.fillRect(Math.random()*W,Math.random()*H,3,3);}x.strokeStyle='#efe8da';x.lineWidth=3;for(let k=0;k<=2;k++){x.beginPath();x.moveTo(0,k*128);x.lineTo(W,k*128);x.stroke();x.beginPath();x.moveTo(k*128,0);x.lineTo(k*128,H);x.stroke();}})});
+   P(stoneW,1.4,2.75,-39.05,e+1.4,BN+0.01,Math.PI);const gr=new THREE.Mesh(new THREE.PlaneGeometry(1.6,1.5),sm({color:0x2e2f33,roughness:0.3}));gr.rotation.x=-Math.PI/2;gr.position.set(-39.05,e+0.013,-(BN+0.8));g.add(gr);
+   const ind=textPlane('3',0.16,0.2,{w:128,h:160,font:'bold 130px sans-serif',fg:'#ff5a3a',bg:'#111'});ind.position.set(-39.05,e+2.32,-(BN+0.03));ind.rotation.y=Math.PI;g.add(ind);}
+  // elevator door + frame on every floor, tactile patch
+  P(ss,1.0,2.1,-39.05,e+1.05,BN+0.02,Math.PI);const fr=new THREE.Mesh(new THREE.BoxGeometry(1.2,2.25,0.05),ss);fr.position.set(-39.05,e+1.12,-(BN+0.005));g.add(fr);
+  {const seam=new THREE.Mesh(new THREE.BoxGeometry(0.01,2.1,0.01),sm({color:0x666}));seam.position.set(-39.05,e+1.05,-(BN+0.035));g.add(seam);}
+  {const t=new THREE.Mesh(new THREE.PlaneGeometry(0.9,0.45),SS.yel);t.rotation.x=-Math.PI/2;t.position.set(-39.05,e+0.016,-(BN+0.55));g.add(t);}
+  {const s=textPlane('화장실',0.6,0.18,{w:512,h:150,font:'bold 96px NanumGothic, sans-serif',fg:'#fff',bg:'#141414'});s.position.set(-37.4,e+2.45,-(BN+1.2));g.add(s);const s2=s.clone();s2.rotation.y=Math.PI;s2.position.z-=0.003;g.add(s2);}
+  {const a=textPlane('♿',0.22,0.22,{w:256,h:256,font:'bold 200px sans-serif',fg:'#fff',bg:'#1f6fc4'});a.position.set(-41.75,e+2.0,-19.17);g.add(a);}
+  g.userData.kind='photo';c.group.add(g);}
+ // 나래3 corridor: white cubby shoe racks on the classroom wall pieces, grey tile strip, yellow umbrella stand, hanging sign
+ const c1=chunks.main_1F;if(!c1)return;const g=new THREE.Group();const white=sm({color:0xf5f5f2}),grey=sm({color:0xa7abaf}),yel=sm({color:0xf2c230});
+ const strip=new THREE.Mesh(new THREE.PlaneGeometry(0.7,23.0),grey);strip.rotation.x=-Math.PI/2;strip.position.set(-49.55,0.012,-11.0);g.add(strip);
+ for(const [a,b] of[[16.65,17.55],[19.25,20.15],[7.65,8.55],[10.25,11.15],[1.25,2.15],[-1.35,-0.45]]){const L=b-a;const rk=new THREE.Mesh(new THREE.BoxGeometry(0.34,1.0,L),white);rk.position.set(-49.78,0.5,-(a+b)/2);g.add(rk);
+  for(let i=1;i<4;i++){const sh=new THREE.Mesh(new THREE.BoxGeometry(0.3,0.02,L-0.04),grey);sh.position.set(-49.77,i*0.25,-(a+b)/2);g.add(sh);}for(let j=1;j<4;j++){const dv=new THREE.Mesh(new THREE.BoxGeometry(0.3,1.0,0.015),grey);dv.position.set(-49.77,0.5,-(a+j*L/4));g.add(dv);}
+  WALLS.main_1F&&WALLS.main_1F.r.push([-49.95,a,-49.6,b]);}
+ {const u=new THREE.Mesh(new THREE.BoxGeometry(0.5,0.6,0.35),yel);u.position.set(-47.85,0.3,-21.2);g.add(u);WALLS.main_1F&&WALLS.main_1F.r.push([-48.1,21.0,-47.6,21.4]);}
+ for(const [t,n] of[['나래1',0.3],['나래2',9.6],['나래3',18.4]]){const s=textPlane(t,0.5,0.16,{w:512,h:160,font:'bold 100px NanumGothic, sans-serif',fg:'#fff',bg:'#141414'});s.position.set(-49.6,2.45,-n);s.rotation.y=Math.PI/2;g.add(s);const s2=s.clone();s2.rotation.y=-Math.PI/2;s2.position.x+=0.003;g.add(s2);}
+ // 가동 나래꿈터 portal at the south end of the west corridor (to the covered link), pink stripes, doormat
+ {const por=sm({color:0x8d9399});const x0=-49.95,x1=-47.6,n=-3.7;const top=new THREE.Mesh(new THREE.BoxGeometry(x1-x0,0.45,0.3),por);top.position.set((x0+x1)/2,2.6,-n);g.add(top);for(const x of[x0+0.1,x1-0.1]){const p=new THREE.Mesh(new THREE.BoxGeometry(0.2,2.4,0.3),por);p.position.set(x,1.2,-n);g.add(p);}
+  const t=textPlane('가동 나래꿈터',2.0,0.3,{w:1024,h:150,font:'bold 100px NanumGothic, sans-serif',fg:'#f06292',bg:null});t.position.set((x0+x1)/2,2.6,-(n+0.16));t.rotation.y=Math.PI;g.add(t);const t2=t.clone();t2.rotation.y=0;t2.position.z=-(n-0.16);g.add(t2);
+  const pink=sm({transparent:true,map:_cvT(512,512,(x,W,H)=>{x.fillStyle='#fafafa';x.fillRect(0,0,W,H);x.strokeStyle='#e8588a';x.lineWidth=26;for(let i=-2;i<4;i++){x.beginPath();x.moveTo(i*180,H);x.lineTo(i*180+300,0);x.stroke();}})});
+  const pw=new THREE.Mesh(new THREE.PlaneGeometry(2.4,2.2),pink);pw.position.set(-47.62,1.6,-(n+2.4));pw.rotation.y=-Math.PI/2;g.add(pw);
+  const mat=new THREE.Mesh(new THREE.BoxGeometry(1.6,0.015,1.0),sm({color:0x55595e}));mat.position.set((x0+x1)/2,0.01,-(n-0.7));g.add(mat);}
+ g.userData.kind='photo';c1.group.add(g);}
 
 function buildStairs(){const byChunk={};for(const st of STAIRS){const k=st.bld+'_'+st.floor;(byChunk[k]=byChunk[k]||[]).push(st);}
  for(const k in byChunk){const c=chunks[k];if(!c)continue;const mats=[],rails=[],nos=[],strs=[],hrs=[],hjs=[];
@@ -339,7 +372,7 @@ function buildPorch(){const p=man.porch,C=chunks.main_porch;if(!p||!C)return;C.g
  WALLS.main_porch={e:0,s:[],r:[[X0,NF,-1.8,NB],[1.9,NF,2.5,NB],[6.6,NF,X1,NB],...rr]};}
 function buildDado(){const trim=new THREE.MeshStandardMaterial({color:0x8fbfae,roughness:0.6});for(const ck in DADO){const c=chunks[ck];if(!c)continue;const e=DADO[ck].e,gs=[],ts=[];for(const[ax,a,b,cc]of DADO[ck].s){const L=b-a,m=(a+b)/2;const g=ax==='x'?new THREE.BoxGeometry(L,1.1,0.02):new THREE.BoxGeometry(0.02,1.1,L);const t=ax==='x'?new THREE.BoxGeometry(L,0.04,0.035):new THREE.BoxGeometry(0.035,0.04,L);if(ax==='x'){g.translate(m,e+0.55,-cc);t.translate(m,e+1.12,-cc);}else{g.translate(cc,e+0.55,-m);t.translate(cc,e+1.12,-m);}gs.push(g);ts.push(t);}
  if(!gs.length)continue;const me=new THREE.Mesh(mergeGeometries(gs),ck==='main_1F'?(M._cream||(M._cream=new THREE.MeshStandardMaterial({color:0xefe2a8,roughness:0.6}))):M.mint);me.receiveShadow=true;me.userData.mat='dado';const mt=new THREE.Mesh(mergeGeometries(ts),trim);mt.userData.mat='dado';c.group.add(me,mt);}}
-function decorate(){try{buildDado();}catch(err){console.error('dado',err);}try{fillGaps();}catch(err){console.error('gaps',err);}buildStairs();try{styleStairs();}catch(err){console.error('stairstyle',err);}buildFixtures();buildColumns();buildSigns();buildCorrLights();try{photoDress();}catch(err){console.error('photo',err);}try{infoWalk();}catch(err){console.error('infowalk',err);}try{lobbyGarden();}catch(err){console.error('lobby',err);}addFurnCollision();try{buildRooms(chunks,WALLS,logoTex,man);}catch(err){console.error('rooms',err);}const s=man.sign;if(s){const g=new THREE.Group();const n=[...s.text];const cx=(s.x0+s.x1)/2;const sp=Math.min(5.4,(s.x1-s.x0)/(n.length+1.5));
+function decorate(){try{buildDado();}catch(err){console.error('dado',err);}try{fillGaps();}catch(err){console.error('gaps',err);}buildStairs();try{styleStairs();}catch(err){console.error('stairstyle',err);}buildFixtures();buildColumns();buildSigns();buildCorrLights();try{photoDress();}catch(err){console.error('photo',err);}try{infoWalk();}catch(err){console.error('infowalk',err);}try{lobbyGarden();}catch(err){console.error('lobby',err);}try{mainInteriors();}catch(err){console.error('mainint',err);}addFurnCollision();try{buildRooms(chunks,WALLS,logoTex,man);}catch(err){console.error('rooms',err);}const s=man.sign;if(s){const g=new THREE.Group();const n=[...s.text];const cx=(s.x0+s.x1)/2;const sp=Math.min(5.4,(s.x1-s.x0)/(n.length+1.5));
  n.forEach((ch,i)=>{const p=textPlane(ch,1.6,1.6,{w:256,h:256,font:'bold 230px NanumGothic, sans-serif'});p.position.set(cx+(i-(n.length-1)/2)*sp+sp*0.6,s.y,-(s.n-0.26));g.add(p);});
  const lg=new THREE.Mesh(new THREE.PlaneGeometry(1.6,1.6),new THREE.MeshStandardMaterial({map:logoTex(),transparent:true}));lg.position.set(cx-(n.length-1)/2*sp-sp*0.5,s.y,-(s.n-0.26));g.add(lg);
  g.userData.kind='roofdeco';chunks.main_roof?.group.add(g);}
