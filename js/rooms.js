@@ -52,7 +52,7 @@ export function buildRooms(chunks,WALLS,logoTex,man){
   R.wallp(S({color:0xf6f6f6,roughness:0.4}),'x',-50.6,-45.4,-41.25,1.05,2.5,1);
   const bn=text('서울가동초등학교',4.6,0.42,{fg:'#ffffff',bg:'#1d4f9a',font:'bold 110px NanumGothic, sans-serif'});bn.position.set(-48.96,2.72,41.2);bn.rotation.y=Math.PI;chunks.info_1F.group.add(bn);
   const seatR=S({color:0xb3212f,roughness:0.7}),seatW=S({color:0xf3f1ec,roughness:0.5});const at=[];
-  for(let r=0;r<12;r++){const n=-35.6+r*1.0,lift=r*0.12;for(let x=-53.2;x<=-42.8;x+=0.56){if(Math.abs(x+48)<0.55)continue;at.push([x,n,Math.PI]);}R.rects.push([-53.5,n-0.3,-48.6,n+0.35],[-47.4,n-0.3,-42.4,n+0.35]);}
+  for(let r=0;r<12;r++){const n=-35.6+r*1.0,lift=r*0.12;for(let x=-53.2;x<=-44.2;x+=0.56){if(Math.abs(x+48)<0.55)continue;at.push([x,n,Math.PI]);}R.rects.push([-53.5,n-0.3,-48.6,n+0.35],[-47.4,n-0.3,-43.95,n+0.35]);}
   R.inst([[0.5,0.08,0.45,0,0.45,0,seatR],[0.5,0.6,0.06,0,0.75,-0.22,seatR],[0.05,0.5,0.4,-0.26,0.3,0,dark]],at);
   leds(R,-53.6,-42.4,-37,-21.2);},INFO_SX);
  // 4) 뮤지컬실 = 본관 2F (x -57.3..-50.3, n -3.9..13.7)

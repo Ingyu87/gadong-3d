@@ -8,9 +8,9 @@ import {GTAOPass} from 'three/addons/postprocessing/GTAOPass.js';
 import {OutputPass} from 'three/addons/postprocessing/OutputPass.js';
 import {RoomEnvironment} from 'three/addons/environments/RoomEnvironment.js';
 import {mergeGeometries} from 'three/addons/utils/BufferGeometryUtils.js';
-import {buildRooms} from './rooms.js?v=202610221716';
-import * as T from './tex.js?v=202610221716';
-import {buildInstanced} from './furn.js?v=202610221716';
+import {buildRooms} from './rooms.js?v=202610221729';
+import * as T from './tex.js?v=202610221729';
+import {buildInstanced} from './furn.js?v=202610221729';
 const Q=new URLSearchParams(location.search);const SHOT=Q.has('shot');
 const MOBILE=matchMedia('(pointer:coarse)').matches||innerWidth<760;
 await document.fonts.load('bold 40px NanumGothic').catch(()=>{});
@@ -545,7 +545,7 @@ srch.oninput=fill;
 addEventListener('resize',()=>{cam.aspect=innerWidth/innerHeight;cam.updateProjectionMatrix();r.setSize(innerWidth,innerHeight);sizeLabels();render();});
 sizeLabels();setView('bird');applyFloor();
 // test hooks
-window.__api={setFloor:f=>{curFloor=f;applyFloor();},setWalk,roomFocus,labels:man.labels,render:()=>r.render(scene,cam),cam,ctl,setCut:v=>{cut=v;applyFloor();},info:()=>r.info.render,scene,WALLS,doorIMs,fd:(x,z)=>freeDist(new THREE.Vector3(x,0,z),3),cc:()=>curChunks(),ok:(x,z)=>okStep(cam.position.clone().add(new THREE.Vector3(x,0,z)))};
+window.__api={setFloor:f=>{curFloor=f;applyFloor();},setWalk,roomFocus,labels:man.labels,render:()=>r.render(scene,cam),cam,ctl,setCut:v=>{cut=v;applyFloor();},info:()=>r.info.render,scene,WALLS,doorIMs,fd:(x,z)=>freeDist(new THREE.Vector3(x,0,z),3),cc:()=>curChunks(),why:(dx,dn)=>{const R=0.3,ox=cam.position.x,on=-cam.position.z,o=[];for(const k of curChunks()){const W=WALLS[k];for(const r of W.r){const t=rayRect(ox,on,dx,dn,r[0]-R,r[1]-R,r[2]+R,r[3]+R);if(t<1.5)o.push([k,'r',t,...r]);}for(const q of W.s){const t=rayRect(ox,on,dx,dn,Math.min(q[0],q[2])-R,Math.min(q[1],q[3])-R,Math.max(q[0],q[2])+R,Math.max(q[1],q[3])+R);if(t<1.5)o.push([k,'s',t,...q]);}}for(const im of doorIMs){if(!im.parent||!im.parent.visible)continue;for(const dd of im.userData.doors){if(dd.ang>0.3||Math.abs(dd.e+EYE-cam.position.y)>1)continue;const t=rayRect(ox,on,dx,dn,dd.x0-R,dd.n0-R,dd.x1+R,dd.n1+R);if(t<1.5)o.push(['door',dd.c,t,dd.x0,dd.n0,dd.x1,dd.n1]);}}return o;},ok:(x,z)=>okStep(cam.position.clone().add(new THREE.Vector3(x,0,z)))};
 
 // ---------- on-screen pad ----------
 document.querySelectorAll('[data-k]').forEach(b=>{const k=b.dataset.k;const on=e=>{e.preventDefault();e.stopPropagation();keys[k]=true;t0=performance.now();loop();try{b.setPointerCapture(e.pointerId)}catch(_){}};let t0=0;const off=e=>{const el=performance.now()-t0;setTimeout(()=>{keys[k]=false;},Math.max(0,220-el));};
