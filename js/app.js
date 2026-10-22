@@ -8,9 +8,9 @@ import {GTAOPass} from 'three/addons/postprocessing/GTAOPass.js';
 import {OutputPass} from 'three/addons/postprocessing/OutputPass.js';
 import {RoomEnvironment} from 'three/addons/environments/RoomEnvironment.js';
 import {mergeGeometries} from 'three/addons/utils/BufferGeometryUtils.js';
-import {buildRooms} from './rooms.js?v=202610221706';
-import * as T from './tex.js?v=202610221706';
-import {buildInstanced} from './furn.js?v=202610221706';
+import {buildRooms} from './rooms.js?v=202610221716';
+import * as T from './tex.js?v=202610221716';
+import {buildInstanced} from './furn.js?v=202610221716';
 const Q=new URLSearchParams(location.search);const SHOT=Q.has('shot');
 const MOBILE=matchMedia('(pointer:coarse)').matches||innerWidth<760;
 await document.fonts.load('bold 40px NanumGothic').catch(()=>{});
@@ -209,6 +209,11 @@ function infoWalk(){const c=chunks.info_1F;if(!c)return;const g=new THREE.Group(
  for(let i=0;i<3;i++){const ph=new THREE.Mesh(new THREE.BoxGeometry(0.08,0.2,0.14),sm({color:i?0x2b2b2b:0xc62222}));ph.position.set(-43.72,1.3,13.7+i*0.45);g.add(ph);}
  g.userData.kind='photo';c.group.add(g);}
 
+// close small non-door gaps between collinear wall segments (gaps.json from gaps.py)
+let GAPS={};const gapReady=fetch(V('gaps.json')).then(r=>r.json()).then(d=>GAPS=d).catch(()=>{});
+function fillGaps(){for(const k in GAPS){const c=chunks[k];if(!c)continue;const e=GAPS[k].e,H=k.startsWith('hall_2')?6.0:3.6;const ms=[];for(const r of GAPS[k].r){ms.push(new THREE.Matrix4().compose(new THREE.Vector3((r[0]+r[2])/2,e+H/2,-(r[1]+r[3])/2),new THREE.Quaternion(),new THREE.Vector3(r[2]-r[0]+0.02,H,r[3]-r[1]+0.02)));WALLS[k]&&WALLS[k].r.push(r);}
+ const im=new THREE.InstancedMesh(new THREE.BoxGeometry(1,1,1),M.wallIn,ms.length);ms.forEach((m,i)=>im.setMatrixAt(i,m));im.instanceMatrix.needsUpdate=true;im.computeBoundingSphere();im.receiveShadow=true;im.userData.mat='wallIn';c.group.add(im);}}
+
 function buildStairs(){const byChunk={};for(const st of STAIRS){const k=st.bld+'_'+st.floor;(byChunk[k]=byChunk[k]||[]).push(st);}
  for(const k in byChunk){const c=chunks[k];if(!c)continue;const mats=[],rails=[],nos=[],strs=[],hrs=[],hjs=[];
   for(const st of byChunk[k])for(const f of st.flights){if(f.kind==='landing'){const m=new THREE.Matrix4().compose(new THREE.Vector3((f.x0+f.x1)/2,f.y0-0.1,-(f.n0+f.n1)/2),new THREE.Quaternion(),new THREE.Vector3(f.x1-f.x0,0.2,f.n1-f.n0));mats.push(m);continue;}
@@ -303,7 +308,7 @@ function buildPorch(){const p=man.porch,C=chunks.main_porch;if(!p||!C)return;C.g
  WALLS.main_porch={e:0,s:[],r:[[X0,NF,-1.8,NB],[1.9,NF,2.5,NB],[6.6,NF,X1,NB],...rr]};}
 function buildDado(){const trim=new THREE.MeshStandardMaterial({color:0x8fbfae,roughness:0.6});for(const ck in DADO){const c=chunks[ck];if(!c)continue;const e=DADO[ck].e,gs=[],ts=[];for(const[ax,a,b,cc]of DADO[ck].s){const L=b-a,m=(a+b)/2;const g=ax==='x'?new THREE.BoxGeometry(L,1.1,0.02):new THREE.BoxGeometry(0.02,1.1,L);const t=ax==='x'?new THREE.BoxGeometry(L,0.04,0.035):new THREE.BoxGeometry(0.035,0.04,L);if(ax==='x'){g.translate(m,e+0.55,-cc);t.translate(m,e+1.12,-cc);}else{g.translate(cc,e+0.55,-m);t.translate(cc,e+1.12,-m);}gs.push(g);ts.push(t);}
  if(!gs.length)continue;const me=new THREE.Mesh(mergeGeometries(gs),ck==='main_1F'?(M._cream||(M._cream=new THREE.MeshStandardMaterial({color:0xefe2a8,roughness:0.6}))):M.mint);me.receiveShadow=true;me.userData.mat='dado';const mt=new THREE.Mesh(mergeGeometries(ts),trim);mt.userData.mat='dado';c.group.add(me,mt);}}
-function decorate(){try{buildDado();}catch(err){console.error('dado',err);}buildStairs();try{styleStairs();}catch(err){console.error('stairstyle',err);}buildFixtures();buildColumns();buildSigns();buildCorrLights();try{photoDress();}catch(err){console.error('photo',err);}try{infoWalk();}catch(err){console.error('infowalk',err);}addFurnCollision();try{buildRooms(chunks,WALLS,logoTex,man);}catch(err){console.error('rooms',err);}const s=man.sign;if(s){const g=new THREE.Group();const n=[...s.text];const cx=(s.x0+s.x1)/2;const sp=Math.min(5.4,(s.x1-s.x0)/(n.length+1.5));
+function decorate(){try{buildDado();}catch(err){console.error('dado',err);}try{fillGaps();}catch(err){console.error('gaps',err);}buildStairs();try{styleStairs();}catch(err){console.error('stairstyle',err);}buildFixtures();buildColumns();buildSigns();buildCorrLights();try{photoDress();}catch(err){console.error('photo',err);}try{infoWalk();}catch(err){console.error('infowalk',err);}addFurnCollision();try{buildRooms(chunks,WALLS,logoTex,man);}catch(err){console.error('rooms',err);}const s=man.sign;if(s){const g=new THREE.Group();const n=[...s.text];const cx=(s.x0+s.x1)/2;const sp=Math.min(5.4,(s.x1-s.x0)/(n.length+1.5));
  n.forEach((ch,i)=>{const p=textPlane(ch,1.6,1.6,{w:256,h:256,font:'bold 230px NanumGothic, sans-serif'});p.position.set(cx+(i-(n.length-1)/2)*sp+sp*0.6,s.y,-(s.n-0.26));g.add(p);});
  const lg=new THREE.Mesh(new THREE.PlaneGeometry(1.6,1.6),new THREE.MeshStandardMaterial({map:logoTex(),transparent:true}));lg.position.set(cx-(n.length-1)/2*sp-sp*0.5,s.y,-(s.n-0.26));g.add(lg);
  g.userData.kind='roofdeco';chunks.main_roof?.group.add(g);}
@@ -321,7 +326,7 @@ const ORDER=c=>c.kind==='site'?0:c.kind==='roof'?2:(c.bld==='main'?1:3);
 const list=[...man.chunks].sort((a,b)=>ORDER(a)-ORDER(b)||a.elev-b.elev);
 async function loadChunk(c){const g=await loader.loadAsync(V(c.file));const grp=new THREE.Group();grp.name=c.name;
  g.scene.traverse(o=>{if(o.isMesh){if(!o.geometry.attributes.normal){o.geometry=o.geometry.toNonIndexed();o.geometry.computeVertexNormals();}const n=(o.material&&o.material.name)||'';const mm=M[n]||M.white;o.material=mm;o.castShadow=!MOBILE&&!mm.transparent&&c.kind!=='site';o.receiveShadow=true;o.userData.mat=n;}});
- await doorsReady;await stairsReady;await fixtReady;await colReady;await signReady;await dadoReady;if(c.kind!=='site'){const rm=[];g.scene.traverse(o=>{if(o.isMesh&&o.userData.mat==='door')rm.push(o);});rm.forEach(o=>o.removeFromParent());buildDoors(c,grp);}window.__shDirty=true;
+ await doorsReady;await stairsReady;await fixtReady;await colReady;await signReady;await dadoReady;await gapReady;if(c.kind!=='site'){const rm=[];g.scene.traverse(o=>{if(o.isMesh&&o.userData.mat==='door')rm.push(o);});rm.forEach(o=>o.removeFromParent());buildDoors(c,grp);}window.__shDirty=true;
  grp.add(g.scene);const fg=new THREE.Group();fg.name='furn';if(c.kind==='site')fg.add(trees(c.furn));else addFurn(fg,classOnly(c,c.furn));grp.add(fg);
  root.add(grp);chunks[c.name]={...c,group:grp};loaded++;prog.textContent=`불러오는 중 ${loaded}/${list.length}`;if(loaded===list.length){prog.style.display='none';decorate();applyFloor();SITEB=null;if(!userMoved&&!walk){if(Q.get('view')==='bird'||SHOT)defaultView(false);else spawnFPS();}window.__loaded=true;}
  render();}

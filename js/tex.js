@@ -7,8 +7,8 @@ export const brick=()=>{const t=cv(1024,616,(x,w,h)=>{x.fillStyle='#6f655d';x.fi
   x.fillStyle=`rgb(${R},${G},${B})`;x.fillRect(c*bw+ox+3,r*bh+3,bw-6,bh-6);
   for(let k=0;k<40;k++){x.fillStyle=`rgba(${rnd()<.5?40:200},${30},${20},0.08)`;x.fillRect(c*bw+ox+5+rnd()*(bw-14),r*bh+5+rnd()*(bh-14),4,3);}}});
  t.repeat.set(1/1.0,1/0.6);return t;};
-export const wood=(base='#a4703f',pw=0.15,pl=1.2,size=1.2)=>{const t=cv(1024,1024,(x,w,h)=>{const n=Math.round(size/pw),ph=h/n;
- for(let i=0;i<n;i++){const off=rnd()*w;for(let j=-1;j<2;j++){const v=rnd()*0.1-0.05;x.fillStyle=shade(base,v);x.fillRect(off+j*w*(pl/size),i*ph,w*(pl/size)-3,ph-2);
+export const wood=(base='#a4703f',pw=0.15,pl=1.2,size=1.2)=>{const t=cv(1024,1024,(x,w,h)=>{const n=Math.round(size/pw),ph=h/n;x.fillStyle=shade(base,-0.08);x.fillRect(0,0,w,h);const J=Math.ceil(size/pl)+1;
+ for(let i=0;i<n;i++){const off=rnd()*w;for(let j=-J;j<=J;j++){const v=rnd()*0.1-0.05;x.fillStyle=shade(base,v);x.fillRect(off+j*w*(pl/size),i*ph,w*(pl/size)-3,ph-2);
   for(let g=0;g<14;g++){x.strokeStyle=`rgba(60,35,15,${0.05+rnd()*0.08})`;x.lineWidth=1+rnd()*2;x.beginPath();const yy=i*ph+rnd()*ph;x.moveTo(off+j*w,yy);x.bezierCurveTo(off+j*w+300,yy+rnd()*6-3,off+j*w+600,yy+rnd()*6-3,off+j*w+w,yy);x.stroke();}}
   x.fillStyle='rgba(40,25,10,0.3)';x.fillRect(0,i*ph+ph-1,w,1);}});t.repeat.set(1/size,1/size);return t;};
 function shade(hex,v){const c=new THREE.Color(hex);c.offsetHSL(0,0,v);return '#'+c.getHexString();}
