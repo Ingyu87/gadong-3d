@@ -61,7 +61,11 @@ export function buildRooms(chunks,WALLS,logoTex,man){
   const curt=S({color:0x0b0b0c,roughness:1});const cg=new THREE.Mesh(new THREE.BoxGeometry(0.12,2.85,17.4),curt);cg.position.set(-57.15,3.6+1.43,-4.9);chunks.main_2F.group.add(cg);
   const fl=S({map:rep(cv(1024,1024,(x,w,h)=>{const g=woodTex('#d0a876').image;x.drawImage(g,0,0,w,h);x.strokeStyle='#f1c40f';x.lineWidth=6;for(const f of[0.25,0.5,0.75]){x.beginPath();x.moveTo(f*w,0);x.lineTo(f*w,h);x.stroke();}x.beginPath();x.moveTo(0,h/2);x.lineTo(w,h/2);x.stroke();}),1,2),roughness:0.45});R.plane(fl,-57.3,-50.3,-3.9,13.7,0.012);
   const stp=S({map:rep(woodTex('#b98a55'),2,1),roughness:0.55});for(let i=0;i<3;i++)R.box(stp,-56.8,-50.8,11.0+i*0.85,13.65,0,0.4*(i+1));R.rects.push([-56.8,11.0,-50.8,13.65]);
-  const mir=S({color:0xdfe6ea,roughness:0.03,metalness:1});R.wallp(mir,'x',-56.5,-51.0,-3.86,0.3,2.3,1);});
+  const mir=S({color:0xdfe6ea,roughness:0.03,metalness:1});R.wallp(mir,'x',-56.5,-51.0,-3.86,0.3,2.3,1);
+  // clboard 뮤지컬실 124-134: 가야금 laid in rows on the floor (paulownia body, silk strings), black padded cases beside them
+  {const bd=S({map:rep(woodTex('#b27a45',3),1,1),roughness:0.5}),str=S({color:0xf3ead2}),cs=S({color:0x1b1c20,roughness:0.9});const at=[],ca=[];
+   for(const x of[-55.6,-53.5,-51.4])for(let n=-2.6;n<10;n+=1.25){at.push([x,n,0.08]);ca.push([x+0.15,n+0.5,0.05]);}
+   R.inst([[1.6,0.08,0.28,0,0.06,0,bd],[1.4,0.006,0.2,0,0.105,0,str],[0.06,0.05,0.24,-0.62,0.13,0,dark]],at);R.inst([[1.65,0.1,0.32,0,0.05,0,cs]],ca);}});
  // 5) 강당 = 다목적강당 2F 강당 202 (gym x 45.4..64.5, n -52.4..-19; stage x 50.4..60, n -57.2..-52.5)
  add('hall_2F',(R,e)=>{const court=S({map:cv(1024,2048,(x,w,h)=>{x.fillStyle='#e6cfa2';x.fillRect(0,0,w,h);for(let i=0;i<w;i+=16)for(let j=0;j<h;j+=128){x.fillStyle=`rgba(${Math.random()<.5?'255,245,225':'150,110,60'},${0.06+Math.random()*0.08})`;x.fillRect(i,j+(i%32?64:0),16,128);}x.strokeStyle='rgba(120,90,50,0.18)';x.lineWidth=1;for(let i=0;i<w;i+=16){x.beginPath();x.moveTo(i,0);x.lineTo(i,h);x.stroke();}
    x.lineWidth=9;x.strokeStyle='#2f7fe0';x.strokeRect(70,100,w-140,h-200);x.beginPath();x.moveTo(70,h/2);x.lineTo(w-70,h/2);x.stroke();x.beginPath();x.arc(w/2,h/2,150,0,7);x.stroke();x.beginPath();x.arc(w/2,100,380,0,Math.PI);x.stroke();x.beginPath();x.arc(w/2,h-100,380,Math.PI,0);x.stroke();
