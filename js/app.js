@@ -8,9 +8,9 @@ import {GTAOPass} from 'three/addons/postprocessing/GTAOPass.js';
 import {OutputPass} from 'three/addons/postprocessing/OutputPass.js';
 import {RoomEnvironment} from 'three/addons/environments/RoomEnvironment.js';
 import {mergeGeometries} from 'three/addons/utils/BufferGeometryUtils.js';
-import {buildRooms} from './rooms.js?v=202610221729';
-import * as T from './tex.js?v=202610221729';
-import {buildInstanced} from './furn.js?v=202610221729';
+import {buildRooms} from './rooms.js?v=202610221731';
+import * as T from './tex.js?v=202610221731';
+import {buildInstanced} from './furn.js?v=202610221731';
 const Q=new URLSearchParams(location.search);const SHOT=Q.has('shot');
 const MOBILE=matchMedia('(pointer:coarse)').matches||innerWidth<760;
 await document.fonts.load('bold 40px NanumGothic').catch(()=>{});
@@ -213,6 +213,37 @@ function infoWalk(){const c=chunks.info_1F;if(!c)return;const g=new THREE.Group(
 let GAPS={};const gapReady=fetch(V('gaps.json')).then(r=>r.json()).then(d=>GAPS=d).catch(()=>{});
 function fillGaps(){for(const k in GAPS){const c=chunks[k];if(!c)continue;const e=GAPS[k].e,H=k.startsWith('hall_2')?6.0:3.6;const ms=[];for(const r of GAPS[k].r){ms.push(new THREE.Matrix4().compose(new THREE.Vector3((r[0]+r[2])/2,e+H/2,-(r[1]+r[3])/2),new THREE.Quaternion(),new THREE.Vector3(r[2]-r[0]+0.02,H,r[3]-r[1]+0.02)));WALLS[k]&&WALLS[k].r.push(r);}
  const im=new THREE.InstancedMesh(new THREE.BoxGeometry(1,1,1),M.wallIn,ms.length);ms.forEach((m,i)=>im.setMatrixAt(i,m));im.instanceMatrix.needsUpdate=true;im.computeBoundingSphere();im.receiveShadow=true;im.userData.mat='wallIn';c.group.add(im);}}
+// 중앙현관 lobby (boards, panel dado, blue map wall, tank, TV, plant) + front garden (pergola path, benches, looped fences, lamps, hex planter bench)
+function lobbyGarden(){const sm=(o)=>new THREE.MeshStandardMaterial(Object.assign({roughness:0.6},o));const c=chunks.main_1F;
+ const board=(t1,t2,bg,w,h)=>sm({map:_cvT(1024,Math.round(1024*h/w),(x,W,H)=>{x.fillStyle=bg;x.fillRect(0,0,W,H);x.fillStyle='#fff';x.fillRect(16,16,W-32,H*0.2);x.fillStyle='#1d3f7a';x.font=`bold ${Math.round(H*0.12)}px NanumGothic, sans-serif`;x.textAlign='center';x.fillText(t1,W/2,H*0.17);
+   const C=['#f2c14e','#7cc6a8','#e98a6b','#8fb3e0','#c9a0dc','#f4f4f4'];for(let i=0;i<8;i++){x.fillStyle=C[i%6];x.fillRect(40+(i%4)*((W-80)/4),H*0.3+Math.floor(i/4)*H*0.33,(W-80)/4-20,H*0.28);}if(t2){x.fillStyle='#333';x.font=`${Math.round(H*0.06)}px NanumGothic, sans-serif`;x.fillText(t2,W/2,H*0.97);}})});
+ if(c){const g=new THREE.Group();const P=(mat,w,h,x,y,n,ry)=>{const m=new THREE.Mesh(new THREE.PlaneGeometry(w,h),mat);m.position.set(x,y,-n);m.rotation.y=ry;g.add(m);return m;};
+  P(board('보람을 주는 행복한 가동교육','','#e9f1f7',3.2,1.4),3.2,1.4,2.33,1.75,16.4,Math.PI/2);
+  P(board('창의적인 인재','꿈 · 끼 · 사랑','#fdf3d8',4.4,1.2),4.4,1.2,6.62,1.8,16.6,-Math.PI/2);
+  const pan=[0xf0c84a,0xb8bcc0,0xf6f4ee];for(let i=0;i<6;i++){P(sm({color:pan[i%3]}),1.2,0.95,2.33,0.55,13.7+i*1.2,Math.PI/2);P(sm({color:pan[(i+1)%3]}),1.2,0.95,6.62,0.55,13.7+i*1.2,-Math.PI/2);}
+  const blue=sm({map:_cvT(1024,512,(x,W,H)=>{x.fillStyle='#2f6db5';x.fillRect(0,0,W,H);x.fillStyle='#fff';x.fillRect(W*0.3,H*0.12,W*0.4,H*0.6);x.fillStyle='#9fc98a';for(let i=0;i<9;i++)x.fillRect(W*0.32+(i%3)*W*0.13,H*0.15+Math.floor(i/3)*H*0.19,W*0.11,H*0.16);x.fillStyle='#fff';x.font='bold 40px NanumGothic, sans-serif';x.textAlign='center';x.fillText('학교 배치도',W/2,H*0.85);})});
+  P(blue,4.2,2.1,4.45,1.3,22.83,Math.PI);
+  const tank=new THREE.Mesh(new THREE.BoxGeometry(1.2,0.55,0.4),sm({color:0x7fc3d8,transparent:true,opacity:0.6,roughness:0.05}));tank.position.set(3.4,1.12,-22.55);g.add(tank);
+  const cab=new THREE.Mesh(new THREE.BoxGeometry(1.25,0.85,0.45),sm({color:0x6b4a2e}));cab.position.set(3.4,0.42,-22.55);g.add(cab);
+  const tv=new THREE.Mesh(new THREE.BoxGeometry(1.1,0.65,0.06),sm({color:0x111317,roughness:0.2}));tv.position.set(5.6,1.75,-22.78);g.add(tv);
+  const pot=new THREE.Mesh(new THREE.CylinderGeometry(0.2,0.16,0.4,12),sm({color:0x8a5a3a}));pot.position.set(6.2,0.2,-22.5);g.add(pot);const lf=new THREE.Mesh(new THREE.SphereGeometry(0.4,10,8),sm({color:0x3f8a4a}));lf.position.set(6.2,0.85,-22.5);g.add(lf);
+  WALLS.main_1F&&WALLS.main_1F.r.push([2.75,22.3,4.05,22.8],[5.95,22.25,6.45,22.75]);
+  for(const n of[14.5,17.5]){const l=new THREE.Mesh(new THREE.BoxGeometry(1.2,0.03,0.3),M.led||sm({color:0xffffff}));l.position.set(4.45,2.87,-n);g.add(l);}
+  g.userData.kind='photo';c.group.add(g);}
+ // garden in front of the porch (between the courtyard planters x -2.3..6.8, n -5..7.4)
+ const s=chunks.site;if(!s)return;const g=new THREE.Group();const wood=sm({color:0xb5864f}),stone=sm({color:0xa9a59c}),steel=sm({color:0x6c7177,metalness:0.5}),path=sm({color:0xc9bfae}),fence=sm({color:0x2f3338,metalness:0.4}),pine=sm({color:0x3f6b3a}),bark=sm({color:0x6a4b33}),shrub=sm({color:0x4f8a46});
+ const pth=new THREE.Mesh(new THREE.PlaneGeometry(3.2,12.2),path);pth.rotation.x=-Math.PI/2;pth.position.set(2.25,0.02,-1.2);g.add(pth);
+ for(let n=-4.6;n<=6.2;n+=2.7){for(const x of[0.55,3.95]){const p=new THREE.Mesh(new THREE.BoxGeometry(0.12,2.6,0.12),wood);p.position.set(x,1.3,-n);g.add(p);WALLS.site=WALLS.site||{e:0,s:[],r:[]};WALLS.site.r.push([x-0.08,n-0.08,x+0.08,n+0.08]);}
+  const a=new THREE.Mesh(new THREE.TorusGeometry(1.7,0.06,6,16,Math.PI),wood);a.position.set(2.25,2.6,-n);g.add(a);}
+ for(const x of[0.25,4.25])for(let n=-4.8;n<=6.6;n+=0.9){const f=new THREE.Mesh(new THREE.TorusGeometry(0.22,0.012,4,10,Math.PI),fence);f.rotation.y=Math.PI/2;f.position.set(x,0.02,-n);g.add(f);}
+ for(const [x,n] of[[-0.6,-1],[5.1,2.5]]){const b=new THREE.Mesh(new THREE.BoxGeometry(0.45,0.06,1.8),wood);b.position.set(x,0.45,-n);g.add(b);for(const d of[-0.6,0.6]){const l=new THREE.Mesh(new THREE.BoxGeometry(0.4,0.42,0.2),stone);l.position.set(x,0.21,-(n+d));g.add(l);}}
+ for(const [x,n] of[[-1.4,6.8],[6.2,6.8]]){const p=new THREE.Mesh(new THREE.CylinderGeometry(0.05,0.07,4,8),steel);p.position.set(x,2,-n);g.add(p);const l=new THREE.Mesh(new THREE.SphereGeometry(0.18,10,8),sm({color:0xfff6d8,emissive:0x665c3a}));l.position.set(x,4.05,-n);g.add(l);}
+ // hexagonal tiered wood planter bench with a pine (바른행동 entrance photo)
+ {const hx=-6.5,hn=6.4;for(const [r,y,h] of[[1.6,0,0.45],[1.15,0.45,0.35]]){const m=new THREE.Mesh(new THREE.CylinderGeometry(r,r,h,6),wood);m.position.set(hx,y+h/2,-hn);g.add(m);}const soil=new THREE.Mesh(new THREE.CylinderGeometry(1.3,1.3,0.05,6),sm({color:0x5a4030}));soil.position.set(hx,0.82,-hn);g.add(soil);
+  const tr=new THREE.Mesh(new THREE.CylinderGeometry(0.12,0.18,1.6,8),bark);tr.position.set(hx,1.6,-hn);g.add(tr);for(const [dx,dy,r] of[[0,2.5,1.0],[0.7,2.1,0.7],[-0.7,2.2,0.7]]){const cp=new THREE.Mesh(new THREE.SphereGeometry(r,10,6),pine);cp.scale.y=0.45;cp.position.set(hx+dx,dy,-hn);g.add(cp);}
+  WALLS.site.r.push([hx-1.45,hn-1.3,hx+1.45,hn+1.3]);}
+ for(const [x,n] of[[-1.6,-3.5],[6.1,-3.5],[-1.6,1.5],[6.1,1.5]]){const b=new THREE.Mesh(new THREE.SphereGeometry(0.55,10,8),shrub);b.scale.y=0.7;b.position.set(x,0.38,-n);g.add(b);}
+ g.userData.kind='photo';s.group.add(g);}
 
 function buildStairs(){const byChunk={};for(const st of STAIRS){const k=st.bld+'_'+st.floor;(byChunk[k]=byChunk[k]||[]).push(st);}
  for(const k in byChunk){const c=chunks[k];if(!c)continue;const mats=[],rails=[],nos=[],strs=[],hrs=[],hjs=[];
@@ -308,7 +339,7 @@ function buildPorch(){const p=man.porch,C=chunks.main_porch;if(!p||!C)return;C.g
  WALLS.main_porch={e:0,s:[],r:[[X0,NF,-1.8,NB],[1.9,NF,2.5,NB],[6.6,NF,X1,NB],...rr]};}
 function buildDado(){const trim=new THREE.MeshStandardMaterial({color:0x8fbfae,roughness:0.6});for(const ck in DADO){const c=chunks[ck];if(!c)continue;const e=DADO[ck].e,gs=[],ts=[];for(const[ax,a,b,cc]of DADO[ck].s){const L=b-a,m=(a+b)/2;const g=ax==='x'?new THREE.BoxGeometry(L,1.1,0.02):new THREE.BoxGeometry(0.02,1.1,L);const t=ax==='x'?new THREE.BoxGeometry(L,0.04,0.035):new THREE.BoxGeometry(0.035,0.04,L);if(ax==='x'){g.translate(m,e+0.55,-cc);t.translate(m,e+1.12,-cc);}else{g.translate(cc,e+0.55,-m);t.translate(cc,e+1.12,-m);}gs.push(g);ts.push(t);}
  if(!gs.length)continue;const me=new THREE.Mesh(mergeGeometries(gs),ck==='main_1F'?(M._cream||(M._cream=new THREE.MeshStandardMaterial({color:0xefe2a8,roughness:0.6}))):M.mint);me.receiveShadow=true;me.userData.mat='dado';const mt=new THREE.Mesh(mergeGeometries(ts),trim);mt.userData.mat='dado';c.group.add(me,mt);}}
-function decorate(){try{buildDado();}catch(err){console.error('dado',err);}try{fillGaps();}catch(err){console.error('gaps',err);}buildStairs();try{styleStairs();}catch(err){console.error('stairstyle',err);}buildFixtures();buildColumns();buildSigns();buildCorrLights();try{photoDress();}catch(err){console.error('photo',err);}try{infoWalk();}catch(err){console.error('infowalk',err);}addFurnCollision();try{buildRooms(chunks,WALLS,logoTex,man);}catch(err){console.error('rooms',err);}const s=man.sign;if(s){const g=new THREE.Group();const n=[...s.text];const cx=(s.x0+s.x1)/2;const sp=Math.min(5.4,(s.x1-s.x0)/(n.length+1.5));
+function decorate(){try{buildDado();}catch(err){console.error('dado',err);}try{fillGaps();}catch(err){console.error('gaps',err);}buildStairs();try{styleStairs();}catch(err){console.error('stairstyle',err);}buildFixtures();buildColumns();buildSigns();buildCorrLights();try{photoDress();}catch(err){console.error('photo',err);}try{infoWalk();}catch(err){console.error('infowalk',err);}try{lobbyGarden();}catch(err){console.error('lobby',err);}addFurnCollision();try{buildRooms(chunks,WALLS,logoTex,man);}catch(err){console.error('rooms',err);}const s=man.sign;if(s){const g=new THREE.Group();const n=[...s.text];const cx=(s.x0+s.x1)/2;const sp=Math.min(5.4,(s.x1-s.x0)/(n.length+1.5));
  n.forEach((ch,i)=>{const p=textPlane(ch,1.6,1.6,{w:256,h:256,font:'bold 230px NanumGothic, sans-serif'});p.position.set(cx+(i-(n.length-1)/2)*sp+sp*0.6,s.y,-(s.n-0.26));g.add(p);});
  const lg=new THREE.Mesh(new THREE.PlaneGeometry(1.6,1.6),new THREE.MeshStandardMaterial({map:logoTex(),transparent:true}));lg.position.set(cx-(n.length-1)/2*sp-sp*0.5,s.y,-(s.n-0.26));g.add(lg);
  g.userData.kind='roofdeco';chunks.main_roof?.group.add(g);}
