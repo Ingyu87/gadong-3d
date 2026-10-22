@@ -8,9 +8,9 @@ import {GTAOPass} from 'three/addons/postprocessing/GTAOPass.js';
 import {OutputPass} from 'three/addons/postprocessing/OutputPass.js';
 import {RoomEnvironment} from 'three/addons/environments/RoomEnvironment.js';
 import {mergeGeometries} from 'three/addons/utils/BufferGeometryUtils.js';
-import {buildRooms} from './rooms.js?v=202610221856';
-import * as T from './tex.js?v=202610221856';
-import {buildInstanced} from './furn.js?v=202610221856';
+import {buildRooms} from './rooms.js?v=202610222111';
+import * as T from './tex.js?v=202610222111';
+import {buildInstanced} from './furn.js?v=202610222111';
 const Q=new URLSearchParams(location.search);const SHOT=Q.has('shot');
 const MOBILE=matchMedia('(pointer:coarse)').matches||innerWidth<760;
 await document.fonts.load('bold 40px NanumGothic').catch(()=>{});
@@ -617,18 +617,18 @@ function clampOrbit(force){if(walk)return;if(walk||camAnim)return;const SB=siteB
  const minY=detailMode?2:6;if(cam.position.y<minY){const off=cam.position.clone().sub(t);if(off.y>0.01){cam.position.copy(t).addScaledVector(off,(minY-t.y)/off.y);}else cam.position.y=minY;}
  if(force){const now=performance.now();lastClampRay=now;const dir=cam.position.clone().sub(t);const L=dir.length();dir.normalize();rc.set(t.clone().addScaledVector(dir,0.5),dir);rc.far=L;
   const objs=[];for(const k in chunks){const c=chunks[k];if(c.kind==='site'||!c.group.visible)continue;c.group.traverseVisible(o=>{if(o.isMesh&&!(o.parent&&o.parent.name==='furn')&&!['glass','glassIn','line','led'].includes(o.userData.mat))objs.push(o);});}
-  const hs=rc.intersectObjects(objs,false);if(hs.length&&!detailMode){// building between target and camera: rise above it smoothly instead of diving in
-   const sph=new THREE.Spherical().setFromVector3(cam.position.clone().sub(t));sph.phi=Math.max(ctl.minPolarAngle,sph.phi-0.35);animTo(t.clone().add(new THREE.Vector3().setFromSpherical(sph)),t.clone(),cam.fov,0.5);}}
+  /* no auto-rise: the user's pitch/height is kept even if a building sits between target and camera */}
  guard();}
 function guard(){if(walk||camAnim)return;const SB=siteBox();if(!SB)return;const t=ctl.target;const far=SB.distanceToPoint(t)>10;const d=cam.position.distanceTo(t);
- if(far||cam.position.y<1.5||!isFinite(d)){defaultView(true);}}
+ if(!isFinite(d)||!isFinite(cam.position.y)){defaultView(false);return;}
+ if(far){const old=t.clone();SB.clampPoint(t,t);cam.position.add(t.clone().sub(old));}}
 
 ctl.addEventListener('change',()=>clampOrbit(false));function orbitRot(dyaw,dpitch){const t=ctl.target;const o=cam.position.clone().sub(t);const sp=new THREE.Spherical().setFromVector3(o);sp.theta+=dyaw;sp.phi=Math.max(ctl.minPolarAngle,Math.min(ctl.maxPolarAngle,sp.phi+dpitch));cam.position.copy(t).add(o.setFromSpherical(sp));cam.lookAt(t);userMoved=true;camAnim=null;render();}
 r.domElement.addEventListener('wheel',e=>{if(walk||!e.ctrlKey)return;e.preventDefault();e.stopImmediatePropagation();orbitRot(0,e.deltaY*0.0015);},{passive:false,capture:true});
 let cdrag=null;r.domElement.addEventListener('pointerdown',e=>{if(walk||!e.ctrlKey||e.button!==0)return;e.stopImmediatePropagation();cdrag=[e.clientX,e.clientY];ctl.enabled=false;try{r.domElement.setPointerCapture(e.pointerId)}catch(_){}},{capture:true});
 r.domElement.addEventListener('pointermove',e=>{if(!cdrag)return;e.stopImmediatePropagation();orbitRot(-(e.clientX-cdrag[0])*0.006,-(e.clientY-cdrag[1])*0.004);cdrag=[e.clientX,e.clientY];},{capture:true});
 const cend=e=>{if(!cdrag)return;e.stopImmediatePropagation();cdrag=null;ctl.enabled=!walk;};r.domElement.addEventListener('pointerup',cend,{capture:true});r.domElement.addEventListener('pointercancel',cend,{capture:true});
-let wheelAt=0;r.domElement.addEventListener('wheel',()=>{wheelAt=performance.now();},{passive:true,capture:true});ctl.addEventListener('end',()=>{setTimeout(()=>{clampOrbit(performance.now()-wheelAt>800);render();},400);});ctl.addEventListener('start',()=>{userMoved=true;camAnim=null;if(ctl._panOffset)ctl._panOffset.set(0,0,0);if(ctl._sphericalDelta)ctl._sphericalDelta.set(0,0,0);if(ctl.getDistance()>40)detailMode=false;});
+let wheelAt=0;r.domElement.addEventListener('wheel',()=>{wheelAt=performance.now();},{passive:true,capture:true});ctl.addEventListener('end',()=>{setTimeout(()=>{if(ctl._panOffset)ctl._panOffset.set(0,0,0);if(ctl._sphericalDelta)ctl._sphericalDelta.set(0,0,0);if(ctl._scale!==undefined)ctl._scale=1;},350);setTimeout(()=>{clampOrbit(performance.now()-wheelAt>800);render();},400);});ctl.addEventListener('start',()=>{userMoved=true;camAnim=null;if(ctl._panOffset)ctl._panOffset.set(0,0,0);if(ctl._sphericalDelta)ctl._sphericalDelta.set(0,0,0);if(ctl.getDistance()>40)detailMode=false;});
 window.__check=()=>{const p=cam.position;let inWall=false;if(walk){const R=0.12;for(const k of curChunks()){for(const r of WALLS[k].r)if(p.x>r[0]+R&&p.x<r[2]-R&&-p.z>r[1]+R&&-p.z<r[3]-R)inWall=true;}}else{for(const b of bldBoxes()){if(b.containsPoint(p)&&!b.containsPoint(ctl.target))inWall=true;}}return {y:p.y,walk,inWall,below:p.y<0.3};};
 
 function colliders(){const a=[];for(const k in chunks){const g=chunks[k].group;if(!g.visible)continue;g.traverse(o=>{if(o.isMesh&&!o.isInstancedMesh&&o.visible&&!['glass','glassIn','led','ceil','line'].includes(o.userData.mat)&&!(o.parent&&o.parent.name==='furn'))a.push(o);});}for(const im of doorIMs)if(im.parent&&im.parent.visible)a.push(im);return a;}
@@ -675,7 +675,7 @@ function roomFocus(l){const fl=l.floor==='site'?'all':(l.floor==='roof'?'all':l.
  render();closePanel();}
 window.roomFocus=roomFocus;window.chunksDbg=chunks;
 // ---------- UI ----------
-const fl=document.getElementById('floors');FLOORS.forEach(f=>{const b=document.createElement('button');b.textContent=f==='all'?'전체':f;b.dataset.f=f;b.onclick=()=>{curFloor=f;applyFloor();if(f!=='all'&&!walk){ctl.target.set(0,ELEV[f],10);}};fl.appendChild(b);});
+const fl=document.getElementById('floors');FLOORS.forEach(f=>{const b=document.createElement('button');b.textContent=f==='all'?'전체':f;b.dataset.f=f;b.onclick=()=>{curFloor=f;applyFloor();};fl.appendChild(b);});
 document.getElementById('cut').onclick=e=>{cut=!cut;e.target.classList.toggle('on',cut);applyFloor();};
 document.getElementById('lbl').onclick=e=>{showLabels=!showLabels;e.target.classList.toggle('on',showLabels);applyFloor();};
 document.getElementById('walkbtn').onclick=()=>{if(walk)setWalk(false);else enterLobby();}; // 1인칭 always starts at 중앙현관 (1F), facing inward
