@@ -73,3 +73,20 @@ export function sinkNuri(chunks,WALLS,STAIRS,DOORS,doorIMs){
  const turf=new THREE.Mesh(new THREE.PlaneGeometry(30.5,3.2),new THREE.MeshStandardMaterial({map:t,roughness:0.95}));turf.rotation.x=-Math.PI/2;turf.position.set(48.8,D+0.015,68.0);turf.receiveShadow=true;g.add(turf);
  const lime=new THREE.MeshStandardMaterial({color:0xe9e9e4});const ln=new THREE.Mesh(new THREE.PlaneGeometry(30.5,0.08),lime);ln.rotation.x=-Math.PI/2;ln.position.set(48.8,D+0.018,66.45);g.add(ln);
  return mv.length;}
+
+// 후문 covered walkway (photos 182, 90, 249): the green arched canopy continues from the back corridor north along the east edge
+// (x65.5..67.5) to n 40.5, then turns west to the 후문 gate (x59.7, n43.5). Paver floor, steel posts every 3 m, on main level (0).
+export function hooMunWalk(chunks){const s=chunks.site;if(!s)return;const g=new THREE.Group();g.name='hoomun8';s.group.add(g);
+ const can=new THREE.MeshStandardMaterial({color:0x2f7d5a,transparent:true,opacity:0.8,side:THREE.DoubleSide,roughness:0.35});
+ const post=new THREE.MeshStandardMaterial({color:0x8a9096,metalness:0.6,roughness:0.4});
+ const cv=document.createElement('canvas');cv.width=cv.height=128;const x=cv.getContext('2d');x.fillStyle='#b9b3a6';x.fillRect(0,0,128,128);const C=['#a59f92','#c9c2b4','#9fb0b8','#c7a9a0'];
+ for(let i=0;i<8;i++)for(let j=0;j<8;j++){x.fillStyle=C[(i*3+j*5)%4];x.fillRect(i*16+1,j*16+1,14,14);}const t=new THREE.CanvasTexture(cv);t.wrapS=t.wrapT=THREE.RepeatWrapping;t.colorSpace=THREE.SRGBColorSpace;
+ const seg=(x0,x1,n0,n1)=>{const alongN=(n1-n0)>(x1-x0),len=alongN?n1-n0:x1-x0,w=alongN?x1-x0:n1-n0,cx=(x0+x1)/2,cn=(n0+n1)/2;
+  const a=new THREE.Mesh(new THREE.CylinderGeometry(w/2+0.1,w/2+0.1,len,20,1,true,-Math.PI/2,Math.PI),can);if(alongN)a.rotation.x=Math.PI/2;else{a.rotation.z=Math.PI/2;a.rotation.y=0;}
+  a.scale.set(1,1,1);if(alongN)a.scale.z=0.45;else a.scale.x=1;a.position.set(cx,2.75,-cn);if(!alongN){a.rotation.set(0,0,Math.PI/2);a.scale.set(1,1,0.45);} g.add(a);
+  const fl=new THREE.Mesh(new THREE.PlaneGeometry(alongN?w:len,alongN?len:w),new THREE.MeshStandardMaterial({map:t.clone(),roughness:0.8}));fl.material.map.needsUpdate=true;fl.material.map.repeat.set((alongN?w:len)/2,(alongN?len:w)/2);fl.rotation.x=-Math.PI/2;fl.position.set(cx,0.012,-cn);fl.receiveShadow=true;g.add(fl);
+  for(let u=0;u<=len+0.01;u+=3){for(const side of[0,1]){const p=new THREE.Mesh(new THREE.CylinderGeometry(0.05,0.05,2.75,8),post);
+   if(alongN)p.position.set(side?x1-0.05:x0+0.05,1.375,-(n0+u));else p.position.set(x0+u,1.375,-(side?n1-0.05:n0+0.05));p.castShadow=true;g.add(p);}}};
+ seg(65.5,67.5,-12.9,40.5);seg(58.6,65.5,38.5,40.5);
+ // 급식실 north 1F: no doors in the photos (that face is below the 후문-side grade), so the 4 fake door openings are walled shut
+ const wl=new THREE.MeshStandardMaterial({color:0xe9e4d6,roughness:0.9});for(const[a,b]of[[48.7,50.2],[51.05,52.65],[53.45,55.0],[60.55,62.05]]){const m=new THREE.Mesh(new THREE.BoxGeometry(b-a,2.6,0.3),wl);m.position.set((a+b)/2,-3.6+1.3,13.32);g.add(m);}}
