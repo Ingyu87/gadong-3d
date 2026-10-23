@@ -8,10 +8,10 @@ import {GTAOPass} from 'three/addons/postprocessing/GTAOPass.js';
 import {OutputPass} from 'three/addons/postprocessing/OutputPass.js';
 import {RoomEnvironment} from 'three/addons/environments/RoomEnvironment.js';
 import {mergeGeometries} from 'three/addons/utils/BufferGeometryUtils.js';
-import {buildRooms} from './rooms.js?v=202610231921';
-import * as T from './tex.js?v=202610231921';
-import {buildInstanced} from './furn.js?v=202610231921';
-import {sinkField} from './terrain.js?v=202610231921';
+import {buildRooms} from './rooms.js?v=202610231943';
+import * as T from './tex.js?v=202610231943';
+import {buildInstanced} from './furn.js?v=202610231943';
+import {sinkField} from './terrain.js?v=202610231943';
 import {buildProps6} from './site6.js?v=202610231736';
 import {buildSite3,buildSite4,buildInterior5} from './site3.js?v=202610231640';
 const Q=new URLSearchParams(location.search);const SHOT=Q.has('shot');
@@ -521,13 +521,13 @@ r.domElement.addEventListener('pointerdown',e=>{downAt=[e.clientX,e.clientY];dra
 r.domElement.addEventListener('pointermove',e=>{if(ptrs.has(e.pointerId))ptrs.set(e.pointerId,[e.clientX,e.clientY]);if(downAt&&Math.hypot(e.clientX-downAt[0],e.clientY-downAt[1])>6)dragged=true;
  if(!walk){if(ptrs.size===2&&e.pointerType==='touch'){const v=[...ptrs.values()];const an=Math.atan2(v[1][1]-v[0][1],v[1][0]-v[0][0]);if(twist0!==null){let d=an-twist0;if(d>Math.PI)d-=2*Math.PI;if(d<-Math.PI)d+=2*Math.PI;if(Math.abs(d)<0.5){const o=cam.position.clone().sub(ctl.target);o.applyAxisAngle(new THREE.Vector3(0,1,0),-d);cam.position.copy(ctl.target).add(o);cam.lookAt(ctl.target);ctl.update();render();}}twist0=an;}else twist0=null;hoverCursor(null);return;}
  if(pinch0&&ptrs.size===2){const v=[...ptrs.values()];const d=Math.hypot(v[0][0]-v[1][0],v[0][1]-v[1][1]);cam.fov=Math.max(30,Math.min(90,pinch0.fov*pinch0.d/d));cam.updateProjectionMatrix();render();return;}
- if(e.pointerId===lookId&&last&&!document.pointerLockElement){const k=0.0045*cam.fov/72;yaw+=(e.clientX-last[0])*k;pitch=Math.max(-1.2,Math.min(1.2,pitch+(e.clientY-last[1])*k));last=[e.clientX,e.clientY];cam.rotation.set(pitch,yaw,0,'YXZ');hoverCursor(null);render();}
+ if(e.pointerId===lookId&&last&&!document.pointerLockElement){const k=0.0045*cam.fov/72;yaw-=(e.clientX-last[0])*k;pitch=Math.max(-1.2,Math.min(1.2,pitch-(e.clientY-last[1])*k));last=[e.clientX,e.clientY];cam.rotation.set(pitch,yaw,0,'YXZ');hoverCursor(null);render();}
  else if(e.pointerType==='mouse')hoverCursor(e);});
 const pend=e=>{ptrs.delete(e.pointerId);if(ptrs.size<2){pinch0=null;twist0=null;}if(e.pointerId===lookId){lookId=null;last=null;}
  if(e.type==='pointerup'&&downAt&&!dragged&&e.button!==2)clickAt(e);downAt=null;};
-document.addEventListener('mousemove',e=>{if(!walk||document.pointerLockElement!==r.domElement)return;const k=0.0022*cam.fov/72;yaw-=e.movementX*k;pitch=Math.max(-1.35,Math.min(1.35,pitch-e.movementY*k));cam.rotation.set(pitch,yaw,0,'YXZ');loop();});
+document.addEventListener('mousemove',e=>{if(!walk||document.pointerLockElement!==r.domElement)return;const k=0.0022*cam.fov/72;yaw+=e.movementX*k;pitch=Math.max(-1.35,Math.min(1.35,pitch+e.movementY*k));cam.rotation.set(pitch,yaw,0,'YXZ');loop();});
 document.addEventListener('pointerlockchange',()=>{document.body.classList.toggle('locked',!!document.pointerLockElement);});
-window.__setYaw=y=>{yaw=y;cam.rotation.set(pitch,yaw,0,"YXZ");loop();};window.__look=(dx,dy)=>{const k=0.0022*cam.fov/72;yaw-=dx*k;pitch=Math.max(-1.35,Math.min(1.35,pitch-dy*k));cam.rotation.set(pitch,yaw,0,'YXZ');loop();};
+window.__setYaw=y=>{yaw=y;cam.rotation.set(pitch,yaw,0,"YXZ");loop();};window.__look=(dx,dy)=>{const k=0.0022*cam.fov/72;yaw+=dx*k;pitch=Math.max(-1.35,Math.min(1.35,pitch+dy*k));cam.rotation.set(pitch,yaw,0,'YXZ');loop();};
 r.domElement.addEventListener('pointerup',pend);r.domElement.addEventListener('pointercancel',pend);
 r.domElement.addEventListener('wheel',e=>{if(!walk)return;cam.fov=Math.max(30,Math.min(90,cam.fov+e.deltaY*0.03));cam.updateProjectionMatrix();render();},{passive:true});
 // ---------- doors ----------
