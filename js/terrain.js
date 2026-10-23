@@ -27,7 +27,13 @@ export function sinkField(chunks,WALLS){const c=chunks.site;if(!c)return;const F
  const rw=(x0,x1,n0,n1)=>{box(conc,x0,x1,-D,0,n0,n1);box(coping,x0-0.05,x1+0.05,0,0.12,n0-0.05,n1+0.05);WALLS.site.r.push([x0,n0,x1,n1]);};
  rw(F.x0-0.3,F.x0,F.n0-0.3,F.n1);rw(F.x0-0.3,F.x0,-116.7,F.n0-0.3);rw(84.7,85.0,-116.7,-60.3);rw(F.x0-0.3,85.0,-117.0,-116.7);rw(65.5,85.0,-60.3,-60.0);
  const rl=(x0,x1,n0,n1)=>{const L=Math.max(x1-x0,n1-n0),ax=x1-x0>n1-n0;for(const y of[1.05,0.55])box(rail,x0,x1,y,y+0.05,n0,n1);for(let t=0;t<=L;t+=2.0){const x=ax?x0+t:x0,n=ax?n0:n0+t;box(rail,x-0.03,x+0.03+(ax?0:x1-x0),0.12,1.1,n-0.03,n+0.03);}};
- rl(F.x0-0.2,F.x0-0.1,F.n0-0.2,F.top);rl(F.x0-0.2,F.x0-0.1,-116.6,F.n0-0.2);rl(65.6,84.6,-60.2,-60.1);
+ rl(F.x0-0.2,F.x0-0.1,F.n0-0.2,-42.3);rl(F.x0-0.2,F.x0-0.1,-116.6,F.n0-0.2);rl(65.6,84.6,-60.2,-60.1);
+ // west edge beside the 정보관 (photo 49): the wall under the building strip is painted with a mural down to the field, no railing (building edge)
+ {const cv=document.createElement('canvas');cv.width=2048;cv.height=128;const x=cv.getContext('2d');x.fillStyle='#e9e2cf';x.fillRect(0,0,2048,128);
+  const C=['#e8574a','#f2b632','#4fa65a','#3f7fcf','#8a5cc2','#f08bb4','#3cb8c2'];let r=7;const rnd=()=>{r=(r*16807)%2147483647;return r/2147483647;};
+  for(let i=0;i<120;i++){x.fillStyle=C[i%C.length];x.globalAlpha=0.85;const cx=rnd()*2048,cy=20+rnd()*90,R=8+rnd()*26;x.beginPath();if(i%3)x.arc(cx,cy,R,0,7);else x.rect(cx-R,cy-R*0.6,R*2,R*1.2);x.fill();}
+  x.globalAlpha=1;x.fillStyle='#6b8f3a';x.fillRect(0,112,2048,16);const t=new THREE.CanvasTexture(cv);t.colorSpace=THREE.SRGBColorSpace;
+  const m=new THREE.Mesh(new THREE.PlaneGeometry(23.3,D),new THREE.MeshStandardMaterial({map:t,roughness:0.85}));m.rotation.y=Math.PI/2;m.position.set(F.x0+0.012,-D/2,-(-42.3+F.top)/2);m.receiveShadow=true;g.add(m);}
  // north band (n top..n1): tiers. stands under the striped canopies, 구령대 block in the middle, concrete steps elsewhere
  const STANDS=[[-24,-6.2],[7.2,26]],POD=[-4.6,5.7];const depth=F.n1-F.top;
  const tiersAt=(x0,x1,k,rise,mat,nose)=>{const t=depth/k;for(let i=0;i<k;i++){const y=-D+rise*(i+1),na=F.top+i*t,nb=na+t;const top=i===k-1?0:y;
