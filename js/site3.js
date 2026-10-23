@@ -22,7 +22,8 @@ export function buildSite3(chunks,WALLS){const s=chunks.site;if(!s)return;const 
   arch.rotation.z=Math.PI/2;arch.position.set((x0+x1)/2,2.6,-(n0+n1)/2);arch.scale.set(1,1,0.9);g.add(arch);
   for(let x=x0;x<=x1+0.01;x+=(x1-x0)/6)for(const n of[n0+0.15,n1-0.15]){box(dgreen,x-0.07,x+0.07,0,2.65,n-0.07,n+0.07);}
   const lime=S({color:0xb8d84a,transparent:true,opacity:0.92,roughness:0.5});
-  box(lime,40.2,40.3,0.3,7.0,-26.6,-19.6);box(lime,40.2,43.0,0.3,7.0,-26.7,-26.6);box(lime,40.2,43.0,0.3,7.0,-19.6,-19.5);box(green,40.0,43.2,7.0,7.25,-26.9,-19.3);}
+  box(lime,40.2,40.3,0.3,7.0,-26.6,-19.6);box(lime,40.2,41.6,0.3,7.0,-26.7,-26.6);box(lime,41.6,43.4,3.2,7.0,-26.7,-26.6);box(lime,40.2,43.4,5.4,7.0,-19.6,-19.5);box(lime,43.35,43.4,3.2,7.0,-26.6,-19.6);box(lime,42.3,42.35,3.2,7.0,-26.6,-19.6);box(green,40.0,43.6,7.0,7.25,-26.9,-19.3);
+  box(S({color:0xf2c230,roughness:0.5}),43.4,43.7,0.0,8.4,-27.0,-26.7);}
  // C5+D12 yellow-framed glass 급식실 entrance next to the yellow mural (faces the field)
  {const X=44.9,n0=-46.4,n1=-43.0;const yl=S({color:0xf2c230,roughness:0.5}),gl=S({color:0x8fb8c8,roughness:0.08,metalness:0.2,transparent:true,opacity:0.6});
   box(yl,X-0.15,X+0.02,0,2.7,n0-0.18,n0);box(yl,X-0.15,X+0.02,0,2.7,n1,n1+0.18);box(yl,X-0.15,X+0.02,2.52,2.7,n0,n1);box(yl,X-0.15,X+0.02,0,2.52,(n0+n1)/2-0.06,(n0+n1)/2+0.06);

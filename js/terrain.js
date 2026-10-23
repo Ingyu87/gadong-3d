@@ -40,7 +40,7 @@ export function sinkField(chunks,WALLS){const c=chunks.site;if(!c)return;const F
    box(mat,x0,x1,-D,top,na,nb);if(nose)box(nose,x0,x1,top-0.04,top+0.004,na,na+0.05);PL.push([x0,na,x1,nb,top]);}};
  const segs=[];let x=F.x0;const cuts=[...STANDS.map(s=>[...s,'w']),[...POD,'p']].sort((a,b)=>a[0]-b[0]);for(const[a,b,t]of cuts){if(a>x)segs.push([x,a,'c']);segs.push([a,b,t]);x=b;}const TX1=41.6;if(x<TX1)segs.push([x,TX1,'c']);
  // under the 강당 west wing (x41.6..45, n -19.45..-12.5) the ground is solid up to main level: retaining block, no tiers
- box(conc,TX1,F.x1+0.05,-D,-0.02,-19.45,F.n1);WALLS.site.r.push([TX1,-19.45,F.x1,F.n1]);
+ box(conc,TX1,F.x1+0.05,-D,-0.02,-19.45,F.n1);WALLS.site.r.push([TX1,-19.45,42.35,F.n1],[43.3,-19.45,F.x1,F.n1]);WALLS.site.r.push([42.25,-26.6,42.38,-19.45],[43.28,-26.6,43.4,-19.45]);
  for(const[a,b,t]of segs){if(t==='w')tiersAt(a,b,6,D/6,wood,woodR);else if(t==='c')tiersAt(a,b,18,D/18,conc,coping);
   else{box(white,a,b,-D,0,F.top,F.n1);const m=(a+b)/2;box(door,m-0.55,m+0.55,-D,-D+2.0,F.top-0.03,F.top);box(white,m-0.7,m+0.7,-D+2.0,-D+2.15,F.top-0.06,F.top);}}
  // stand side cheek walls so the tier ends are clean
