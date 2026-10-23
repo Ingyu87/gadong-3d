@@ -54,3 +54,22 @@ export function backCorridor(chunks,WALLS){const s=chunks.site;if(!s)return;cons
  // collider: rail beside the trench at corridor level is the lime wall (hall_1F covers below); site rect blocks walkers at 0
  WALLS.site.r.push([67.35,-55.3,67.55,-40.0],[65.5,-55.45,67.55,-55.2]);
 }
+
+// Phase 2: 누리관 (indoor baseball hall) + the strip behind the field sit at field level (-2.7), no terrace (photos 75,273,43,146,232)
+export function sinkNuri(chunks,WALLS,STAIRS,DOORS,doorIMs){
+ const D=APRON;const c=chunks.baseball;if(c){c.group.position.y+=D;c.group.updateMatrixWorld(true);c.box=null;if(WALLS.baseball)WALLS.baseball.e+=D;}
+ for(const st of STAIRS||[])if(st.bld==='baseball'){st.e=(st.e||0)+D;for(const f of st.flights){f.y0+=D;if(f.y1!=null)f.y1+=D;}}
+ const seen=new Set();for(const d of [...(DOORS||[]),...(doorIMs||[]).flatMap(im=>im.userData.doors||[])])if(/^baseball/.test(d.c)&&!seen.has(d)){seen.add(d);d.e+=D;}
+ const s=chunks.site;if(!s)return;s.group.updateMatrixWorld(true);
+ const R=[[-37,-116.7,45,-90],[45,-116.7,84.7,-60.3],[33,-88.5,45,-60.3]];const B=new THREE.Box3(),mv=[];
+ s.group.traverse(o=>{if(!o.isMesh||o.isInstancedMesh||/site__|_field$/.test(o.name))return;let p=o;while(p){if(p.name==='fieldTerrain'||p.name==='nuri8')return;p=p.parent;}
+  B.setFromObject(o);if(B.isEmpty()||B.min.y<-0.3)return;const x0=B.min.x,x1=B.max.x,n0=-B.max.z,n1=-B.min.z;
+  if(R.some(r=>x0>=r[0]-0.3&&x1<=r[2]+0.3&&n0>=r[1]-0.3&&n1<=r[3]+0.3))mv.push(o);});
+ for(const o of mv)o.position.y+=D;
+ // artificial-grass strip along the 누리관 north side (photo 273)
+ const g=new THREE.Group();g.name='nuri8';s.group.add(g);
+ const cv=document.createElement('canvas');cv.width=cv.height=128;const x=cv.getContext('2d');x.fillStyle='#3f9a4a';x.fillRect(0,0,128,128);for(let i=0;i<900;i++){x.fillStyle=Math.random()<0.5?'#4cab55':'#358640';x.fillRect(Math.random()*128,Math.random()*128,1.5,3);}
+ const t=new THREE.CanvasTexture(cv);t.wrapS=t.wrapT=THREE.RepeatWrapping;t.repeat.set(15,2);t.colorSpace=THREE.SRGBColorSpace;
+ const turf=new THREE.Mesh(new THREE.PlaneGeometry(30.5,3.2),new THREE.MeshStandardMaterial({map:t,roughness:0.95}));turf.rotation.x=-Math.PI/2;turf.position.set(48.8,D+0.015,68.0);turf.receiveShadow=true;g.add(turf);
+ const lime=new THREE.MeshStandardMaterial({color:0xe9e9e4});const ln=new THREE.Mesh(new THREE.PlaneGeometry(30.5,0.08),lime);ln.rotation.x=-Math.PI/2;ln.position.set(48.8,D+0.018,66.45);g.add(ln);
+ return mv.length;}

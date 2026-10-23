@@ -3,16 +3,18 @@ import * as THREE from 'three';
 // wide concrete steps elsewhere, white retaining wall with a storage door under the 구령대, retaining walls + black railing round the field.
 export const DROP=2.7;
 export const FIELD={x0:-37,x1:45,n0:-90,n1:-12.5,top:-18.6};
+// phase 2: the south strip (behind the field) and the 누리관 block are at field level too, no south retaining wall (photos 43,146,232,75)
+export const LOW=[[-37,-116.7,45,-90],[45,-116.7,84.7,-60.3]];
 const S=o=>new THREE.MeshStandardMaterial(Object.assign({roughness:0.8},o));
 function clipMat(m,inside){const k=m.clone();const F=FIELD;k.onBeforeCompile=sh=>{sh.vertexShader='varying vec3 vWPc;\n'+sh.vertexShader.replace('#include <project_vertex>','#include <project_vertex>\n vWPc=(modelMatrix*vec4(transformed,1.0)).xyz;');
- const cond=`(vWPc.x>${F.x0.toFixed(2)}&&vWPc.x<${F.x1.toFixed(2)}&&-vWPc.z>${F.n0.toFixed(2)}&&-vWPc.z<${F.n1.toFixed(2)})`;
+ const R=(a,b,c,d)=>`(vWPc.x>${a.toFixed(2)}&&vWPc.x<${c.toFixed(2)}&&-vWPc.z>${b.toFixed(2)}&&-vWPc.z<${d.toFixed(2)})`;const cond='('+[R(F.x0,F.n0,F.x1,F.n1),...LOW.map(r=>R(...r))].join('||')+')';
  const hall=`((vWPc.x>45.0&&vWPc.x<65.5&&-vWPc.z>-60.3&&-vWPc.z<-9.7)||(vWPc.x>41.6&&vWPc.x<45.1&&-vWPc.z>-19.45&&-vWPc.z<-9.7)||(vWPc.x>65.4&&vWPc.x<67.45&&-vWPc.z>-55.25&&-vWPc.z<-40.0))`;
  sh.fragmentShader='varying vec3 vWPc;\n'+sh.fragmentShader.replace('void main() {','void main() {\n if('+(inside?'!':'')+cond+')discard;'+(inside?'':'\n if'+hall+'discard;'));};k.customProgramCacheKey=()=>'clip'+inside;return k;}
 export function sinkField(chunks,WALLS){const c=chunks.site;if(!c)return;const F=FIELD,D=DROP;const g=new THREE.Group();g.name='fieldTerrain';
  const ground=[];c.group.traverse(o=>{if(o.isMesh&&/site__(dirt|line|paving|asphalt)/.test(o.name))ground.push(o);});
  for(const o of ground){const low=o.clone();low.material=clipMat(o.material,true);o.material=clipMat(o.material,false);low.position.y-=D;low.name=o.name+'_field';low.receiveShadow=true;o.parent.add(low);}
  // lower loose objects that stand fully on the field part (goals, lines props, trees ...)
- const inF=(x,n)=>x>F.x0+0.2&&x<F.x1-0.2&&n>F.n0+0.2&&n<F.top-0.1;const B=new THREE.Box3(),M=new THREE.Matrix4(),P=new THREE.Vector3();
+ const inF=(x,n)=>(x>F.x0+0.2&&x<F.x1-0.2&&n>F.n0-0.5&&n<F.top-0.1)||LOW.some(r=>x>r[0]+0.2&&x<r[2]-0.2&&n>r[1]+0.2&&n<r[3]-0.2);const B=new THREE.Box3(),M=new THREE.Matrix4(),P=new THREE.Vector3();
  c.group.updateMatrixWorld(true);const mv=[];c.group.traverse(o=>{if(!o.isMesh||ground.includes(o)||/_field$/.test(o.name))return;
   if(o.isInstancedMesh){let ch=false;for(let i=0;i<o.count;i++){o.getMatrixAt(i,M);P.setFromMatrixPosition(M).applyMatrix4(o.matrixWorld);if(inF(P.x,-P.z)){M.elements[13]-=D;o.setMatrixAt(i,M);ch=true;}}if(ch){o.instanceMatrix.needsUpdate=true;o.computeBoundingSphere&&o.computeBoundingSphere();}return;}
   B.setFromObject(o);if(B.isEmpty())return;if(inF(B.min.x,-B.max.z)&&inF(B.max.x,-B.min.z)&&B.min.y>-0.3)mv.push(o);});
@@ -20,12 +22,12 @@ export function sinkField(chunks,WALLS){const c=chunks.site;if(!c)return;const F
  const conc=S({color:0xbdbab3}),coping=S({color:0x9c9a95}),white=S({color:0xf1f1ee,roughness:0.7}),wood=S({color:0x8a4f34,roughness:0.65}),woodR=S({color:0x6e3b27,roughness:0.7}),rail=S({color:0x1c1d20,metalness:0.5,roughness:0.4}),door=S({color:0x3a3f46,roughness:0.5}),post=S({color:0x6f757b,metalness:0.6,roughness:0.4});
  const box=(m,x0,x1,y0,y1,n0,n1)=>{const b=new THREE.Mesh(new THREE.BoxGeometry(x1-x0,y1-y0,n1-n0),m);b.position.set((x0+x1)/2,(y0+y1)/2,-(n0+n1)/2);b.castShadow=b.receiveShadow=true;g.add(b);return b;};
  WALLS.site=WALLS.site||{e:0,s:[],r:[]};const PL=WALLS.site.plat=WALLS.site.plat||[];
- PL.push([F.x0,F.n0,F.x1,F.top,-D]);
+ PL.push([F.x0,F.n0,F.x1,F.top,-D]);for(const r of LOW)PL.push([...r,-D]);
  // retaining walls W, E, S (top flush with 0) + coping + railing
  const rw=(x0,x1,n0,n1)=>{box(conc,x0,x1,-D,0,n0,n1);box(coping,x0-0.05,x1+0.05,0,0.12,n0-0.05,n1+0.05);WALLS.site.r.push([x0,n0,x1,n1]);};
- rw(F.x0-0.3,F.x0,F.n0-0.3,F.n1);rw(F.x1,F.x1+0.3,F.n0-0.3,-60.3);rw(F.x0-0.3,F.x1+0.3,F.n0-0.3,F.n0);
+ rw(F.x0-0.3,F.x0,F.n0-0.3,F.n1);rw(F.x0-0.3,F.x0,-116.7,F.n0-0.3);rw(84.7,85.0,-116.7,-60.3);rw(F.x0-0.3,85.0,-117.0,-116.7);rw(65.5,85.0,-60.3,-60.0);
  const rl=(x0,x1,n0,n1)=>{const L=Math.max(x1-x0,n1-n0),ax=x1-x0>n1-n0;for(const y of[1.05,0.55])box(rail,x0,x1,y,y+0.05,n0,n1);for(let t=0;t<=L;t+=2.0){const x=ax?x0+t:x0,n=ax?n0:n0+t;box(rail,x-0.03,x+0.03+(ax?0:x1-x0),0.12,1.1,n-0.03,n+0.03);}};
- rl(F.x0-0.2,F.x0-0.1,F.n0-0.2,F.top);rl(F.x1+0.1,F.x1+0.2,F.n0-0.2,-60.5);rl(F.x0-0.2,F.x1+0.2,F.n0-0.2,F.n0-0.1);
+ rl(F.x0-0.2,F.x0-0.1,F.n0-0.2,F.top);rl(F.x0-0.2,F.x0-0.1,-116.6,F.n0-0.2);rl(65.6,84.6,-60.2,-60.1);
  // north band (n top..n1): tiers. stands under the striped canopies, 구령대 block in the middle, concrete steps elsewhere
  const STANDS=[[-24,-6.2],[7.2,26]],POD=[-4.6,5.7];const depth=F.n1-F.top;
  const tiersAt=(x0,x1,k,rise,mat,nose)=>{const t=depth/k;for(let i=0;i<k;i++){const y=-D+rise*(i+1),na=F.top+i*t,nb=na+t;const top=i===k-1?0:y;
