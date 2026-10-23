@@ -36,3 +36,21 @@ export function sinkHall(chunks,WALLS,STAIRS,DOORS,doorIMs){
  // landing edge rail beside the 6-step drop to the 급식실 (north side is the wall)
  window.__hallLevels={entry:E,dining:F,hall:T,main:0,field:-2.7};
 }
+// 급식실 back door (photos 248/299/21/155/184): green arched covered corridor at main-building level along the hall east wall,
+// lime wall + railing, then a straight 24-step stair down in a trench to the east door of the 급식실 (-3.6)
+export function backCorridor(chunks,WALLS){const s=chunks.site;if(!s)return;const g=new THREE.Group();g.name='backCorr8';s.group.add(g);
+ const M=(c,o={})=>new THREE.MeshStandardMaterial({color:c,roughness:0.6,...o});const lime=M(0xb9cf3a),conc=M(0xc9c6bf),rail=M(0x8d949b,{metalness:0.6,roughness:0.35}),mat=M(0x3d4044,{roughness:0.9}),
+  can=M(0x2f8f7a,{transparent:true,opacity:0.55,side:THREE.DoubleSide,roughness:0.3}),frame=M(0x2e6e5f,{metalness:0.4});
+ const box=(m,x0,x1,y0,y1,n0,n1)=>{const b=new THREE.Mesh(new THREE.BoxGeometry(x1-x0,y1-y0,n1-n0),m);b.position.set((x0+x1)/2,(y0+y1)/2,-(n0+n1)/2);b.castShadow=b.receiveShadow=true;g.add(b);return b;};
+ const X0=65.5,X1=67.5,N0=-55.3,N1=-12.9,NT=-40.0,F=-3.6;
+ box(lime,67.35,67.5,F,2.6,N0,NT);box(lime,X0,X1,F,0.0,N0,N0+0.1);box(conc,65.5,65.56,F,0,N0,NT);
+ box(mat,65.7,67.2,0.005,0.015,NT,N1);// rubber runner on the corridor (photo 299)
+ for(let n=NT;n<=N1-0.5;n+=2.0)box(rail,67.4,67.46,0,1.0,n-0.03,n+0.03);box(rail,67.38,67.48,0.98,1.04,NT,N1);box(rail,67.38,67.48,0.5,0.54,NT,N1);
+ // handrail down the stair on the lime wall
+ {const L=Math.hypot(7.2,3.6),a=Math.atan2(3.6,7.2);const h=new THREE.Mesh(new THREE.BoxGeometry(0.05,0.05,L),rail);h.position.set(67.28,-1.8+0.9,-(-47.2-40.0)/2);h.rotation.x=a;g.add(h);}
+ // arched canopy
+ const R=(X1-X0)/2+0.1,len=N1-N0;const arc=new THREE.Mesh(new THREE.CylinderGeometry(R,R,len,20,1,true,-Math.PI/2,Math.PI),can);arc.rotation.x=Math.PI/2;arc.scale.set(1,1,0.45);arc.position.set((X0+X1)/2,2.75,-(N0+N1)/2);g.add(arc);
+ for(let n=N0;n<=N1+0.01;n+=3.0){box(frame,X1+0.02,X1+0.1,0,2.75,n-0.04,n+0.04);const r=new THREE.Mesh(new THREE.TorusGeometry(R,0.04,6,20,Math.PI),frame);r.scale.set(1,0.45,1);r.position.set((X0+X1)/2,2.75,-n);g.add(r);}
+ // collider: rail beside the trench at corridor level is the lime wall (hall_1F covers below); site rect blocks walkers at 0
+ WALLS.site.r.push([67.35,-55.3,67.55,-40.0],[65.5,-55.45,67.55,-55.2]);
+}
