@@ -239,4 +239,18 @@ export function buildRooms(chunks,WALLS,logoTex,man){
    R.inst([[0.5,0.32,0.03,0,1.05,0,scr],[0.52,0.34,0.02,0,1.05,-0.015,blk]],[[cx-0.6,n-0.15],[cx+0.6,n-0.15]]);{const fd=S({color:0xcfd8dc,roughness:0.5}),fr=S({color:0xd84315,roughness:0.5});let k=0;for(let x=cx-0.9;x<cx+1.0;x+=0.08,k++)R.box(k%6?fd:fr,x,x+0.03,n+0.05,n+0.15,0.82,0.85);}
    R.box(blk,cx+1.4,cx+1.95,n-0.3,n+0.3,0,1.6);R.rects.push([cx+1.4,n-0.3,cx+1.95,n+0.3]);});
  }
+
+ // 본관 좌·우 측면 출입구 (운동장에서 볼 때 왼쪽 S1 x -47.1..-43.3, 오른쪽 S3 x 47.9..52.0; front face n≈12.6) per photo 157:
+ // recessed glass double door in a dark portal, cantilevered dark flat canopy, 3-step granite stoop, stainless handrails both sides
+ if(chunks.site){const g=new THREE.Group();g.name='sideEntrances';const gran=S({color:0xb9b6ae,roughness:0.55}),nose=S({color:0x8f8c86,roughness:0.5}),cano=S({color:0x34383d,roughness:0.6}),port=S({color:0x2c2f33,roughness:0.5}),ss=S({color:0xd5d9dd,metalness:0.85,roughness:0.2});
+  WALLS.site=WALLS.site||{e:0,s:[],r:[]};WALLS.site.plat=WALLS.site.plat||[];
+  const B=(m,x0,x1,y0,y1,z0,z1)=>{const b=new THREE.Mesh(new THREE.BoxGeometry(x1-x0,y1-y0,z1-z0),m);b.position.set((x0+x1)/2,(y0+y1)/2,(z0+z1)/2);b.castShadow=b.receiveShadow=true;g.add(b);return b;};
+  for(const[d0,d1]of[[-47.1,-43.3],[47.9,52.0]]){const zf=-12.5;const X0=d0-0.6,X1=d1+0.6;// outward (to the field) is +z
+   B(port,d0-0.25,d0,0,2.6,zf-0.25,zf+0.05);B(port,d1,d1+0.25,0,2.6,zf-0.25,zf+0.05);B(port,d0-0.25,d1+0.25,2.4,2.75,zf-0.25,zf+0.05);
+   B(cano,X0-0.2,X1+0.2,2.75,2.95,zf-0.1,zf+1.9);B(S({color:0x5b5f64,roughness:0.6}),X0-0.2,X1+0.2,2.72,2.75,zf,zf+1.9);
+   const st=[[0.30,zf+0.05,zf+1.2],[0.20,zf+1.2,zf+1.55],[0.10,zf+1.55,zf+1.9]];
+   for(const[h,za,zb]of st){B(gran,X0,X1,0,h,za,zb);B(nose,X0,X1,h-0.012,h+0.002,zb-0.04,zb);WALLS.site.plat.push([X0,-zb,X1,-za,h]);}
+   for(const x of[X0+0.05,X1-0.05]){B(ss,x-0.025,x+0.025,0.95,1.0,zf+0.1,zf+1.95);for(const z of[zf+0.2,zf+1.1,zf+1.85])B(ss,x-0.02,x+0.02,0.1,0.97,z-0.02,z+0.02);B(ss,x-0.012,x+0.012,0.5,0.53,zf+0.1,zf+1.95);WALLS.site.r.push([x-0.06,-(zf+1.95),x+0.06,-(zf+0.1)]);}
+  }
+  chunks.site.group.add(g);}
 }
