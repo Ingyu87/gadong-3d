@@ -11,6 +11,7 @@ import {mergeGeometries} from 'three/addons/utils/BufferGeometryUtils.js';
 import {buildRooms} from './rooms.js?v=202610232257';
 import * as T from './tex.js?v=202610232257';
 import {buildInstanced} from './furn.js?v=202610232257';
+import {sinkHall} from './site8.js?v=1';
 import {sinkField} from './terrain.js?v=202610232257';
 import {buildProps6} from './site6.js?v=202610231736';
 import {buildHall7} from './site7.js?v=202610232003';
@@ -508,7 +509,7 @@ async function loadChunk(c){const g=await loader.loadAsync(V(c.file));const grp=
  g.scene.traverse(o=>{if(o.isMesh){if(!o.geometry.attributes.normal){o.geometry=o.geometry.toNonIndexed();o.geometry.computeVertexNormals();}const n=(o.material&&o.material.name)||'';const mm=M[n]||M.white;o.material=mm;o.castShadow=!MOBILE&&!mm.transparent&&c.kind!=='site';o.receiveShadow=true;o.userData.mat=n;}});
  await doorsReady;await stairsReady;await fixtReady;await colReady;await signReady;await dadoReady;await gapReady;if(c.kind!=='site'){const rm=[];g.scene.traverse(o=>{if(o.isMesh&&o.userData.mat==='door')rm.push(o);});rm.forEach(o=>o.removeFromParent());buildDoors(c,grp);}window.__shDirty=true;
  grp.add(g.scene);const fg=new THREE.Group();fg.name='furn';if(c.kind==='site')fg.add(trees(c.furn));else addFurn(fg,classOnly(c,c.furn));grp.add(fg);
- root.add(grp);chunks[c.name]={...c,group:grp};loaded++;prog.textContent=`불러오는 중 ${loaded}/${list.length}`;if(loaded===list.length){prog.style.display='none';decorate();try{buildSite3(chunks,WALLS);}catch(err){console.error('site3',err);}try{buildSite4(chunks,WALLS);}catch(err){console.error('site4',err);}try{buildInterior5(chunks,WALLS);}catch(err){console.error('int5',err);}try{buildProps6(chunks,WALLS,2.7);try{buildHall7(chunks,WALLS);}catch(err){console.error('hall7',err);};}catch(err){console.error('p6',err);}applyFloor();SITEB=null;if(!userMoved&&!walk){if(Q.get('view')==='bird'||SHOT)defaultView(false);else spawnFPS();}window.__loaded=true;}
+ root.add(grp);chunks[c.name]={...c,group:grp};loaded++;prog.textContent=`불러오는 중 ${loaded}/${list.length}`;if(loaded===list.length){prog.style.display='none';decorate();try{buildSite3(chunks,WALLS);}catch(err){console.error('site3',err);}try{buildSite4(chunks,WALLS);}catch(err){console.error('site4',err);}try{buildInterior5(chunks,WALLS);}catch(err){console.error('int5',err);}try{buildProps6(chunks,WALLS,2.7);try{buildHall7(chunks,WALLS);}catch(err){console.error('hall7',err);};try{sinkHall(chunks,WALLS,STAIRS,DOORS,doorIMs);}catch(err){console.error('hall8',err);}}catch(err){console.error('p6',err);}applyFloor();SITEB=null;if(!userMoved&&!walk){if(Q.get('view')==='bird'||SHOT)defaultView(false);else spawnFPS();}window.__loaded=true;}
  render();}
 // sequential with small concurrency
 (async()=>{const q=[...list];const work=async()=>{while(q.length){await loadChunk(q.shift());}};await Promise.all([work(),work(),work()]);})();
@@ -587,7 +588,7 @@ const chevGeo=(()=>{const sh=new THREE.Shape();sh.moveTo(0,0.45);sh.lineTo(0.42,
 const chevMat=new THREE.MeshBasicMaterial({color:0xffffff,transparent:true,opacity:0.9,depthTest:false,side:THREE.DoubleSide});
 for(let k=0;k<8;k++){const m=new THREE.Mesh(chevGeo,chevMat.clone());m.rotation.order='YXZ';m.renderOrder=21;m.userData.chev=k;chev.add(m);}
 let WALLS={};fetch(V('walls.json')).then(r=>r.json()).then(w=>{const m=w.main_1F;if(m)for(const r of m.r){if(Math.abs(r[0]-49.8)<0.01&&Math.abs(r[1]-15)<0.01&&Math.abs(r[3]-18.3)<0.01)r[3]=17.7;if(Math.abs(r[0]-49.95)<0.01&&Math.abs(r[1]-18.6)<0.01)r[1]=18.75;if(Math.abs(r[0]-49.95)<0.01&&Math.abs(r[1]-18.65)<0.01)r[1]=18.75;}return w;}).then(w=>WALLS=w).catch(()=>{});
-function curChunks(){const y=cam.position.y-EYE;return Object.keys(WALLS).filter(k=>chunks[k]&&chunks[k].group.visible&&WALLS[k].e<=y+0.3&&y-WALLS[k].e<2.9);}
+function curChunks(){const y=cam.position.y-EYE;return Object.keys(WALLS).filter(k=>chunks[k]&&chunks[k].group.visible&&((WALLS[k].e<=y+0.3&&y-WALLS[k].e<2.9)||(k==='site'&&y<-0.5)));}
 function rayRect(ox,on,dx,dn,x0,n0,x1,n1){let t0=-1e9,t1=1e9;for(const [o,d,a,b] of [[ox,dx,x0,x1],[on,dn,n0,n1]]){if(Math.abs(d)<1e-9){if(o<a||o>b)return Infinity;}else{let ta=(a-o)/d,tb=(b-o)/d;if(ta>tb)[ta,tb]=[tb,ta];t0=Math.max(t0,ta);t1=Math.min(t1,tb);}}if(t0>t1||t1<0)return Infinity;return t0<0?Infinity:t0;}
 function freeDist(dir,max){const R=0.3;const d=dir.clone().setY(0).normalize();const ox=cam.position.x,on=-cam.position.z,dx=d.x,dn=-d.z;let best=max+R;
  for(const k of curChunks()){const W=WALLS[k];for(const r of W.r){const t=rayRect(ox,on,dx,dn,r[0]-R,r[1]-R,r[2]+R,r[3]+R);if(t<best)best=t;}
