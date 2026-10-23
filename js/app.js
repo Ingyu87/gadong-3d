@@ -8,10 +8,10 @@ import {GTAOPass} from 'three/addons/postprocessing/GTAOPass.js';
 import {OutputPass} from 'three/addons/postprocessing/OutputPass.js';
 import {RoomEnvironment} from 'three/addons/environments/RoomEnvironment.js';
 import {mergeGeometries} from 'three/addons/utils/BufferGeometryUtils.js';
-import {buildRooms} from './rooms.js?v=202610232143';
-import * as T from './tex.js?v=202610232143';
-import {buildInstanced} from './furn.js?v=202610232143';
-import {sinkField} from './terrain.js?v=202610232143';
+import {buildRooms} from './rooms.js?v=202610232145';
+import * as T from './tex.js?v=202610232145';
+import {buildInstanced} from './furn.js?v=202610232145';
+import {sinkField} from './terrain.js?v=202610232145';
 import {buildProps6} from './site6.js?v=202610231736';
 import {buildHall7} from './site7.js?v=202610232003';
 import {buildSite3,buildSite4,buildInterior5} from './site3.js?v=202610231640';
@@ -312,11 +312,11 @@ function hallExterior(){const sm=(o)=>new THREE.MeshStandardMaterial(Object.assi
  const r=chunks.hall_roof;if(r)r.group.traverse(o=>{if(o.isMesh&&o.material&&!o.userData._g){o.material=o.material.clone();o.material.color&&o.material.color.lerp(new THREE.Color(0x3f8a55),0.75);o.material.map=null;o.material.needsUpdate=true;o.userData._g=1;}});}
 // 정보관 exterior: sage-green panel cladding with orange bands on the stair tower, white 정보관 lettering, orange base; beige glass skybridge to the brick main building
 function infoExterior(){const sm=(o)=>new THREE.MeshStandardMaterial(Object.assign({roughness:0.6},o));const s=chunks.site;if(!s)return;const g=new THREE.Group();
- const clad=sm({map:_cvT(256,1024,(x,W,H)=>{x.fillStyle='#b9cdb3';x.fillRect(0,0,W,H);x.strokeStyle='#9fb59a';x.lineWidth=3;for(let y=0;y<H;y+=48){x.beginPath();x.moveTo(0,y);x.lineTo(W,y);x.stroke();}for(let k=1;k<4;k++){x.fillStyle='#e08a3c';x.fillRect(0,H-k*(H/3.4)-18,W,22);}x.fillStyle='#e08a3c';x.fillRect(0,H-70,W,70);})});
+ const clad=sm({map:_cvT(256,1024,(x,W,H)=>{x.fillStyle='#b9cdb3';x.fillRect(0,0,W,H);x.strokeStyle='#9fb59a';x.lineWidth=3;for(let y=0;y<H;y+=48){x.beginPath();x.moveTo(0,y);x.lineTo(W,y);x.stroke();}x.fillStyle='#e08a3c';for(const yy of[1.8,3.5,5.3,7.1,8.9,10.7]){x.fillRect(0,H-yy/11.2*H-14,W,yy%3.6<0.3||yy>10?28:14);}x.fillRect(0,H-60,W,60);x.fillRect(0,0,W,26);})});
  const H=11.2;const faces=[[-40.08,-16.1,-11.7,-Math.PI/2],[-43.9,-16.1,-40.1,0]];
  {const p=new THREE.Mesh(new THREE.PlaneGeometry(4.4,H),clad);p.position.set(-39.8,H/2,16.25);p.rotation.y=Math.PI/2;p.scale.x=2.4/4.4;g.add(p);}
  {const p=new THREE.Mesh(new THREE.PlaneGeometry(1.5,H),clad);p.position.set(-40.55,H/2,17.42);g.add(p);}
- {const t=textPlane('정보관',3.0,0.8,{w:768,h:200,font:'bold 150px NanumGothic, sans-serif',fg:'#ffffff'});t.position.set(-39.76,9.8,16.25);t.scale.set(0.75,0.75,1);t.rotation.z=0;t.rotation.y=Math.PI/2;g.add(t);}
+ {const t=textPlane('정보관',3.0,0.9,{w:768,h:230,font:'bold 170px NanumGothic, sans-serif',fg:'#eef2ec',bg:null});t.position.set(-39.74,9.6,16.25);t.scale.set(0.8,0.8,1);const sh=textPlane('정보관',3.0,0.9,{w:768,h:230,font:'bold 170px NanumGothic, sans-serif',fg:'#6f7f6c',bg:null});sh.position.set(-39.755,9.57,16.22);sh.rotation.y=Math.PI/2;sh.scale.set(0.8,0.8,1);g.add(sh);t.rotation.z=0;t.rotation.y=Math.PI/2;g.add(t);}
  // small artificial-turf area beside the grey metal-clad 실내야구연습장 (aerials)
  {const tf=new THREE.Mesh(new THREE.PlaneGeometry(29,8.6),sm({map:_cvT(64,64,(x,W,H)=>{x.fillStyle='#3f9a4a';x.fillRect(0,0,W,H);for(let i=0;i<300;i++){x.fillStyle=Math.random()<0.5?'#47a653':'#378a41';x.fillRect(Math.random()*W,Math.random()*H,1,2);}})}));tf.rotation.x=-Math.PI/2;tf.position.set(48.5,0.015,64.95);g.add(tf);}
  // B1: beige 2F/3F link block over an open 1F walk-through (photo 42): balcony window bands with railings, posts, soffit, 정보관 sign
