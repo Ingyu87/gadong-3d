@@ -116,8 +116,8 @@ export function buildRooms(chunks,WALLS,logoTex,man){
  add('hall_1F',(R)=>{// clboard 급식실 104-123: long rows of white-marble tables with orange round swing-arm stools, light grey floor, mint lower walls + cream upper, cream columns
   const mar=S({map:rep(cv(256,256,(x,w,h)=>{x.fillStyle='#e9e9e6';x.fillRect(0,0,w,h);for(let i=0;i<900;i++){x.fillStyle=`rgba(110,110,110,${Math.random()*0.12})`;x.fillRect(Math.random()*w,Math.random()*h,2,2);}}),4,1),roughness:0.25}),org=S({color:0xf07a1e,roughness:0.45}),gr=S({color:0x55595d,metalness:0.5,roughness:0.4});const at=[],st=[];
   R.plane(S({color:0xdfe1df,roughness:0.3,polygonOffset:true,polygonOffsetFactor:-2}),45.4,65.1,-60.2,-34.1,0.02);
-  {const mn=S({color:0xbfe5c8,roughness:0.6});R.wallp(mn,'z',-60.1,-34.2,45.37,0,1.3,1);R.wallp(mn,'z',-60.1,-34.2,65.1,0,1.3,-1);}
-  for(let x=47.4;x<64;x+=2.05){for(let n=-58.2;n<-40;n+=4.6){at.push([x,n]);for(const dn of[-1.6,-0.53,0.53,1.6])for(const dx of[-0.52,0.52])st.push([x+dx,n+dn]);}R.rects.push([x-0.35,-59.3,x+0.35,-42.1]);}
+  {const mn=S({color:0xbfe5c8,roughness:0.6});R.wallp(mn,'z',-60.1,-46.45,45.37,0,1.3,1);R.wallp(mn,'z',-42.95,-34.2,45.37,0,1.3,1);R.wallp(mn,'z',-60.1,-34.2,65.1,0,1.3,-1);}
+  for(let x=47.4;x<64;x+=2.05){for(let n=-58.2;n<-40;n+=4.6){if(x<48&&n>-51)continue;at.push([x,n]);for(const dn of[-1.6,-0.53,0.53,1.6])for(const dx of[-0.52,0.52])st.push([x+dx,n+dn]);}R.rects.push([x-0.35,-59.3,x+0.35,x<48?-51.4:-42.1]);}
   R.inst([[0.78,0.04,4.3,0,0.72,0,mar],[0.06,0.68,0.06,0,0.36,-1.9,gr],[0.06,0.68,0.06,0,0.36,1.9,gr],[0.06,0.06,4.0,0,0.3,0,gr]],at);
   R.inst([[0.32,0.05,0.32,0,0.44,0,org],[0.04,0.4,0.04,0,0.24,0,gr]],st);});
 

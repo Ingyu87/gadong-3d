@@ -52,9 +52,9 @@ export function buildHall7(chunks,WALLS){const s=chunks.site;if(!s)return;const 
  {const xb=45.35,fr=S({color:0xf2be12,roughness:0.5});box(fr,X-0.35,X+0.02,0,3.05,EN0-0.35,EN0);box(fr,X-0.35,X+0.02,0,3.05,EN1,EN1+0.35);box(fr,X-0.35,X+0.02,2.7,3.05,EN0,EN1);
   const wall=S({color:0xf6d14a});box(wall,X,xb,0,2.7,EN0-0.02,EN0+0.05);box(wall,X,xb,0,2.7,EN1-0.05,EN1+0.02);box(S({color:0x2a2622}),X-0.35,xb,2.62,2.7,EN0,EN1);
   const cloud=cvT(512,256,(x,w,h)=>{x.fillStyle='#bcd7ea';x.fillRect(0,0,w,h);x.fillStyle='#e9f2fa';for(let i=0;i<7;i++){const cx=i*80+20;x.beginPath();x.arc(cx,h*0.62,40,0,7);x.arc(cx+38,h*0.55,46,0,7);x.arc(cx+70,h*0.66,34,0,7);x.fill();}x.fillRect(0,h*0.7,w,h*0.3);x.fillStyle='#6c86b8';x.font='bold 34px NanumGothic, sans-serif';x.fillText('맛있는 급식실',150,50);});
-  const gl=new THREE.Mesh(new THREE.PlaneGeometry(EN1-EN0-0.2,2.55),S({color:0x9ec3d6,roughness:0.08,metalness:0.2,transparent:true,opacity:0.55}));gl.position.set(xb-0.02,1.3,-(EN0+EN1)/2);gl.rotation.y=-Math.PI/2;g.add(gl);
-  const cb=new THREE.Mesh(new THREE.PlaneGeometry(EN1-EN0-0.2,0.9),S({map:cloud,roughness:0.5}));cb.position.set(xb-0.03,0.5,-(EN0+EN1)/2);cb.rotation.y=-Math.PI/2;g.add(cb);
-  box(S({color:0x8a9096,metalness:0.6,roughness:0.3}),xb-0.06,xb-0.02,0,2.6,(EN0+EN1)/2-0.04,(EN0+EN1)/2+0.04);
+  // (glass doors stand open now: entrance to the split landing) const gl=new THREE.Mesh(new TH
+  // (glass doors stand open now: entrance to the split landing) const cb=new THREE.Mesh(new TH
+  // (glass doors stand open now: entrance to the split landing) box(S({color:0x8a9096,metalnes
   const fl=new THREE.Mesh(new THREE.PlaneGeometry(xb-X+0.4,EN1-EN0),S({color:0x7b7f83}));fl.rotation.x=-Math.PI/2;fl.position.set((X+xb)/2-0.2,0.012,-(EN0+EN1)/2);g.add(fl);}
  // 4: arch-top 2F windows in the brick band above the mural
  {const sh=new THREE.Shape();sh.moveTo(-0.5,-0.6);sh.lineTo(0.5,-0.6);sh.lineTo(0.5,0.2);sh.absarc(0,0.2,0.5,0,Math.PI,false);sh.lineTo(-0.5,-0.6);
