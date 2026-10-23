@@ -8,10 +8,10 @@ import {GTAOPass} from 'three/addons/postprocessing/GTAOPass.js';
 import {OutputPass} from 'three/addons/postprocessing/OutputPass.js';
 import {RoomEnvironment} from 'three/addons/environments/RoomEnvironment.js';
 import {mergeGeometries} from 'three/addons/utils/BufferGeometryUtils.js';
-import {buildRooms} from './rooms.js?v=202610232137';
-import * as T from './tex.js?v=202610232137';
-import {buildInstanced} from './furn.js?v=202610232137';
-import {sinkField} from './terrain.js?v=202610232137';
+import {buildRooms} from './rooms.js?v=202610232143';
+import * as T from './tex.js?v=202610232143';
+import {buildInstanced} from './furn.js?v=202610232143';
+import {sinkField} from './terrain.js?v=202610232143';
 import {buildProps6} from './site6.js?v=202610231736';
 import {buildHall7} from './site7.js?v=202610232003';
 import {buildSite3,buildSite4,buildInterior5} from './site3.js?v=202610231640';
@@ -319,10 +319,21 @@ function infoExterior(){const sm=(o)=>new THREE.MeshStandardMaterial(Object.assi
  {const t=textPlane('정보관',3.0,0.8,{w:768,h:200,font:'bold 150px NanumGothic, sans-serif',fg:'#ffffff'});t.position.set(-39.76,9.8,16.25);t.scale.set(0.75,0.75,1);t.rotation.z=0;t.rotation.y=Math.PI/2;g.add(t);}
  // small artificial-turf area beside the grey metal-clad 실내야구연습장 (aerials)
  {const tf=new THREE.Mesh(new THREE.PlaneGeometry(29,8.6),sm({map:_cvT(64,64,(x,W,H)=>{x.fillStyle='#3f9a4a';x.fillRect(0,0,W,H);for(let i=0;i<300;i++){x.fillStyle=Math.random()<0.5?'#47a653':'#378a41';x.fillRect(Math.random()*W,Math.random()*H,1,2);}})}));tf.rotation.x=-Math.PI/2;tf.position.set(48.5,0.015,64.95);g.add(tf);}
- // skybridge (2 floors) over the 1F link
- {const beige=sm({color:0xd9ccb0}),gl=sm({color:0x8fb3c4,roughness:0.15,metalness:0.2});const x0=-50.1,x1=-47.4,n0=-9.6,n1=-4.4;
-  const b=new THREE.Mesh(new THREE.BoxGeometry(x1-x0,7.0,n1-n0),beige);b.position.set((x0+x1)/2,3.6+3.5,-(n0+n1)/2);g.add(b);
-  for(const y of[5.0,8.6])for(const x of[x0-0.01,x1+0.01]){const w=new THREE.Mesh(new THREE.PlaneGeometry(n1-n0-0.6,1.3),gl);w.position.set(x,y,-(n0+n1)/2);w.rotation.y=x<x0+0.1?-Math.PI/2:Math.PI/2;g.add(w);}}
+ // B1: beige 2F/3F link block over an open 1F walk-through (photo 42): balcony window bands with railings, posts, soffit, 정보관 sign
+ {const beige=sm({color:0xd8c9a8}),dk=sm({color:0x3b3f44,roughness:0.4}),gl=sm({color:0x6f8fa0,roughness:0.15,metalness:0.3}),rl=sm({color:0x5a5f63,metalness:0.6,roughness:0.35}),sof=sm({color:0xbfb397});const x0=-50.1,x1=-47.4,n0=-9.6,n1=-4.4,nc=-(n0+n1)/2,L=n1-n0;
+  const b=new THREE.Mesh(new THREE.BoxGeometry(x1-x0,7.0,L),beige);b.position.set((x0+x1)/2,3.6+3.5,nc);g.add(b);
+  const so=new THREE.Mesh(new THREE.BoxGeometry(x1-x0+0.02,0.08,L+0.02),sof);so.position.set((x0+x1)/2,3.58,nc);g.add(so);
+  for(const fy of[3.6,7.2])for(const [x,sg] of[[x0,-1],[x1,1]]){
+   const fr=new THREE.Mesh(new THREE.BoxGeometry(0.06,1.9,L-0.7),dk);fr.position.set(x+sg*0.03,fy+1.55,nc);g.add(fr);
+   const w=new THREE.Mesh(new THREE.BoxGeometry(0.04,1.7,L-0.9),gl);w.position.set(x+sg*0.07,fy+1.55,nc);g.add(w);
+   for(let k=1;k<4;k++){const m=new THREE.Mesh(new THREE.BoxGeometry(0.06,1.7,0.06),dk);m.position.set(x+sg*0.09,fy+1.55,-(n0+0.45+k*(L-0.9)/4));g.add(m);}
+   const sl=new THREE.Mesh(new THREE.BoxGeometry(0.5,0.12,L-0.3),beige);sl.position.set(x+sg*0.25,fy+0.35,nc);g.add(sl);
+   const top=new THREE.Mesh(new THREE.BoxGeometry(0.05,0.05,L-0.4),rl);top.position.set(x+sg*0.47,fy+1.35,nc);g.add(top);
+   const mid=top.clone();mid.position.y=fy+0.85;g.add(mid);
+   for(let n=n0+0.3;n<=n1-0.3;n+=0.25){const p=new THREE.Mesh(new THREE.BoxGeometry(0.025,0.95,0.025),rl);p.position.set(x+sg*0.47,fy+0.88,-n);g.add(p);}}
+  for(const x of[x0+0.15,x1-0.15])for(const n of[n0+0.15,n1-0.15]){const p=new THREE.Mesh(new THREE.BoxGeometry(0.3,3.6,0.3),beige);p.position.set(x,1.8,-n);g.add(p);}
+  const pv=new THREE.Mesh(new THREE.PlaneGeometry(x1-x0,L),sm({color:0x9a958c,roughness:0.9}));pv.rotation.x=-Math.PI/2;pv.position.set((x0+x1)/2,0.012,nc);g.add(pv);
+  const sg=textPlane('정보관',1.1,0.4,{w:512,h:180,font:'bold 130px NanumGothic, sans-serif',fg:'#1d3f8f',bg:'#ffffff'});sg.position.set(x1+0.02,2.4,-(n0+0.6));sg.rotation.y=Math.PI/2;g.add(sg);}
  g.userData.kind='photo';s.group.add(g);}
 // 강당/주리홀 west school entrance (photo 4e71e16d): navy band '서울가동초등학교', dark wood soffit, red/black mat, teal curved canopy
 function hallEntrance(){const sm=(o)=>new THREE.MeshStandardMaterial(Object.assign({roughness:0.6},o));const s=chunks.site;if(!s)return;const g=new THREE.Group();const X=44.98,N0=-37.2,N1=-34.3;
