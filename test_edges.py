@@ -3,7 +3,7 @@ import sys,math,time
 from playwright.sync_api import sync_playwright
 U=sys.argv[1] if len(sys.argv)>1 else 'http://localhost:18741/'
 F=dict(x0=-37,x1=45,n0=-90,n1=-12.5)
-HALL=[(45.0,65.6,-60.4,-9.6),(41.6,45.1,-19.5,-9.6)]
+HALL=[(45.0,65.6,-60.4,-9.6),(41.6,45.1,-19.5,-9.6),(-37.4,45.4,-117,-89.6),(44.6,85,-117,-60.0)]  # phase 2: south strip + 누리관 block at field level
 def low_ok(x,n):
   if F['x0']-0.4<x<F['x1']+0.4 and F['n0']-0.4<n<F['n1']+0.4:return True
   return any(a<=x<=b and c<=n<=d for a,b,c,d in HALL)
