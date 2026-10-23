@@ -11,7 +11,7 @@ import {mergeGeometries} from 'three/addons/utils/BufferGeometryUtils.js';
 import {buildRooms} from './rooms.js?v=202610240115';
 import * as T from './tex.js?v=202610240115';
 import {buildInstanced} from './furn.js?v=202610240115';
-import {sinkHall} from './site8.js?v=202610240115';
+import {sinkHall,backCorridor} from './site8.js?v=202610240115';
 import {sinkField} from './terrain.js?v=202610240115';
 import {buildProps6} from './site6.js?v=202610240115';
 import {buildHall7} from './site7.js?v=202610240115';
@@ -97,11 +97,11 @@ let STAIRS=[];const stairsReady=fetch(V('stairs.json')).then(r=>r.json()).then(d
 function flightY(f,x,n){const u=f.x1-f.x0>f.n1-f.n0&&false?0:0;const along=(f.kind==='landing')?null:(STAIRRUN(f));if(!along)return f.y0;const [lo,hi,v]=along(x,n);const t=Math.max(0,Math.min(1,(v-lo)/(hi-lo)));return f.start==='hi'?f.y0+(1-t)*(f.y1-f.y0):f.y0+t*(f.y1-f.y0);}
 function STAIRRUN(f){return f.run==='x'?((x,n)=>[f.x0,f.x1,x]):((x,n)=>[f.n0,f.n1,n]);}
 function inR(f,x,n,m=0){return x>=f.x0-m&&x<=f.x1+m&&n>=f.n0-m&&n<=f.n1+m;}
-function surfaceAt(x,n,feet){let best=-1e9;const cand=[];
+function surfaceAt(x,n,feet){let best=-1e9;const cand=[];const inCore=STAIRS.filter(st=>chunks[st.bld+'_'+st.floor]&&inR({x0:st.core[0],n0:st.core[1],x1:st.core[2],n1:st.core[3]},x,n));const coreLo=inCore.length?Math.min(...inCore.map(st=>Math.min(...st.flights.map(f=>Math.min(f.y0,f.y1??f.y0))))):1e9;
  for(const st of STAIRS){if(!chunks[st.bld+'_'+st.floor])continue;for(const f of st.flights){f.run=st.run;if(inR(f,x,n))cand.push(flightY(f,x,n));}}
  for(const k in WALLS){const W=WALLS[k];if(k==='main_porch')continue;const c=chunks[k];if(!c)continue;if(!c.box)c.box=new THREE.Box3().setFromObject(c.group);const b=c.box;if(x<b.min.x||x>b.max.x||-n<b.min.z||-n>b.max.z)continue;
-  const hole=STAIRS.some(st=>st.bld+'_'+st.to===k&&inR({x0:st.core[0],n0:st.core[1],x1:st.core[2],n1:st.core[3]},x,n));if(!hole)cand.push(W.e);if(W.plat)for(const q of W.plat)if(x>=q[0]&&x<=q[2]&&n>=q[1]&&n<=q[3])cand.push(W.e+q[4]);}
- cand.push(0);for(const y of cand)if(y<=feet+(window.__noStepUp?0.05:0.47)&&y>best)best=y;return best===-1e9?feet:best;}
+  const hole=STAIRS.some(st=>st.bld+'_'+st.to===k&&inR({x0:st.core[0],n0:st.core[1],x1:st.core[2],n1:st.core[3]},x,n));if(!hole&&W.e<=coreLo+0.05)cand.push(W.e);if(W.plat)for(const q of W.plat)if(x>=q[0]&&x<=q[2]&&n>=q[1]&&n<=q[3])cand.push(W.e+q[4]);}
+ if(0<=coreLo+0.05)cand.push(0);for(const y of cand)if(y<=feet+(window.__noStepUp?0.05:0.47)&&y>best)best=y;return best===-1e9?feet:best;}
 window.__surface=(x,n,f)=>surfaceAt(x,n,f);
 const railMat=new THREE.MeshStandardMaterial({color:0xc9ced3,metalness:0.75,roughness:0.3});
 const NOSE_M=new THREE.MeshStandardMaterial({color:0x3a3d42,roughness:0.6}),STR_M=new THREE.MeshStandardMaterial({color:0xa9aaa6,roughness:0.6}),HR_M=new THREE.MeshStandardMaterial({color:0xc9ced3,metalness:0.75,roughness:0.3});
@@ -509,7 +509,7 @@ async function loadChunk(c){const g=await loader.loadAsync(V(c.file));const grp=
  g.scene.traverse(o=>{if(o.isMesh){if(!o.geometry.attributes.normal){o.geometry=o.geometry.toNonIndexed();o.geometry.computeVertexNormals();}const n=(o.material&&o.material.name)||'';const mm=M[n]||M.white;o.material=mm;o.castShadow=!MOBILE&&!mm.transparent&&c.kind!=='site';o.receiveShadow=true;o.userData.mat=n;}});
  await doorsReady;await stairsReady;await fixtReady;await colReady;await signReady;await dadoReady;await gapReady;if(c.kind!=='site'){const rm=[];g.scene.traverse(o=>{if(o.isMesh&&o.userData.mat==='door')rm.push(o);});rm.forEach(o=>o.removeFromParent());buildDoors(c,grp);}window.__shDirty=true;
  grp.add(g.scene);const fg=new THREE.Group();fg.name='furn';if(c.kind==='site')fg.add(trees(c.furn));else addFurn(fg,classOnly(c,c.furn));grp.add(fg);
- root.add(grp);chunks[c.name]={...c,group:grp};loaded++;prog.textContent=`불러오는 중 ${loaded}/${list.length}`;if(loaded===list.length){prog.style.display='none';decorate();try{buildSite3(chunks,WALLS);}catch(err){console.error('site3',err);}try{buildSite4(chunks,WALLS);}catch(err){console.error('site4',err);}try{buildInterior5(chunks,WALLS);}catch(err){console.error('int5',err);}try{buildProps6(chunks,WALLS,2.7);try{buildHall7(chunks,WALLS);}catch(err){console.error('hall7',err);};try{sinkHall(chunks,WALLS,STAIRS,DOORS,doorIMs);}catch(err){console.error('hall8',err);}}catch(err){console.error('p6',err);}applyFloor();SITEB=null;if(!userMoved&&!walk){if(Q.get('view')==='bird'||SHOT)defaultView(false);else spawnFPS();}window.__loaded=true;}
+ root.add(grp);chunks[c.name]={...c,group:grp};loaded++;prog.textContent=`불러오는 중 ${loaded}/${list.length}`;if(loaded===list.length){prog.style.display='none';decorate();try{buildSite3(chunks,WALLS);}catch(err){console.error('site3',err);}try{buildSite4(chunks,WALLS);}catch(err){console.error('site4',err);}try{buildInterior5(chunks,WALLS);}catch(err){console.error('int5',err);}try{buildProps6(chunks,WALLS,2.7);try{buildHall7(chunks,WALLS);}catch(err){console.error('hall7',err);};try{sinkHall(chunks,WALLS,STAIRS,DOORS,doorIMs);backCorridor(chunks,WALLS);}catch(err){console.error('hall8',err);}}catch(err){console.error('p6',err);}applyFloor();SITEB=null;if(!userMoved&&!walk){if(Q.get('view')==='bird'||SHOT)defaultView(false);else spawnFPS();}window.__loaded=true;}
  render();}
 // sequential with small concurrency
 (async()=>{const q=[...list];const work=async()=>{while(q.length){await loadChunk(q.shift());}};await Promise.all([work(),work(),work()]);})();

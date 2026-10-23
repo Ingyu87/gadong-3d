@@ -6,7 +6,7 @@ export const FIELD={x0:-37,x1:45,n0:-90,n1:-12.5,top:-18.6};
 const S=o=>new THREE.MeshStandardMaterial(Object.assign({roughness:0.8},o));
 function clipMat(m,inside){const k=m.clone();const F=FIELD;k.onBeforeCompile=sh=>{sh.vertexShader='varying vec3 vWPc;\n'+sh.vertexShader.replace('#include <project_vertex>','#include <project_vertex>\n vWPc=(modelMatrix*vec4(transformed,1.0)).xyz;');
  const cond=`(vWPc.x>${F.x0.toFixed(2)}&&vWPc.x<${F.x1.toFixed(2)}&&-vWPc.z>${F.n0.toFixed(2)}&&-vWPc.z<${F.n1.toFixed(2)})`;
- const hall=`((vWPc.x>45.0&&vWPc.x<65.5&&-vWPc.z>-60.3&&-vWPc.z<-9.7)||(vWPc.x>41.6&&vWPc.x<45.1&&-vWPc.z>-19.45&&-vWPc.z<-9.7))`;
+ const hall=`((vWPc.x>45.0&&vWPc.x<65.5&&-vWPc.z>-60.3&&-vWPc.z<-9.7)||(vWPc.x>41.6&&vWPc.x<45.1&&-vWPc.z>-19.45&&-vWPc.z<-9.7)||(vWPc.x>65.4&&vWPc.x<67.45&&-vWPc.z>-55.25&&-vWPc.z<-40.0))`;
  sh.fragmentShader='varying vec3 vWPc;\n'+sh.fragmentShader.replace('void main() {','void main() {\n if('+(inside?'!':'')+cond+')discard;'+(inside?'':'\n if'+hall+'discard;'));};k.customProgramCacheKey=()=>'clip'+inside;return k;}
 export function sinkField(chunks,WALLS){const c=chunks.site;if(!c)return;const F=FIELD,D=DROP;const g=new THREE.Group();g.name='fieldTerrain';
  const ground=[];c.group.traverse(o=>{if(o.isMesh&&/site__(dirt|line|paving|asphalt)/.test(o.name))ground.push(o);});
