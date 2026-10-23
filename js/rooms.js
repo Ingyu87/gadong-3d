@@ -142,7 +142,11 @@ export function buildRooms(chunks,WALLS,logoTex,man){
     for(let k=-3;k<=3;k++){const tx=cx+k*span/3.5;const tr=new THREE.Mesh(new THREE.BoxGeometry(0.06,0.25,D-0.2),S({color:0x8a9096,metalness:0.6}));tr.position.set(tx,YC+0.6-R+Math.sqrt(R*R-(tx-cx)**2)-0.18,cz);g.add(tr);}
     const crest=new THREE.Mesh(new THREE.TorusGeometry(1.2,0.05,6,24,Math.PI),S({color:0xd9dcdf,metalness:0.7}));crest.position.set(cx,YC+0.6,cz-0.2);g.add(crest);
     const cr2=new THREE.Mesh(new THREE.CylinderGeometry(1.2,1.2,1.4,20,1,true,-Math.PI/2,Math.PI),S({map:rain,transparent:true,opacity:0.85,side:THREE.DoubleSide}));cr2.rotation.x=Math.PI/2;cr2.position.set(cx,YC+0.6,cz-0.2);cr2.scale.set(1,1,0.6);g.add(cr2);}
-   WALLS.site=WALLS.site||{e:0,s:[],r:[]};WALLS.site.r.push([bx0,-z1,bx1,-(z0+0.9)]);
+   WALLS.site=WALLS.site||{e:0,s:[],r:[]};
+   // walkable: no block collider; the 0.45 m platform is a surface you step/jump onto; only the railings (field side + both sides) and the four columns collide
+   (WALLS.site.plat=WALLS.site.plat||[]).push([bx0,-z1,bx1,-z0,H]);
+   WALLS.site.r.push([bx0,-z1,bx1,-z1+0.1],[bx0,-z1,bx0+0.1,-(z0+1.0)],[bx1-0.1,-z1,bx1,-(z0+1.0)]);
+   for(const [x,z] of[[bx0+0.3,z0+0.4],[bx1-0.3,z0+0.4],[bx0+0.3,z1-0.6],[bx1-0.3,z1-0.6]])WALLS.site.r.push([x-0.2,-z-0.2,x+0.2,-z+0.2]);
    // asphalt road between the courtyard planters and the field edge
    {const rd=new THREE.Mesh(new THREE.PlaneGeometry(92,6.0),S({color:0x55585c,roughness:0.95}));rd.rotation.x=-Math.PI/2;rd.position.set(1,0.012,8.6);g.add(rd);}}
   const fp=[[7.6,11.6],[9.6,11.6],[11.6,11.6]];const fl=S({map:cv(300,200,(x,w,h)=>{x.fillStyle='#fff';x.fillRect(0,0,w,h);x.fillStyle='#cd2e3a';x.beginPath();x.arc(w/2,h/2,50,Math.PI,0);x.fill();x.fillStyle='#0047a0';x.beginPath();x.arc(w/2,h/2,50,0,Math.PI);x.fill();x.fillStyle='#000';[[50,40],[w-70,40],[50,h-60],[w-70,h-60]].forEach(([a,b])=>x.fillRect(a,b,20,20));}),side:THREE.DoubleSide});const fl2=S({color:0x2e7d32,side:THREE.DoubleSide});
