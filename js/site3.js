@@ -36,7 +36,9 @@ export function buildSite3(chunks,WALLS){const s=chunks.site;if(!s)return;const 
   const rnd=i=>{const r=Math.sin(i*12.99)*43758.5;return r-Math.floor(r);};for(let i=0;i<70;i++){const x=x0+rnd(i)*(x1-x0),n=n0+rnd(i+99)*(n1-n0);const b=new THREE.Mesh(new THREE.SphereGeometry(0.6+rnd(i+7)*0.6,8,6),vine);b.position.set(x,2.9,-n);b.scale.y=0.45;b.castShadow=true;g.add(b);}
   const pav=new THREE.Mesh(new THREE.PlaneGeometry(x1-x0+1,n1-n0),S({color:0xb7a998}));pav.rotation.x=-Math.PI/2;pav.position.set(0,0.013,-(n0+n1)/2);g.add(pav);}
  // C8 정보관 link: 2F only. Close the 1F and 3F passages (wall + collision), shrink skybridge, 정보관 1F own door with ramp
- {const beige=S({color:0xd9ccb0});for(const[ck,e]of[['main_1F',0],['main_3F',7.2]]){box(beige,-50.2,-47.4,e,e+3.4,-9.42,-9.36);const W=WALLS[ck];if(W)W.r.push([-50.2,-9.6,-47.4,-9.36]);}
+ {const beige=S({color:0xd9ccb0});for(const[ck,e]of[['main_3F',7.2]]){box(beige,-50.2,-47.4,e,e+3.4,-9.42,-9.36);const W=WALLS[ck];if(W)W.r.push([-50.2,-9.6,-47.4,-9.36]);}
+  // 1F under the link is an open outdoor walk-through (main_1F.glb walls cut there); close the main building's 1F end at n -4.4 instead
+  {const brk=S({color:0x8e4a3a,roughness:0.9});box(brk,-50.25,-47.2,0,2.9,-4.52,-4.38);const W=WALLS.main_1F;if(W){W.r.push([-50.25,-4.55,-47.2,-4.35]);for(const x of[-49.95,-47.55])for(const n of[-9.45,-4.55])W.r.push([x-0.15,n-0.15,x+0.15,n+0.15]);}}
   s.group.traverse(o=>{if(o.isMesh&&o.geometry?.parameters&&Math.abs(o.position.y-7.1)<0.01&&Math.abs(o.geometry.parameters.height-7.0)<0.01){o.scale.y=3.6/7.0;o.position.y=5.4;}});
   s.group.traverse(o=>{if(o.isMesh&&o.geometry?.type==='PlaneGeometry'&&Math.abs(o.position.y-8.6)<0.01&&o.position.x<-47&&o.position.x>-50.2&&o.position.z>4&&o.position.z<10)o.visible=false;});
   // ramp + rails at the 정보관 east door (n -16.5..-14.5 at x -42)
