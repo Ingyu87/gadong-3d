@@ -319,6 +319,13 @@ function infoExterior(){const sm=(o)=>new THREE.MeshStandardMaterial(Object.assi
  {const t=textPlane('정보관',3.0,0.9,{w:768,h:230,font:'bold 170px NanumGothic, sans-serif',fg:'#eef2ec',bg:null});t.position.set(-39.74,9.6,16.25);t.scale.set(0.8,0.8,1);const sh=textPlane('정보관',3.0,0.9,{w:768,h:230,font:'bold 170px NanumGothic, sans-serif',fg:'#6f7f6c',bg:null});sh.position.set(-39.755,9.57,16.22);sh.rotation.y=Math.PI/2;sh.scale.set(0.8,0.8,1);g.add(sh);t.rotation.z=0;t.rotation.y=Math.PI/2;g.add(t);}
  // small artificial-turf area beside the grey metal-clad 실내야구연습장 (aerials)
  {const tf=new THREE.Mesh(new THREE.PlaneGeometry(29,8.6),sm({map:_cvT(64,64,(x,W,H)=>{x.fillStyle='#3f9a4a';x.fillRect(0,0,W,H);for(let i=0;i<300;i++){x.fillStyle=Math.random()<0.5?'#47a653':'#378a41';x.fillRect(Math.random()*W,Math.random()*H,1,2);}})}));tf.rotation.x=-Math.PI/2;tf.position.set(48.5,0.015,64.95);g.add(tf);}
+ // B3: graffiti mural strip along the 정보관 brick base (photo 147), canvas only
+ {const gT=(L)=>{const W=Math.round(L*120),Hh=110;return _cvT(W,Hh,(x,W,H)=>{x.fillStyle='#e9e4da';x.fillRect(0,0,W,H);const C=['#e94f64','#f7b538','#3fa9f5','#7bc043','#9b59b6','#ff7f50','#1abc9c','#2c3e50'];let s=7;const R=()=>{s=(s*9301+49297)%233280;return s/233280;};
+  for(let i=0;i<L*3;i++){x.fillStyle=C[Math.floor(R()*8)];x.globalAlpha=0.85;x.beginPath();x.ellipse(R()*W,R()*H,10+R()*40,8+R()*26,R()*3,0,7);x.fill();}
+  x.globalAlpha=1;x.lineWidth=6;x.lineCap='round';for(let i=0;i<L*1.5;i++){x.strokeStyle=C[Math.floor(R()*8)];x.beginPath();let px=R()*W,py=R()*H;x.moveTo(px,py);for(let j=0;j<4;j++){px+=(R()-0.5)*80;py=Math.max(8,Math.min(H-8,py+(R()-0.5)*60));x.lineTo(px,py);}x.stroke();}
+  x.font='bold 64px NanumGothic, sans-serif';x.textBaseline='middle';const wds=['꿈','희망','친구','사랑','가동','함께','웃음'];for(let i=0;i<L/3;i++){x.fillStyle='#ffffff';x.strokeStyle='#2c3e50';x.lineWidth=5;const t=wds[i%wds.length],px=(i+0.3)*W/(L/3)+R()*40;x.strokeText(t,px,H/2);x.fillText(t,px,H/2);}});};
+  const mk=(L,px,pn,ry)=>{const p=new THREE.Mesh(new THREE.PlaneGeometry(L,0.85),sm({map:gT(L),roughness:0.8}));p.position.set(px,0.47,pn);p.rotation.y=ry;g.add(p);};
+  mk(15.5,-39.93,33.75,Math.PI/2);mk(14.0,-47.25,41.97,0);mk(31.0,-54.57,25.85,-Math.PI/2);}
  // B1: beige 2F/3F link block over an open 1F walk-through (photo 42): balcony window bands with railings, posts, soffit, 정보관 sign
  {const beige=sm({color:0xd8c9a8}),dk=sm({color:0x3b3f44,roughness:0.4}),gl=sm({color:0x6f8fa0,roughness:0.15,metalness:0.3}),rl=sm({color:0x5a5f63,metalness:0.6,roughness:0.35}),sof=sm({color:0xbfb397});const x0=-50.1,x1=-47.4,n0=-9.6,n1=-4.4,nc=-(n0+n1)/2,L=n1-n0;
   const b=new THREE.Mesh(new THREE.BoxGeometry(x1-x0,7.0,L),beige);b.position.set((x0+x1)/2,3.6+3.5,nc);g.add(b);
