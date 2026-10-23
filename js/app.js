@@ -8,11 +8,12 @@ import {GTAOPass} from 'three/addons/postprocessing/GTAOPass.js';
 import {OutputPass} from 'three/addons/postprocessing/OutputPass.js';
 import {RoomEnvironment} from 'three/addons/environments/RoomEnvironment.js';
 import {mergeGeometries} from 'three/addons/utils/BufferGeometryUtils.js';
-import {buildRooms} from './rooms.js?v=202610232003';
-import * as T from './tex.js?v=202610232003';
-import {buildInstanced} from './furn.js?v=202610232003';
-import {sinkField} from './terrain.js?v=202610232003';
+import {buildRooms} from './rooms.js?v=202610232036';
+import * as T from './tex.js?v=202610232036';
+import {buildInstanced} from './furn.js?v=202610232036';
+import {sinkField} from './terrain.js?v=202610232036';
 import {buildProps6} from './site6.js?v=202610231736';
+import {buildHall7} from './site7.js?v=202610232003';
 import {buildSite3,buildSite4,buildInterior5} from './site3.js?v=202610231640';
 const Q=new URLSearchParams(location.search);const SHOT=Q.has('shot');
 const MOBILE=matchMedia('(pointer:coarse)').matches||innerWidth<760;
@@ -482,7 +483,7 @@ async function loadChunk(c){const g=await loader.loadAsync(V(c.file));const grp=
  g.scene.traverse(o=>{if(o.isMesh){if(!o.geometry.attributes.normal){o.geometry=o.geometry.toNonIndexed();o.geometry.computeVertexNormals();}const n=(o.material&&o.material.name)||'';const mm=M[n]||M.white;o.material=mm;o.castShadow=!MOBILE&&!mm.transparent&&c.kind!=='site';o.receiveShadow=true;o.userData.mat=n;}});
  await doorsReady;await stairsReady;await fixtReady;await colReady;await signReady;await dadoReady;await gapReady;if(c.kind!=='site'){const rm=[];g.scene.traverse(o=>{if(o.isMesh&&o.userData.mat==='door')rm.push(o);});rm.forEach(o=>o.removeFromParent());buildDoors(c,grp);}window.__shDirty=true;
  grp.add(g.scene);const fg=new THREE.Group();fg.name='furn';if(c.kind==='site')fg.add(trees(c.furn));else addFurn(fg,classOnly(c,c.furn));grp.add(fg);
- root.add(grp);chunks[c.name]={...c,group:grp};loaded++;prog.textContent=`불러오는 중 ${loaded}/${list.length}`;if(loaded===list.length){prog.style.display='none';decorate();try{buildSite3(chunks,WALLS);}catch(err){console.error('site3',err);}try{buildSite4(chunks,WALLS);}catch(err){console.error('site4',err);}try{buildInterior5(chunks,WALLS);}catch(err){console.error('int5',err);}try{buildProps6(chunks,WALLS,2.7);}catch(err){console.error('p6',err);}applyFloor();SITEB=null;if(!userMoved&&!walk){if(Q.get('view')==='bird'||SHOT)defaultView(false);else spawnFPS();}window.__loaded=true;}
+ root.add(grp);chunks[c.name]={...c,group:grp};loaded++;prog.textContent=`불러오는 중 ${loaded}/${list.length}`;if(loaded===list.length){prog.style.display='none';decorate();try{buildSite3(chunks,WALLS);}catch(err){console.error('site3',err);}try{buildSite4(chunks,WALLS);}catch(err){console.error('site4',err);}try{buildInterior5(chunks,WALLS);}catch(err){console.error('int5',err);}try{buildProps6(chunks,WALLS,2.7);try{buildHall7(chunks,WALLS);}catch(err){console.error('hall7',err);};}catch(err){console.error('p6',err);}applyFloor();SITEB=null;if(!userMoved&&!walk){if(Q.get('view')==='bird'||SHOT)defaultView(false);else spawnFPS();}window.__loaded=true;}
  render();}
 // sequential with small concurrency
 (async()=>{const q=[...list];const work=async()=>{while(q.length){await loadChunk(q.shift());}};await Promise.all([work(),work(),work()]);})();
