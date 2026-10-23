@@ -28,6 +28,10 @@ export function buildSite3(chunks,WALLS){const s=chunks.site;if(!s)return;const 
  {const X=44.9,n0=-46.4,n1=-43.0;const yl=S({color:0xf2c230,roughness:0.5}),gl=S({color:0x8fb8c8,roughness:0.08,metalness:0.2,transparent:true,opacity:0.6});
   box(yl,X-0.15,X+0.02,0,2.7,n0-0.18,n0);box(yl,X-0.15,X+0.02,0,2.7,n1,n1+0.18);box(yl,X-0.15,X+0.02,2.52,2.7,n0,n1);box(yl,X-0.15,X+0.02,0,2.52,(n0+n1)/2-0.06,(n0+n1)/2+0.06);
   box(gl,X-0.1,X-0.06,0,2.52,n0,n1);box(S({color:0x3a3d40}),X-2.2,X+0.02,2.75,2.9,n0-0.6,n1+0.6);
+  // photo 138: teal glass canopy panel over the approach + lime screen panel on its south side
+  {const tg=S({color:0x6fc7c0,transparent:true,opacity:0.5,roughness:0.15,side:THREE.DoubleSide});box(tg,41.0,X-0.15,3.0,3.05,n0-2.6,n1+2.5);box(steel,41.0,X-0.15,2.92,3.0,n0-2.6,n0-2.5);box(steel,41.0,X-0.15,2.92,3.0,n1+2.4,n1+2.5);
+   for(const n of[n0-2.55,n1+2.45])box(steel,41.0,41.12,0,3.0,n-0.06,n+0.06);R(40.95,n0-2.62,41.17,n0-2.48);R(40.95,n1+2.38,41.17,n1+2.52);
+   box(S({color:0xb8d84a,roughness:0.5}),41.15,X-0.2,0,2.6,n0-2.62,n0-2.5);R(41.15,n0-2.65,X-0.2,n0-2.47);}
   const t=txt('급식실',1.8,0.4,'#1f3d6b','#f6cf3c');t.position.set(X-0.17,3.15,-(n0+n1)/2);t.rotation.y=-Math.PI/2;g.add(t);}
  // C6 vine pergola path behind the field (photo 161)
  {const n0=-95.4,n1=-92.4,x0=-28,x1=28;const wood=S({color:0x7a5236}),vine=S({color:0x4e8a3a,roughness:0.95});
