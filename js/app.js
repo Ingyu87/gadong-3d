@@ -8,10 +8,10 @@ import {GTAOPass} from 'three/addons/postprocessing/GTAOPass.js';
 import {OutputPass} from 'three/addons/postprocessing/OutputPass.js';
 import {RoomEnvironment} from 'three/addons/environments/RoomEnvironment.js';
 import {mergeGeometries} from 'three/addons/utils/BufferGeometryUtils.js';
-import {buildRooms} from './rooms.js?v=202610232148';
-import * as T from './tex.js?v=202610232148';
-import {buildInstanced} from './furn.js?v=202610232148';
-import {sinkField} from './terrain.js?v=202610232148';
+import {buildRooms} from './rooms.js?v=202610232150';
+import * as T from './tex.js?v=202610232150';
+import {buildInstanced} from './furn.js?v=202610232150';
+import {sinkField} from './terrain.js?v=202610232150';
 import {buildProps6} from './site6.js?v=202610231736';
 import {buildHall7} from './site7.js?v=202610232003';
 import {buildSite3,buildSite4,buildInterior5} from './site3.js?v=202610231640';
@@ -211,6 +211,9 @@ function infoWalk(){const c=chunks.info_1F;if(!c)return;const g=new THREE.Group(
  for(let n=N0+0.3;n<=N1;n+=2.4){const p=new THREE.Mesh(new THREE.CylinderGeometry(0.05,0.05,2.85,10),post);p.position.set(X1,1.42,-n);g.add(p);WALLS.info_1F&&WALLS.info_1F.r.push([X1-0.06,n-0.06,X1+0.06,n+0.06]);}
  for(let n=N0;n<N1-1.2;n+=1.0){const f=new THREE.Mesh(new THREE.TorusGeometry(0.22,0.012,4,12,Math.PI),fence);f.rotation.y=Math.PI/2;f.position.set(X1+0.35,0.02,-(n+0.5));g.add(f);}
  const m1=new THREE.Mesh(new THREE.BoxGeometry(1.2,0.015,0.8),mat);m1.position.set(-41.68,0.02,17.7);g.add(m1);
+ // C5: pink wall panel with green round rose plaque beside the 장미홀 east entrance (photos 194/8), canvas only
+ {const pk=new THREE.Mesh(new THREE.PlaneGeometry(1.8,3.0),sm({map:_cvT(256,420,(x,W,H)=>{x.fillStyle='#ecc9bd';x.fillRect(0,0,W,H);x.strokeStyle='#d9ad9f';x.lineWidth=2;for(let y=0;y<H;y+=60){x.beginPath();x.moveTo(0,y);x.lineTo(W,y);x.stroke();}x.fillStyle='#3a3a3a';x.fillRect(W/2-34,24,68,48);x.fillStyle='#555';for(let i=0;i<6;i++)x.fillRect(W/2-30,28+i*7,60,3);x.fillStyle='#f6f3e8';x.fillRect(40,330,60,70);x.fillRect(150,345,70,50);x.fillStyle='#4a9a52';x.fillRect(150,345,70,10);})}));pk.position.set(-43.77,1.5,32.2);pk.rotation.y=Math.PI/2;g.add(pk);
+  const _mm=sm({map:_cvT(256,256,(x,W,H)=>{x.fillStyle='#1f6b4a';x.fillRect(0,0,W,H);x.strokeStyle='#c9a35a';x.lineWidth=8;x.beginPath();x.arc(128,128,118,0,7);x.stroke();x.fillStyle='#c79a52';for(let i=0;i<5;i++){x.beginPath();x.ellipse(128+Math.cos(i*1.256)*26,110+Math.sin(i*1.256)*26,34,26,i*1.256,0,7);x.fill();}x.fillStyle='#a87a3a';x.beginPath();x.arc(128,110,22,0,7);x.fill();x.strokeStyle='#8a6a32';x.lineWidth=7;x.beginPath();x.moveTo(128,140);x.quadraticCurveTo(118,190,132,228);x.stroke();x.fillStyle='#b8904a';x.beginPath();x.ellipse(100,180,24,11,-0.6,0,7);x.fill();x.beginPath();x.ellipse(158,196,24,11,0.6,0,7);x.fill();x.fillStyle='#e0c488';x.font='bold 30px NanumGothic, sans-serif';x.fillText('장미',176,140);}),roughness:0.5,metalness:0.2});_mm.map.center.set(0.5,0.5);_mm.map.rotation=-Math.PI/2;const md=new THREE.Mesh(new THREE.CircleGeometry(0.5,40),_mm);md.rotation.y=Math.PI/2;md.position.set(-43.7,1.75,32.2);g.add(md);const rim=new THREE.Mesh(new THREE.TorusGeometry(0.5,0.03,6,40),sm({color:0x1f6b4a}));rim.rotation.y=Math.PI/2;rim.position.set(-43.72,1.75,32.2);g.add(rim);}
  // lobby: yellow phone panel on west side, red phone, white door with vent under the stair
  {const wd=new THREE.Mesh(new THREE.PlaneGeometry(0.85,1.9),sm({map:_cvT(128,288,(x,W,H)=>{x.fillStyle='#f4f4f2';x.fillRect(0,0,W,H);x.strokeStyle='#c9c9c6';x.lineWidth=4;x.strokeRect(4,4,W-8,H-8);x.fillStyle='#bdbdb9';for(let i=0;i<8;i++)x.fillRect(24,H-80+i*8,W-48,4);x.fillStyle='#999';x.fillRect(W-26,H*0.5,10,26);})}));wd.position.set(-42.12,0.95,14.6);wd.rotation.y=-Math.PI/2;g.add(wd);}
  const yel=new THREE.Mesh(new THREE.BoxGeometry(0.03,0.9,1.4),sm({color:0xe8c33a}));yel.position.set(-43.78+0.02,1.3,14.2);g.add(yel);
