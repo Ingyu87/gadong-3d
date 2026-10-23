@@ -8,10 +8,10 @@ import {GTAOPass} from 'three/addons/postprocessing/GTAOPass.js';
 import {OutputPass} from 'three/addons/postprocessing/OutputPass.js';
 import {RoomEnvironment} from 'three/addons/environments/RoomEnvironment.js';
 import {mergeGeometries} from 'three/addons/utils/BufferGeometryUtils.js';
-import {buildRooms} from './rooms.js?v=202610232147';
-import * as T from './tex.js?v=202610232147';
-import {buildInstanced} from './furn.js?v=202610232147';
-import {sinkField} from './terrain.js?v=202610232147';
+import {buildRooms} from './rooms.js?v=202610232148';
+import * as T from './tex.js?v=202610232148';
+import {buildInstanced} from './furn.js?v=202610232148';
+import {sinkField} from './terrain.js?v=202610232148';
 import {buildProps6} from './site6.js?v=202610231736';
 import {buildHall7} from './site7.js?v=202610232003';
 import {buildSite3,buildSite4,buildInterior5} from './site3.js?v=202610231640';
@@ -245,8 +245,12 @@ function lobbyGarden(){const sm=(o)=>new THREE.MeshStandardMaterial(Object.assig
  {const P0=-46.5,P1=-2.7,N0=5.4,N1=8.2,pv=sm({map:_cvT(128,128,(x,W,H)=>{x.fillStyle='#8f8a82';x.fillRect(0,0,W,H);x.strokeStyle='#6f6a63';x.lineWidth=2;for(let i=0;i<8;i++)for(let j=0;j<4;j++)x.strokeRect(i*16+(j%2)*8,j*32,16,32);})});pv.map.wrapS=pv.map.wrapT=THREE.RepeatWrapping;pv.map.repeat.set((P1-P0)/1.2,(N1-N0)/1.2);
   const pth=new THREE.Mesh(new THREE.PlaneGeometry(P1-P0,N1-N0),pv);pth.rotation.x=-Math.PI/2;pth.position.set((P0+P1)/2,0.02,-(N0+N1)/2);g.add(pth);
   const arch=sm({color:0x4a4f55,metalness:0.6,roughness:0.35});WALLS.site=WALLS.site||{e:0,s:[],r:[]};
-  for(let x=P0+1;x<=P1-0.5;x+=2.4){const t=new THREE.Mesh(new THREE.TorusGeometry((N1-N0)/2,0.04,6,20,Math.PI),arch);t.rotation.y=Math.PI/2;t.scale.set(1,0.45,1);t.position.set(x,2.3,-(N0+N1)/2);g.add(t);if(!g.userData.lat){g.userData.lat=sm({map:_cvT(64,128,(c,W,H)=>{c.clearRect(0,0,W,H);c.strokeStyle='#4a4f55';c.lineWidth=5;c.strokeRect(2,2,W-4,H-4);c.beginPath();c.moveTo(0,0);c.lineTo(W,H);c.moveTo(W,0);c.lineTo(0,H);c.stroke();}),transparent:true,alphaTest:0.5,side:THREE.DoubleSide});}for(const n of[N0+0.05,N1-0.05]){const l=new THREE.Mesh(new THREE.PlaneGeometry(0.45,2.2),g.userData.lat);l.position.set(x,1.1,-n);g.add(l);}for(const n of[N0+0.05,N1-0.05]){const p=new THREE.Mesh(new THREE.CylinderGeometry(0.04,0.04,2.2,8),arch);p.position.set(x,1.1,-n);g.add(p);}}
-  for(const n of[N0+0.05,N1-0.05]){const r=new THREE.Mesh(new THREE.CylinderGeometry(0.03,0.03,P1-P0-1,6),arch);r.rotation.z=Math.PI/2;r.position.set((P0+P1)/2,2.2,-n);g.add(r);const rt=new THREE.Mesh(new THREE.CylinderGeometry(0.03,0.03,P1-P0-1,6),arch);rt.rotation.z=Math.PI/2;rt.position.set((P0+P1)/2,2.2+(N1-N0)/2,-(N0+N1)/2);g.add(rt);}
+  for(let x=P0+1;x<=P1-0.5;x+=1.2){const t=new THREE.Mesh(new THREE.TorusGeometry((N1-N0)/2,0.04,6,20,Math.PI),arch);t.rotation.y=Math.PI/2;t.scale.set(1,0.75,1);t.position.set(x,2.3,-(N0+N1)/2);g.add(t);if(!g.userData.lat){g.userData.lat=sm({map:_cvT(64,128,(c,W,H)=>{c.clearRect(0,0,W,H);c.strokeStyle='#4a4f55';c.lineWidth=5;c.strokeRect(2,2,W-4,H-4);c.beginPath();c.moveTo(0,0);c.lineTo(W,H);c.moveTo(W,0);c.lineTo(0,H);c.stroke();}),transparent:true,alphaTest:0.5,side:THREE.DoubleSide});}for(const n of[N0+0.05,N1-0.05]){const l=new THREE.Mesh(new THREE.PlaneGeometry(0.45,2.2),g.userData.lat);l.position.set(x,1.1,-n);g.add(l);}for(const n of[N0+0.05,N1-0.05]){const p=new THREE.Mesh(new THREE.CylinderGeometry(0.04,0.04,2.2,8),arch);p.position.set(x,1.1,-n);g.add(p);}}
+  for(const n of[N0+0.05,N1-0.05]){const r=new THREE.Mesh(new THREE.CylinderGeometry(0.03,0.03,P1-P0-1,6),arch);r.rotation.z=Math.PI/2;r.position.set((P0+P1)/2,2.2,-n);g.add(r);const rt=new THREE.Mesh(new THREE.CylinderGeometry(0.03,0.03,P1-P0-1,6),arch);rt.rotation.z=Math.PI/2;rt.position.set((P0+P1)/2,2.3+0.75*(N1-N0)/2,-(N0+N1)/2);g.add(rt);}
+  {const R=(N1-N0)/2;for(const th of[Math.PI/4,3*Math.PI/4,Math.PI/8,7*Math.PI/8,3*Math.PI/8,5*Math.PI/8]){const r=new THREE.Mesh(new THREE.CylinderGeometry(0.022,0.022,P1-P0-1,5),arch);r.rotation.z=Math.PI/2;r.position.set((P0+P1)/2,2.3+0.75*R*Math.sin(th),-((N0+N1)/2+R*Math.cos(th)));g.add(r);}
+   // C6: black steel side railings along both sides of the pergola path (photos 80/285/350)
+   const rl=sm({color:0x2b2e32,metalness:0.6,roughness:0.4});const bars=[];for(const n of[N0-0.35,N1+0.3]){for(const y of[0.85,0.3]){const t=new THREE.Mesh(new THREE.BoxGeometry(P1-P0,0.04,0.04),rl);t.position.set((P0+P1)/2,y,-n);g.add(t);}for(let x=P0;x<=P1;x+=0.14)bars.push([x,n]);}
+   const im=new THREE.InstancedMesh(new THREE.BoxGeometry(0.02,0.6,0.02),rl,bars.length);const M4=new THREE.Matrix4();bars.forEach(([x,n],i)=>{M4.makeTranslation(x,0.57,-n);im.setMatrixAt(i,M4);});im.instanceMatrix.needsUpdate=true;im.computeBoundingSphere();g.add(im);}
   const curb=new THREE.Mesh(new THREE.BoxGeometry(P1-P0,0.25,0.35),stone);curb.position.set((P0+P1)/2,0.12,-(N0-0.2));g.add(curb);WALLS.site.r.push([P0,N0-0.4,P1-0.2,N0-0.02]);
   for(let x=P0;x<P1-0.3;x+=0.42){const f=new THREE.Mesh(new THREE.TorusGeometry(0.2,0.012,4,10,Math.PI),fence);f.position.set(x+0.2,0.25,-(N0-0.2));g.add(f);}const curb2=new THREE.Mesh(new THREE.BoxGeometry(P1-P0,0.25,0.3),stone);curb2.position.set((P0+P1)/2,0.12,-(N1+0.15));g.add(curb2);for(let x=P0;x<P1;x+=0.42){const f=new THREE.Mesh(new THREE.TorusGeometry(0.2,0.012,4,10,Math.PI),fence);f.position.set(x+0.2,0.25,-(N1+0.15));g.add(f);}WALLS.site.r.push([P0,N1,P1,N1+0.3]);
   for(const x of[-40,-33,-26,-19,-12]){const b=new THREE.Mesh(new THREE.BoxGeometry(1.8,0.09,0.42),sm({color:0xf2c230,roughness:0.55}));b.position.set(x,0.45,-(N1-0.4));g.add(b);for(const d of[-0.65,0.65]){const l=new THREE.Mesh(new THREE.BoxGeometry(0.18,0.42,0.4),stone);l.position.set(x+d,0.21,-(N1-0.4));g.add(l);}WALLS.site.r.push([x-0.9,N1-0.62,x+0.9,N1-0.18]);}
