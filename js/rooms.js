@@ -75,7 +75,7 @@ export function buildRooms(chunks,WALLS,logoTex,man){
    x.strokeStyle='#2e7d4f';x.strokeRect(160,300,w-320,h-600);x.beginPath();x.moveTo(w/2,0);x.lineTo(w/2,h);x.stroke();x.strokeStyle='#f2c230';x.lineWidth=6;x.strokeRect(30,40,w-60,h-80);}),roughness:0.3});
   // clboard 느티홀 47-64: dark green lower walls (~1.8 m) under white walls, blue gym mats stacked along the side wall, white goals
   {const gw=S({color:0x1f5a3c,roughness:0.6});R.wallp(gw,'z',-52.3,-19.2,45.47,0,1.8,1);R.wallp(gw,'z',-52.3,-19.2,64.43,0,1.8,-1);R.wallp(gw,'x',45.5,64.4,-19.17,0,1.8,-1);
-   const bm=S({color:0x2a5fc0,roughness:0.8});for(let n=-50.5;n<-42;n+=2.2){R.box(bm,46.0,47.0,n,n+2.0,0,0.6);}R.rects.push([45.9,-50.6,47.05,-41.9]);
+   const bm=S({color:0x2a5fc0,roughness:0.8});for(let n=-41.0;n<-32.5;n+=2.2){R.box(bm,46.0,47.0,n,n+2.0,0,0.6);}R.rects.push([45.9,-41.1,47.05,-32.4]);// mats moved off the stair hole
    const gol=S({color:0xf4f4f4,metalness:0.3,roughness:0.4});for(const n of[-20.0]){for(const x of[53.5,56.9])R.box(gol,x-0.04,x+0.04,n-0.04,n+0.04,0,2.0);R.box(gol,53.5,56.9,n-0.04,n+0.04,1.96,2.04);}}
   R.plane(court,45.4,64.5,-52.4,-19.1,0.012);
   const stg=S({map:rep(woodTex('#a06a3a'),3,2),roughness:0.5});R.box(stg,50.45,60.0,-52.35,-49.2,0,1.0);R.box(stg,49.3,50.45,-51.6,-49.2,0,0.5);R.rects.push([50.4,-52.4,60.0,-49.2]);
