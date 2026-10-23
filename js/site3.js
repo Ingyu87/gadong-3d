@@ -39,8 +39,8 @@ export function buildSite3(chunks,WALLS){const s=chunks.site;if(!s)return;const 
   s.group.traverse(o=>{if(o.isMesh&&o.geometry?.parameters&&Math.abs(o.position.y-7.1)<0.01&&Math.abs(o.geometry.parameters.height-7.0)<0.01){o.scale.y=3.6/7.0;o.position.y=5.4;}});
   s.group.traverse(o=>{if(o.isMesh&&o.geometry?.type==='PlaneGeometry'&&Math.abs(o.position.y-8.6)<0.01&&o.position.x<-47&&o.position.x>-50.2&&o.position.z>4&&o.position.z<10)o.visible=false;});
   // ramp + rails at the 정보관 east door (n -16.5..-14.5 at x -42)
-  const conc=S({color:0xc2bfb8});const rp=new THREE.Mesh(new THREE.BoxGeometry(5.0,0.06,1.6),conc);rp.position.set(-39.6,0.06,15.5);rp.rotation.z=-Math.atan(0.12/5);g.add(rp);
-  for(const n of[-16.35,-14.65]){box(steel,-42.0,-37.1,0.9,0.95,n-0.025,n+0.025);for(let x=-42;x<=-37.1;x+=1.6)box(steel,x-0.02,x+0.02,0,0.92,n-0.02,n+0.02);}}
+  const conc=S({color:0xc2bfb8});const rp=new THREE.Mesh(new THREE.BoxGeometry(1.6,0.06,4.0),conc);rp.position.set(-41.67,0.06,19.2);rp.rotation.x=-Math.atan(0.12/4);g.add(rp);
+  for(const x of[-42.5,-40.85]){box(steel,x-0.025,x+0.025,0.9,0.95,-21.3,-17.3);for(let n=-21.3;n<=-17.2;n+=1.35)box(steel,x-0.02,x+0.02,0,0.92,n-0.02,n+0.02);}}
  // D10 blue translucent parking canopy (west lot)
  {const blue=S({color:0x3d7fd6,transparent:true,opacity:0.55,side:THREE.DoubleSide,roughness:0.3});const x0=-71,x1=-63.5,n0=-12,n1=22;
   box(blue,x0,x1,3.0,3.06,n0,n1);for(let n=n0;n<=n1+0.01;n+=(n1-n0)/6){box(steel,x0+0.3,x0+0.5,0,3.0,n-0.1,n+0.1);R(x0+0.28,n-0.12,x0+0.52,n+0.12);}
@@ -55,3 +55,26 @@ export function buildSite3(chunks,WALLS){const s=chunks.site;if(!s)return;const 
   const pm=S({map:cvT(1024,128,(x,w,h)=>{x.fillStyle='#7b4fa8';x.fillRect(0,0,w,h);const c=['#f3d34a','#ff9fc8','#9fe0ff','#ffffff'];for(let i=0;i<40;i++){x.fillStyle=c[i%4];x.beginPath();x.arc(i*26+13,h/2+Math.sin(i)*30,10+(i%3)*5,0,7);x.fill();}})});
   const m=new THREE.Mesh(new THREE.PlaneGeometry(12,1.2),pm);m.position.set(X+10,0.9,-(N-0.6));g.add(m);}
  g.userData.kind='photo';s.group.add(g);}
+
+// Phase 4: D2 green roof lettering, D11 playground, D6 장미홀 quilted brown door surrounds (D13 정보관 striped tower + lettering already present)
+export function buildSite4(chunks,WALLS){const s=chunks.site;if(!s)return;const g=new THREE.Group();g.name='site4';
+ const box=(m,x0,x1,y0,y1,n0,n1,par)=>{const b=new THREE.Mesh(new THREE.BoxGeometry(x1-x0,y1-y0,n1-n0),m);b.position.set((x0+x1)/2,(y0+y1)/2,-(n0+n1)/2);b.castShadow=b.receiveShadow=true;(par||g).add(b);return b;};
+ const SR=WALLS.site=WALLS.site||{e:0,s:[],r:[]};const R=(a,b,c,d)=>SR.r.push([a,b,c,d]);
+ const rf=chunks.main_roof?.group;if(rf)rf.traverse(o=>{if(o.userData?.kind==='roofdeco')o.traverse(m=>{if(m.isMesh&&m.material.map&&m.geometry.parameters?.width===1.6&&m.material.transparent&&!m.userData.logo){m.material=m.material.clone();m.material.color.set(0x1f8a3c);}});});
+ // playground beside the 정문 보안관실 (photos 48,99,156,166,221): rainbow rope dome, slide tower, tyre border, rubber floor
+ {const cx=-49,cn=-74;const rub=new THREE.Mesh(new THREE.CircleGeometry(6.5,40),S({color:0x4c8bd0,roughness:0.95}));rub.rotation.x=-Math.PI/2;rub.position.set(cx,0.02,-cn);g.add(rub);
+  const tyre=S({color:0x1d1d1f,roughness:0.9});const tg=new THREE.TorusGeometry(0.32,0.12,8,16);for(let i=0;i<44;i++){const a=i/44*Math.PI*2;const t=new THREE.Mesh(tg,tyre);t.position.set(cx+Math.cos(a)*6.6,0.3,-(cn+Math.sin(a)*6.6));t.rotation.y=-a;g.add(t);}
+  const RB=[0xe53935,0xfb8c00,0xfdd835,0x43a047,0x1e88e5,0x3949ab,0x8e24aa];const dx=cx-2.2;
+  for(let i=0;i<12;i++){const a=i/12*Math.PI;const tr=new THREE.Mesh(new THREE.TorusGeometry(2.4,0.035,6,40,Math.PI),S({color:RB[i%7]}));tr.position.set(dx,0,-cn);tr.rotation.y=a;g.add(tr);}
+  for(let k=1;k<4;k++){const y=k*0.6,r=Math.sqrt(2.4*2.4-y*y);const tr=new THREE.Mesh(new THREE.TorusGeometry(r,0.03,6,40),S({color:RB[(k*2)%7]}));tr.rotation.x=Math.PI/2;tr.position.set(dx,y,-cn);g.add(tr);}
+  R(dx-2.3,cn-2.3,dx+2.3,cn+2.3);
+  const tx=cx+3,tn=cn+1;const pm=S({color:0xf2f2f2,metalness:0.4}),yl=S({color:0xf6c935}),rd=S({color:0xd8402e});
+  for(const[a,b]of[[-0.9,-0.9],[0.9,-0.9],[-0.9,0.9],[0.9,0.9]])box(pm,tx+a-0.06,tx+a+0.06,0,3.4,tn+b-0.06,tn+b+0.06);
+  box(yl,tx-0.95,tx+0.95,1.5,1.62,tn-0.95,tn+0.95);const rf2=new THREE.Mesh(new THREE.ConeGeometry(1.45,1.0,4),rd);rf2.position.set(tx,3.9,-tn);rf2.rotation.y=Math.PI/4;g.add(rf2);
+  const sl=new THREE.Mesh(new THREE.BoxGeometry(0.75,0.06,3.4),yl);sl.position.set(tx+0.0,0.8,-(tn-2.3));sl.rotation.x=-Math.atan(1.5/3.2);g.add(sl);R(tx-1.0,tn-1.0,tx+1.0,tn+1.0);}
+ // 장미홀 brown quilted leather door surrounds (photos 23,32,278)
+ {const qt=document.createElement('canvas');qt.width=qt.height=128;const x=qt.getContext('2d');x.fillStyle='#6b3a24';x.fillRect(0,0,128,128);x.strokeStyle='#4a2616';x.lineWidth=3;for(let i=-128;i<256;i+=32){x.beginPath();x.moveTo(i,0);x.lineTo(i+128,128);x.stroke();x.beginPath();x.moveTo(i+128,0);x.lineTo(i,128);x.stroke();}x.fillStyle='#c9a35a';for(let i=0;i<128;i+=32)for(let j=0;j<128;j+=32){x.beginPath();x.arc(i+16,j+16,2.5,0,7);x.fill();}
+  const t=new THREE.CanvasTexture(qt);t.colorSpace=THREE.SRGBColorSpace;t.wrapS=t.wrapT=THREE.RepeatWrapping;t.repeat.set(1,3);const qm=S({map:t,roughness:0.6});const gold=S({color:0xc9a35a,metalness:0.7,roughness:0.3});
+  for(const[x0,x1]of[[-51.0,-49.25],[-48.65,-46.9]])for(const n of[-19.12,-18.73]){box(qm,x0-0.35,x0,0,2.3,n-0.02,n+0.02);box(qm,x1,x1+0.35,0,2.3,n-0.02,n+0.02);box(qm,x0-0.35,x1+0.35,2.3,2.6,n-0.02,n+0.02);}
+  const tp=txt('장미홀',1.4,0.32,'#c9a35a','#3a1e12');tp.position.set(-48.95,2.85,18.71);tp.rotation.y=Math.PI;g.add(tp);}
+ s.group.add(g);}
