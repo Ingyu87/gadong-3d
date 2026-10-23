@@ -2,37 +2,76 @@
 <title>서울가동초등학교 3D</title><link rel="preconnect" href="https://fonts.googleapis.com"><link href="https://fonts.googleapis.com/css2?family=Nanum+Gothic:wght@400;700&display=swap" rel="stylesheet">
 <style>
 html,body{margin:0;height:100%;overflow:hidden;font-family:'Nanum Gothic','NanumGothic',sans-serif;background:#e6ecf0;touch-action:none}
+:root{--bw:84px;--safeL:env(safe-area-inset-left,0px)}
 #view{position:fixed;inset:0}
-#bar{position:fixed;left:8px;right:8px;top:8px;display:flex;flex-wrap:wrap;gap:6px;align-items:center;pointer-events:none}
-#bar>*{pointer-events:auto}
-.card{background:#fffffff0;border-radius:12px;box-shadow:0 2px 10px #0002;padding:6px 8px}
-h1{font-size:15px;margin:0 6px 0 2px;color:#1f3d6b;white-space:nowrap}
-button{font:inherit;font-size:13px;border:1px solid #c9d3de;background:#fff;border-radius:9px;padding:6px 9px;margin:1px;color:#1f3d6b;cursor:pointer}
-button.on{background:#1f3d6b;color:#fff;border-color:#1f3d6b}
-#floors{display:flex;flex-wrap:wrap}
-#panel{position:fixed;right:8px;top:62px;bottom:8px;width:min(320px,calc(100% - 16px));display:none;flex-direction:column}
-#panel.open{display:flex}#q{font:inherit;padding:8px;border-radius:9px;border:1px solid #c9d3de;margin-bottom:6px}
-#res{overflow:auto;flex:1}#res h4{margin:8px 2px 4px;font-size:12px;color:#5a6b7d}#res button{font-size:12px}
-#prog{position:fixed;left:50%;bottom:16px;transform:translateX(-50%)}
-#joy{position:fixed;left:24px;bottom:24px;width:120px;height:120px;border-radius:50%;background:#ffffff55;border:2px solid #ffffffaa;display:none;touch-action:none}
-#joy i{position:absolute;left:35px;top:35px;width:50px;height:50px;border-radius:50%;background:#1f3d6bcc}
-body.walk #joy{display:block}#hint{position:fixed;right:10px;bottom:10px;max-width:70vw;font-size:11px;line-height:1.4;color:#223;background:rgba(255,255,255,.75);padding:4px 8px;border-radius:8px;text-align:right}
-body.shot #bar,body.shot #prog,body.shot #hint{display:none}
-@media (max-width:760px){h1{font-size:13px;width:100%}button{font-size:12px;padding:6px 8px}#panel{top:auto;height:60%}}
-#flr{display:none;position:fixed;left:50%;transform:translateX(-50%);bottom:14px;background:rgba(31,61,107,.85);color:#fff;font:bold 13px sans-serif;padding:5px 12px;border-radius:14px}body.shot #flr{display:none!important}#pad{position:fixed;right:10px;bottom:64px;display:flex;flex-direction:column;gap:6px;align-items:flex-end;z-index:5;touch-action:none;user-select:none}#pad .g{display:grid;grid-template-columns:repeat(3,40px);gap:4px}#pad button{height:40px;border:1px solid #c9d3e0;border-radius:10px;background:rgba(255,255,255,.9);font:bold 17px sans-serif;color:#1f3d6b;touch-action:none}#pad .g2{display:flex;gap:4px}#pad .g2 button{font-size:13px;padding:0 10px}#pad .wo{display:none}body.walk #pad .wo{display:block}body.shot #pad{display:none}@media (max-width:600px){#pad .g{grid-template-columns:repeat(3,36px)}#pad button{height:36px}#pad{bottom:58px}#hint{display:none}}#xh{position:fixed;left:50%;top:50%;width:6px;height:6px;margin:-3px 0 0 -3px;border-radius:50%;background:#fff;box-shadow:0 0 0 1.5px #0008;display:none;pointer-events:none;z-index:5}body.walk #xh{display:block}#pRun.on{background:#1f3d6b;color:#fff}
-#ohint{position:fixed;left:10px;bottom:10px;max-width:60vw;font-size:12px;line-height:1.45;color:#223;background:rgba(255,255,255,.85);padding:6px 9px;border-radius:8px;z-index:4}body.walk #ohint,body.walk #opad{display:none}body.shot #ohint,body.shot #opad{display:none}#opad{position:fixed;right:10px;bottom:10px;display:grid;grid-template-columns:1fr 1fr;gap:6px;z-index:4}#opad button{font:bold 13px sans-serif;padding:8px 10px;border-radius:10px;border:1px solid #ccd;background:#fff;touch-action:none}body:not(.walk) #pad,body:not(.walk) #hint{display:none}
-#hbtn{position:fixed;left:10px;bottom:10px;z-index:6;min-width:44px;min-height:44px;border-radius:22px;font:bold 18px sans-serif}
-body.hidehint #ohint,body.hidehint #hint{display:none!important}#ohint,#hint{bottom:62px}
-body.walk #hbtn{bottom:auto;top:45%}body.shot #hbtn{display:none}
-@media (max-width:760px){button{min-height:44px;min-width:44px;font-size:13px;white-space:nowrap}#bar .card{flex-wrap:nowrap!important;overflow-x:auto;max-width:100%}#floors{flex-wrap:nowrap!important}h1{display:none}#pad button,#opad button{min-height:44px}#pad .g{grid-template-columns:repeat(3,44px)}#ohint{max-width:calc(100vw - 20px);right:10px;bottom:auto;top:120px}}
+button{font:inherit;cursor:pointer;color:#1f3d6b}
+.card{background:#fffffff2;border-radius:14px;box-shadow:0 2px 12px #0003}
+/* one vertical tool bar on the left */
+#bar{position:fixed;left:calc(6px + var(--safeL));top:6px;bottom:6px;width:var(--bw);display:flex;flex-direction:column;gap:6px;overflow-y:auto;overflow-x:hidden;z-index:10;scrollbar-width:none;padding:6px 4px;box-sizing:border-box}
+#bar::-webkit-scrollbar{display:none}
+#bar .grp{display:flex;flex-direction:column;gap:4px;padding:4px 0}
+#bar .gt{font-size:11px;font-weight:700;color:#5a6b7d;text-align:center;letter-spacing:1px}
+#bar button{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1px;width:100%;min-height:48px;border:1px solid #d4dce6;background:#fff;border-radius:11px;padding:4px 2px;font-size:12px;line-height:1.1;white-space:nowrap}
+#bar button b{font-size:18px;line-height:1}
+#bar button.on{background:#1f3d6b;color:#fff;border-color:#1f3d6b}
+#floors{display:grid;grid-template-columns:1fr 1fr;gap:4px}
+#floors button{min-height:40px;font-size:13px;font-weight:700}
+#floors button[data-f=all]{grid-column:span 2}
+#hbtn{font-size:20px!important;font-weight:700;background:#ffd84d!important;border-color:#e8bf2a!important}
+#panel{position:fixed;left:calc(var(--bw) + 16px + var(--safeL));top:8px;bottom:8px;width:min(320px,calc(100% - var(--bw) - 28px));display:none;flex-direction:column;padding:8px;box-sizing:border-box;z-index:11}
+#panel.open{display:flex}#q{font:inherit;padding:10px;border-radius:9px;border:1px solid #c9d3de;margin-bottom:6px}
+#res{overflow:auto;flex:1}#res h4{margin:8px 2px 4px;font-size:12px;color:#5a6b7d}#res button{font-size:13px;border:1px solid #c9d3de;background:#fff;border-radius:9px;padding:8px 10px;margin:2px}
+#prog{position:fixed;left:50%;bottom:16px;transform:translateX(-50%);padding:8px 12px;z-index:12}
+/* first-person controls: joystick to the right of the bar, buttons bottom-right */
+#joy{position:fixed;left:calc(var(--bw) + 28px + var(--safeL));bottom:28px;width:130px;height:130px;border-radius:50%;background:#ffffff55;border:2px solid #ffffffaa;display:none;touch-action:none;z-index:5}
+#joy i{position:absolute;left:39px;top:39px;width:52px;height:52px;border-radius:50%;background:#1f3d6bcc}
+body.walk #joy{display:block}
+#pad{position:fixed;right:calc(14px + env(safe-area-inset-right,0px));bottom:24px;display:none;grid-template-columns:76px 76px;gap:8px;z-index:5;touch-action:none;user-select:none}
+body.walk #pad{display:grid}#pad .g2{display:contents}
+#pad button{min-height:56px;white-space:nowrap;padding:0 4px;border:1px solid #c9d3e0;border-radius:14px;background:rgba(255,255,255,.92);font:bold 14px 'Nanum Gothic',sans-serif;touch-action:none;box-shadow:0 2px 8px #0002}
+body.walk #camg{display:none}#pRun.on{background:#1f3d6b;color:#fff}
+#xh{position:fixed;left:50%;top:50%;width:6px;height:6px;margin:-3px 0 0 -3px;border-radius:50%;background:#fff;box-shadow:0 0 0 1.5px #0008;display:none;pointer-events:none;z-index:5}body.walk #xh{display:block}
+#flr{display:none;position:fixed;left:calc(50% + var(--bw)/2);transform:translateX(-50%);top:10px;background:rgba(31,61,107,.88);color:#fff;font:bold 14px sans-serif;padding:6px 14px;border-radius:14px;z-index:4}
+#opad,#hint,#ohint{display:none!important}
+#tip{position:fixed;left:calc(50% + var(--bw)/2);transform:translateX(-50%);top:12px;max-width:min(420px,calc(100vw - var(--bw) - 40px));background:#1f3d6bee;color:#fff;font-size:14px;line-height:1.45;padding:10px 14px;border-radius:12px;z-index:20;transition:opacity .5s}
+#tip.hide{opacity:0;pointer-events:none}
+#help{position:fixed;inset:0;background:#0007;display:none;align-items:center;justify-content:center;z-index:30}
+#help.open{display:flex}
+#help .box{background:#fff;border-radius:16px;max-width:min(560px,calc(100vw - 24px));max-height:calc(100vh - 24px);overflow:auto;padding:18px 20px;box-sizing:border-box;position:relative;color:#223}
+#help h2{margin:0 36px 10px 0;font-size:19px;color:#1f3d6b}#help h3{margin:14px 0 6px;font-size:15px;color:#1f3d6b}
+#help ol{margin:0;padding-left:22px;font-size:14px;line-height:1.6}
+#help .x{position:absolute;right:10px;top:10px;width:44px;height:44px;border-radius:22px;border:none;background:#eef2f6;font-size:22px}
+#help .tabs{display:flex;gap:6px;margin-bottom:4px}#help .tabs button{flex:1;min-height:42px;border-radius:10px;border:1px solid #c9d3de;background:#fff;font-size:14px}#help .tabs button.on{background:#1f3d6b;color:#fff}
+body.shot #bar,body.shot #prog,body.shot #tip,body.shot #flr,body.shot #pad,body.shot #help{display:none!important}
+@media (max-height:520px){:root{--bw:76px}#bar button{min-height:42px}#bar .gt{display:none}#floors button{min-height:36px}#joy{width:112px;height:112px;bottom:16px}#joy i{left:30px;top:30px}#pad{bottom:12px}#pad button{min-height:48px}}
+@media (max-width:480px){:root{--bw:74px}}
 </style>
 <script type="importmap">{"imports":{"three":"./vendor/three/build/three.module.js","three/addons/":"./vendor/three/examples/jsm/"}}</script></head>
 <body><div id="view"></div>
-<div id="bar"><div class="card" style="display:flex;flex-wrap:wrap;align-items:center"><h1>서울가동초등학교 3D</h1>
-<button id="home">조감</button><button id="front">정면</button><button id="walkbtn">🎮 1인칭</button><button id="back" style="display:none">↩ 돌아가기</button><button id="jump">🔎 실 찾기</button><button id="cut" class="on">단면</button><button id="lbl" class="on">이름표</button></div>
-<div class="card" id="floors"></div></div>
+<div id="bar" class="card">
+<button id="hbtn" title="도움말"><b>?</b>도움말</button>
+<div class="grp"><div class="gt">보기</div>
+<button id="home"><b>🏫</b>조감</button><button id="front"><b>🖼</b>정면</button><button id="walkbtn"><b>🚶</b>1인칭</button><button id="back" style="display:none"><b>↩</b>돌아가기</button><button id="jump"><b>🔎</b>실 찾기</button><button id="cut" class="on"><b>✂</b>단면</button><button id="lbl" class="on"><b>🏷</b>이름표</button></div>
+<div class="grp"><div class="gt">층</div><div id="floors"></div></div>
+<div class="grp" id="camg"><div class="gt">카메라</div><div id="opad"></div>
+<button id="oL"><b>⟲</b>왼쪽 회전</button><button id="oR"><b>⟳</b>오른쪽 회전</button><button id="oIn"><b>＋</b>확대</button><button id="oOut"><b>－</b>축소</button><button id="oReset"><b>⌂</b>초기화</button></div>
+</div>
 <div id="panel" class="card"><input id="q" placeholder="실 이름 검색 (예: 교실 210, 교무실)"><div id="res"></div></div>
 <div id="joy"><i></i></div><div id="prog" class="card">불러오는 중…</div>
-<div id="hint">1인칭(PC): 화면 클릭=마우스 시점 잠금(Esc 해제) · WASD 이동 · Shift 달리기 · Space 점프 · E/Enter 문 열기<br>모바일: 왼쪽 조이스틱=이동 · 화면 오른쪽 드래그=둘러보기 · 점프/달리기/문 버튼 · 조감=전체 보기, ↩ 돌아가기=1인칭 복귀</div><div id="xh"></div><button id="hbtn" title="도움말">?</button><div id="ohint">조감/단면: 왼쪽 드래그 또는 Ctrl+드래그=회전 · 오른쪽 드래그 또는 Shift+드래그=이동 · 휠=확대/축소 · Ctrl+휠=기울기 · 이름표 클릭=그 실로 이동<br>모바일: 한 손가락=회전 · 두 손가락 벌리기=확대 · 두 손가락 끌기=이동</div><div id="opad"><button id="oL" title="왼쪽 회전">⟲ 회전</button><button id="oR" title="오른쪽 회전">회전 ⟳</button><button id="oIn" title="확대">＋ 확대</button><button id="oOut" title="축소">－ 축소</button><button id="oReset" title="초기화">⌂ 초기화</button></div><div id="flr"></div><div id="pad"><div class="g2"><button id="pJump" title="점프(Space)">⤒ 점프</button><button id="pRun" title="달리기 전환(Shift)">🏃 달리기</button></div><div class="g2"><button id="pReset" title="시점 초기화">⌂ 초기화</button><button id="pDoor" class="wo" title="문 열기(E)">🚪 문 열기</button></div></div>
+<div id="hint"></div><div id="ohint"></div><div id="xh"></div><div id="flr"></div>
+<div id="pad"><div class="g2"><button id="pJump" title="점프(Space)">⤒ 점프</button><button id="pRun" title="달리기 전환(Shift)">🏃 달리기</button></div><div class="g2"><button id="pDoor" class="wo" title="문 열기(E)">🚪 문 열기</button><button id="pReset" title="시점 초기화">⌂ 초기화</button></div></div>
+<div id="tip" class="hide"></div>
+<div id="help"><div class="box"><button class="x" id="hx" title="닫기">✕</button><h2>사용 방법</h2>
+<div class="tabs"><button id="tPC">💻 컴퓨터</button><button id="tMo">📱 휴대폰</button></div>
+<div id="hPC"><h3>둘러보기 (조감·정면)</h3><ol><li>마우스 왼쪽 끌기: 돌리기</li><li>오른쪽 끌기: 옮기기</li><li>휠: 확대·축소</li><li>이름표 클릭: 그 교실로 이동</li></ol>
+<h3>1인칭 걷기</h3><ol><li>왼쪽 막대의 🚶 1인칭을 누르세요</li><li>화면을 클릭하면 마우스로 둘러봅니다 (Esc로 해제)</li><li>WASD 또는 방향키: 걷기 · Shift: 달리기</li><li>Space: 점프 · E: 문 열기</li></ol></div>
+<div id="hMo"><h3>둘러보기 (조감·정면)</h3><ol><li>한 손가락 끌기: 돌리기</li><li>두 손가락 벌리기: 확대·축소</li><li>두 손가락 끌기: 옮기기</li><li>이름표를 누르면 그 교실로 이동</li></ol>
+<h3>1인칭 걷기</h3><ol><li>왼쪽 막대의 🚶 1인칭을 누르세요</li><li>왼쪽 아래 동그라미: 걷기</li><li>화면 오른쪽 끌기: 둘러보기</li><li>오른쪽 아래 버튼: 점프·달리기·문 열기</li></ol></div>
+<p style="font-size:13px;color:#5a6b7d;margin:14px 0 0">층 버튼으로 한 층만 볼 수 있어요. 🏫 조감을 누르면 처음 화면으로 돌아갑니다.</p></div></div>
 <script>if(location.search.includes('shot'))document.body.classList.add('shot')</script>
-<script>if(innerWidth<760||localStorage.gdHint==="0")document.documentElement.classList.add("hh");addEventListener("DOMContentLoaded",()=>{const b=document.body;if(document.documentElement.classList.contains("hh"))b.classList.add("hidehint");document.getElementById("hbtn").onclick=()=>{b.classList.toggle("hidehint");localStorage.gdHint=b.classList.contains("hidehint")?"0":"1";};setTimeout(()=>{if(!localStorage.gdHint){b.classList.add("hidehint");}},12000);});</script><script type="module" src="js/app.js?v=202610231725"></script></body></html>
+<script>addEventListener("DOMContentLoaded",()=>{const $=i=>document.getElementById(i);const mob=matchMedia("(pointer:coarse)").matches;
+const tab=m=>{$("hPC").style.display=m?"none":"";$("hMo").style.display=m?"":"none";$("tPC").classList.toggle("on",!m);$("tMo").classList.toggle("on",m);};tab(mob);
+$("tPC").onclick=()=>tab(false);$("tMo").onclick=()=>tab(true);
+$("hbtn").onclick=()=>{$("help").classList.add("open");$("tip").classList.add("hide");};$("hx").onclick=()=>$("help").classList.remove("open");
+$("help").onclick=e=>{if(e.target.id==="help")$("help").classList.remove("open");};addEventListener("keydown",e=>{if(e.key==="Escape")$("help").classList.remove("open");});
+if(!localStorage.gdTip&&!location.search.includes("shot")){const t=$("tip");t.textContent=mob?"한 손가락으로 돌리고, 두 손가락으로 확대해요. 🚶 1인칭으로 학교 안을 걸어 보세요! 자세한 방법은 ?":"끌어서 돌리고, 휠로 확대해요. 🚶 1인칭으로 학교 안을 걸어 보세요! 자세한 방법은 ?";t.classList.remove("hide");localStorage.gdTip="1";setTimeout(()=>t.classList.add("hide"),6000);t.onclick=()=>t.classList.add("hide");}});</script><script type="module" src="js/app.js?v=202610231736"></script></body></html>
