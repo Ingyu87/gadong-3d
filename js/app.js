@@ -8,10 +8,10 @@ import {GTAOPass} from 'three/addons/postprocessing/GTAOPass.js';
 import {OutputPass} from 'three/addons/postprocessing/OutputPass.js';
 import {RoomEnvironment} from 'three/addons/environments/RoomEnvironment.js';
 import {mergeGeometries} from 'three/addons/utils/BufferGeometryUtils.js';
-import {buildRooms} from './rooms.js?v=202610231755';
-import * as T from './tex.js?v=202610231755';
-import {buildInstanced} from './furn.js?v=202610231755';
-import {sinkField} from './terrain.js?v=202610231755';
+import {buildRooms} from './rooms.js?v=202610231839';
+import * as T from './tex.js?v=202610231839';
+import {buildInstanced} from './furn.js?v=202610231839';
+import {sinkField} from './terrain.js?v=202610231839';
 import {buildProps6} from './site6.js?v=202610231736';
 import {buildSite3,buildSite4,buildInterior5} from './site3.js?v=202610231640';
 const Q=new URLSearchParams(location.search);const SHOT=Q.has('shot');
@@ -569,18 +569,32 @@ function updateChevrons(){chev.visible=false;return;const fe=document.getElement
  for(let k=0;k<8;k++){const a=yaw+k*Math.PI/4;const dir=new THREE.Vector3(-Math.sin(a),0,-Math.cos(a));const fd=freeDist(dir,4);const m=chev.children[k];
   if(fd<2.6){m.visible=false;continue;}m.visible=true;const step=Math.min(3,fd-0.2);m.userData.step=step;m.userData.dir=dir;m.position.copy(cam.position).addScaledVector(dir,2.4).setY(fy);m.rotation.set(-Math.PI/2,0,0);m.rotation.set(-Math.PI/2,0,0);
   m.quaternion.setFromEuler(new THREE.Euler(-Math.PI/2,0,0)).premultiply(new THREE.Quaternion().setFromAxisAngle(new THREE.Vector3(0,1,0),a));m.material.opacity=k===0?0.95:0.6;m.scale.setScalar(k===0?1.1:0.8);n++;}}
-const ndc=new THREE.Vector2();function pick(e,objs){const b=r.domElement.getBoundingClientRect();ndc.set((e.clientX-b.left)/b.width*2-1,-(e.clientY-b.top)/b.height*2+1);rc.setFromCamera(ndc,cam);rc.far=200;return rc.intersectObjects(objs,false);}
+const ndc=new THREE.Vector2();function pick(e,objs){const b=r.domElement.getBoundingClientRect();ndc.set((e.clientX-b.left)/b.width*2-1,-(e.clientY-b.top)/b.height*2+1);rc.setFromCamera(ndc,cam);rc.far=walk?200:Infinity;return rc.intersectObjects(objs,false);}
 function visibleMeshes(){const a=[];const cc=walk?curChunks():null;const tops=walk?(cc.length?cc.map(k=>chunks[k].group):[root]):[root];if(walk&&chunks.site)tops.push(chunks.site.group);for(const t of tops)t.traverseVisible(o=>{if(o.isMesh&&!['glass','glassIn','led'].includes(o.userData.mat)&&!(o.parent&&o.parent.name==='furn'))a.push(o);});return a;}
 let hovT=0;function hoverCursor(e){if(!e||!walk){if(cursor.visible){cursor.visible=false;render();}return;}const now=performance.now();if(now-hovT<150)return;hovT=now;
  const h=pick(e,visibleMeshes())[0];if(h&&h.face&&h.face.normal.clone().transformDirection(h.object.matrixWorld).y>0.7&&Math.abs(h.point.y-(cam.position.y-EYE))<0.8){cursor.visible=true;cursor.position.copy(h.point).setY(h.point.y+0.02);}else cursor.visible=false;render();}
-function clickAt(e){
+function clickAt(e){if(document.pointerLockElement){const b=r.domElement.getBoundingClientRect();e={clientX:b.left+b.width/2,clientY:b.top+b.height/2};}
  if(!walk&&labelGroup.visible){const b_=r.domElement.getBoundingClientRect();let best=null,bd=40;for(const sp of labels){if(!sp.visible)continue;const v=sp.position.clone().project(cam);if(v.z>1)continue;const sx=(v.x+1)/2*b_.width+b_.left,sy=(1-v.y)/2*b_.height+b_.top;const d=Math.hypot(sx-e.clientX,sy-e.clientY);if(d<bd){bd=d;best=sp;}}if(best){roomFocus(best.userData.l);return;}}
  if(walk&&!MOBILE&&!document.pointerLockElement&&!window.__noLock){try{r.domElement.requestPointerLock();}catch(_){}}
- if(!walk){const h=pick(e,visibleMeshes())[0];if(h){let o=h.object,ch=null;while(o){if(o.name&&chunks[o.name])ch=o.name;o=o.parent;}if(ch==='main_porch'||(h.object.isInstancedMesh&&h.object.userData.isDoor)&&false||ch==='main_1F'&&h.point.y<4&&Math.abs(h.point.x-man.porch.x)<6&&Math.abs(-h.point.z-man.porch.n)<2.5)enterLobby();}return;}
+ if(!walk){if(!window.__move)return;const h=pick(e,visibleMeshes())[0];if(h){let o=h.object,ch=null;while(o){if(o.name&&chunks[o.name])ch=o.name;o=o.parent;}if(ch==='main_porch'||(h.object.isInstancedMesh&&h.object.userData.isDoor)&&false||ch==='main_1F'&&h.point.y<4&&Math.abs(h.point.x-man.porch.x)<6&&Math.abs(-h.point.z-man.porch.n)<2.5){enterLobby();return;}offerGo(e,h);}return;}
  const b_=r.domElement.getBoundingClientRect();let cm=null,cd=55;for(const c of chev.children){if(!c.visible)continue;const v=c.position.clone().project(cam);if(v.z>1)continue;const sx=(v.x+1)/2*b_.width+b_.left,sy=(1-v.y)/2*b_.height+b_.top;const dd=Math.hypot(sx-e.clientX,sy-e.clientY);if(dd<cd){cd=dd;cm=c;}}
  const hs=pick(e,visibleMeshes().concat(doorIMs.filter(d=>d.parent&&d.parent.visible)));const h=hs[0];if(!h)return;
  if(h.object.userData.isDoor){const d=h.object.userData.doors[h.instanceId];openDoor(d,!d.stall);return;}
+ if(window.__move)goFloor(h);
 }
+// tap/click-to-go: floor hit on (about) the same level -> glide there, else teleport to the clicked walkable point
+function upHit(h){return h&&h.face&&h.face.normal.clone().transformDirection(h.object.matrixWorld).y>0.7;}
+let mkT=null;function showMark(p){cursor.visible=true;cursor.position.copy(p).setY(p.y+0.03);render();clearTimeout(mkT);mkT=setTimeout(()=>{cursor.visible=false;render();},1200);}
+function goFloor(h){if(!upHit(h))return;const p=h.point;const feet=cam.position.y-EYE-jumpH;const dy=p.y-feet;if(Math.abs(dy)>4)return;showMark(p);
+ const dir=p.clone().sub(cam.position);dir.y=0;const L=dir.length();if(L<0.3)return;
+ if(Math.abs(dy)<0.6&&freeDist(dir.clone(),L)>=L-0.25){glideTo(new THREE.Vector3(p.x,cam.position.y,p.z),false);}
+ else{glide=null;cam.position.set(p.x,p.y+EYE,p.z);visY=null;colCache=null;updateChevrons();render();}window.__lastGo=[p.x,p.y,-p.z];}
+// 하늘/앞 view: click a walkable spot -> '여기로 가기' popup -> walk mode there
+const GO=document.getElementById('goto');let goP=null;
+function offerGo(e,h){if(!GO||!upHit(h)){GO&&(GO.style.display='none');return;}goP=h.point.clone();GO.style.left=e.clientX+'px';GO.style.top=e.clientY+'px';GO.style.display='block';showMark(goP);}
+if(GO){GO.querySelector('button').onclick=ev=>{ev.stopPropagation();GO.style.display='none';if(!goP)return;const d=goP.clone().sub(cam.position);const yw=Math.atan2(-d.x,-d.z);setWalk(true,[goP.x,goP.y+EYE,goP.z],yw);pitch=0;cam.rotation.set(0,yaw,0,'YXZ');render();};
+ GO.querySelector('.x').onclick=ev=>{ev.stopPropagation();GO.style.display='none';cursor.visible=false;render();};}
+window.__goAt=(x,y)=>clickAt({clientX:x,clientY:y});window.__goAtOld=(x,y)=>{const e={clientX:x,clientY:y};if(walk){const h=pick(e,visibleMeshes())[0];if(h)goFloor(h);}else{const h=pick(e,visibleMeshes())[0];offerGo(e,h);}};
 function enterLobby(){curFloor='1F';applyFloor();const p=man.porch;for(const im of doorIMs)for(const d of im.userData.doors)if(d.ext&&d.c==='main_1F'&&d.tgt===0){d.tgt=Math.PI/2*0.95;d.from=0;d.t0=performance.now();}loop();const dx=p.door??(p.x-2.45);setWalk(true,[dx,EYE,-(p.n-4)],0);setTimeout(()=>glideTo(new THREE.Vector3(dx,EYE,-(p.n+3.2)),true),600);}
 window.__enterLobby=enterLobby;window.__clickAt=(x,y)=>clickAt({clientX:x,clientY:y});
 addEventListener('keydown',e=>{if(!walk)return;if(e.code==='Enter'||e.code==='KeyE'){const d=nearestDoor();if(d)openDoor(d,!d.stall);}if(e.code==='Space'){e.preventDefault();jump();}});
@@ -685,12 +699,12 @@ function roomFocus(l){const fl=l.floor==='site'?'all':(l.floor==='roof'?'all':l.
 window.roomFocus=roomFocus;window.chunksDbg=chunks;
 // ---------- UI ----------
 const fl=document.getElementById('floors');FLOORS.forEach(f=>{const b=document.createElement('button');b.textContent=f==='all'?'전체':f;b.dataset.f=f;b.onclick=()=>{curFloor=f;applyFloor();};fl.appendChild(b);});
-document.getElementById('cut').onclick=e=>{cut=!cut;e.target.classList.toggle('on',cut);applyFloor();};
-document.getElementById('lbl').onclick=e=>{showLabels=!showLabels;e.target.classList.toggle('on',showLabels);applyFloor();};
-document.getElementById('walkbtn').onclick=()=>{if(walk)setWalk(false);else enterLobby();}; // 1인칭 always starts at 중앙현관 (1F), facing inward
+document.getElementById('cut').onclick=e=>{cut=!cut;e.currentTarget.classList.toggle('on',cut);applyFloor();};
+document.getElementById('lbl').onclick=e=>{showLabels=!showLabels;e.currentTarget.classList.toggle('on',showLabels);applyFloor();};
+document.getElementById('walkbtn').onclick=()=>{if(walk)setWalk(false);else spawnFPS();}; // 1인칭 always starts at 중앙현관 (1F), facing inward
 document.getElementById('home').onclick=()=>{if(walk)setWalk(false);curFloor='all';applyFloor();setView('bird');};
 document.getElementById('back').onclick=()=>{if(lastFPS)setWalk(true,lastFPS.p,lastFPS.y);};
-function spawnFPS(){const p=man.porch;setWalk(true,[p.door??4.55,EYE,-(p.front-6.5)],0);pitch=0;cam.rotation.set(0,0,0,'YXZ');render();}window.__spawn=spawnFPS;
+function spawnFPS(){curFloor='all';applyFloor();setWalk(true,[0.5,-2.7+EYE,40],0);pitch=0;cam.rotation.set(0,0,0,'YXZ');render();}window.__spawn=spawnFPS;
 document.getElementById('front').onclick=()=>{curFloor='all';applyFloor();setView('front');};
 const panel=document.getElementById('panel'),srch=document.getElementById('q'),res=document.getElementById('res');
 document.getElementById('jump').onclick=()=>{panel.classList.toggle('open');srch.focus();fill();};
