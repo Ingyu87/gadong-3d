@@ -8,10 +8,10 @@ import {GTAOPass} from 'three/addons/postprocessing/GTAOPass.js';
 import {OutputPass} from 'three/addons/postprocessing/OutputPass.js';
 import {RoomEnvironment} from 'three/addons/environments/RoomEnvironment.js';
 import {mergeGeometries} from 'three/addons/utils/BufferGeometryUtils.js';
-import {buildRooms} from './rooms.js?v=202610232145';
-import * as T from './tex.js?v=202610232145';
-import {buildInstanced} from './furn.js?v=202610232145';
-import {sinkField} from './terrain.js?v=202610232145';
+import {buildRooms} from './rooms.js?v=202610232147';
+import * as T from './tex.js?v=202610232147';
+import {buildInstanced} from './furn.js?v=202610232147';
+import {sinkField} from './terrain.js?v=202610232147';
 import {buildProps6} from './site6.js?v=202610231736';
 import {buildHall7} from './site7.js?v=202610232003';
 import {buildSite3,buildSite4,buildInterior5} from './site3.js?v=202610231640';
@@ -558,8 +558,11 @@ function doorMatrix(d){const L=d.ax==='x'?d.x1-d.x0:d.n1-d.n0;const base=d.ax===
  const a=base+d.ang*(d.sw||1);const c=Math.cos(a),s_=Math.sin(a);// leaf centre offset along rotated x
  _q.setFromEuler(_e.set(0,a,0));const H=d.h||2.1;return _m.compose(new THREE.Vector3(hx+c*L/2,d.e+H/2,hz-s_*L/2),_q,new THREE.Vector3(L,H,d.stall?0.03:0.05));}
 const doorGlass=new THREE.MeshPhysicalMaterial({color:0x9fc4d2,roughness:0.08,metalness:0.1,transparent:true,opacity:0.55,side:THREE.DoubleSide,depthWrite:false});
-function buildDoors(c,grp){for(const g of [0,1]){const ds=DOORS.filter(d=>d.c===c.name&&(d.g?1:0)===g);if(!ds.length)continue;const im=new THREE.InstancedMesh(new THREE.BoxGeometry(1,1,1),g?doorGlass:doorMat,ds.length);im.userData.doors=ds;im.userData.isDoor=true;
- ds.forEach((d,i)=>{d.ang=0;d.tgt=0;d.im=im;d.i=i;d.h=d.g?2.35:2.1;if(!d.g&&!d.ext)d.sl=1;im.setMatrixAt(i,doorMatrix(d));});im.instanceMatrix.needsUpdate=true;im.computeBoundingSphere();grp.add(im);doorIMs.push(im);}}
+const roseDoorMat=std({roughness:0.6,map:_cvT(512,512,(x,W,H)=>{x.fillStyle='#c9a35a';x.fillRect(0,0,W,H);for(const [a0,a1] of[[14,W/2-6],[W/2+6,W-14]]){const g=x.createLinearGradient(a0,0,a1,0);g.addColorStop(0,'#5a1a1c');g.addColorStop(0.5,'#7a2629');g.addColorStop(1,'#5a1a1c');x.fillStyle=g;x.fillRect(a0,16,a1-a0,H-32);x.strokeStyle='#e0bf72';x.lineWidth=5;x.strokeRect(a0+14,30,a1-a0-28,H-60);
+ for(let i=0;i<3;i++)for(let j=0;j<6;j++){const cx=a0+28+(i+0.5)*(a1-a0-56)/3,cy=48+(j+0.5)*(H-96)/6;const rg=x.createRadialGradient(cx,cy,2,cx,cy,30);rg.addColorStop(0,'#8e3236');rg.addColorStop(1,'#4c1517');x.fillStyle=rg;x.beginPath();x.ellipse(cx,cy,(a1-a0-56)/6-2,(H-96)/12-2,0,0,7);x.fill();x.fillStyle='#e0bf72';x.beginPath();x.arc(cx,cy,3.5,0,7);x.fill();}}
+ x.fillStyle='#d9b45e';x.fillRect(W/2-22,H*0.42,8,H*0.2);x.fillRect(W/2+14,H*0.42,8,H*0.2);})});
+function buildDoors(c,grp){for(const g of [0,1,2]){const ds=DOORS.filter(d=>d.c===c.name&&(g===2?d.mat==='rose':(d.g?1:0)===g&&d.mat!=='rose'));if(!ds.length)continue;const im=new THREE.InstancedMesh(new THREE.BoxGeometry(1,1,1),g===2?roseDoorMat:g?doorGlass:doorMat,ds.length);im.userData.doors=ds;im.userData.isDoor=true;
+ ds.forEach((d,i)=>{d.ang=0;d.tgt=0;d.im=im;d.i=i;d.h=d.g?2.35:d.mat==='rose'?2.3:2.1;if(!d.g&&!d.ext)d.sl=1;im.setMatrixAt(i,doorMatrix(d));});im.instanceMatrix.needsUpdate=true;im.computeBoundingSphere();grp.add(im);doorIMs.push(im);}}
 function animDoors(dt){let mv=false;for(const im of doorIMs){for(const d of im.userData.doors){if(d.ang!==d.tgt){const k=Math.min(1,(performance.now()-d.t0)/450);d.ang=k>=1?d.tgt:d.from+(d.tgt-d.from)*k;im.setMatrixAt(d.i,doorMatrix(d));im.instanceMatrix.needsUpdate=true;mv=true;}}if(mv)im.computeBoundingSphere();}if(mv)window.__shDirty=true;return mv;}
 function doorCentre(d){return new THREE.Vector3((d.x0+d.x1)/2,d.e,-(d.n0+d.n1)/2);}
 function openDoor(d,through,pair=true){d.tgt=d.tgt?0:Math.PI/2*0.95;d.from=d.ang;d.t0=performance.now();loop();if(pair)for(const im of doorIMs)for(const o of im.userData.doors){if(o===d||d.stall||o.stall||o.c!==d.c||o.ax!==d.ax||Math.abs(o.e-d.e)>0.1)continue;const co=d.ax==='x'?Math.abs((o.n0+o.n1)-(d.n0+d.n1))<0.1&&(Math.abs(o.x0-d.x1)<0.05||Math.abs(o.x1-d.x0)<0.05):Math.abs((o.x0+o.x1)-(d.x0+d.x1))<0.1&&(Math.abs(o.n0-d.n1)<0.05||Math.abs(o.n1-d.n0)<0.05);if(co&&(o.tgt>0)!==(d.tgt>0)){o.tgt=d.tgt;o.from=o.ang;o.t0=d.t0;}}if(through&&d.tgt){const c=doorCentre(d);const nrm=d.ax==='x'?new THREE.Vector3(0,0,1):new THREE.Vector3(1,0,0);const side=Math.sign(cam.position.clone().sub(c).dot(nrm))||1;

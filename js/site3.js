@@ -75,8 +75,8 @@ export function buildSite4(chunks,WALLS){const s=chunks.site;if(!s)return;const 
  // 장미홀 brown quilted leather door surrounds (photos 23,32,278)
  {const qt=document.createElement('canvas');qt.width=qt.height=128;const x=qt.getContext('2d');x.fillStyle='#6b3a24';x.fillRect(0,0,128,128);x.strokeStyle='#4a2616';x.lineWidth=3;for(let i=-128;i<256;i+=32){x.beginPath();x.moveTo(i,0);x.lineTo(i+128,128);x.stroke();x.beginPath();x.moveTo(i+128,0);x.lineTo(i,128);x.stroke();}x.fillStyle='#c9a35a';for(let i=0;i<128;i+=32)for(let j=0;j<128;j+=32){x.beginPath();x.arc(i+16,j+16,2.5,0,7);x.fill();}
   const t=new THREE.CanvasTexture(qt);t.colorSpace=THREE.SRGBColorSpace;t.wrapS=t.wrapT=THREE.RepeatWrapping;t.repeat.set(1,3);const qm=S({map:t,roughness:0.6});const gold=S({color:0xc9a35a,metalness:0.7,roughness:0.3});
-  for(const[x0,x1]of[[-51.0,-49.25],[-48.65,-46.9]])for(const n of[-19.12,-18.73]){box(qm,x0-0.35,x0,0,2.3,n-0.02,n+0.02);box(qm,x1,x1+0.35,0,2.3,n-0.02,n+0.02);box(qm,x0-0.35,x1+0.35,2.3,2.6,n-0.02,n+0.02);}
-  const tp=txt('장미홀',1.4,0.32,'#c9a35a','#3a1e12');tp.position.set(-48.95,2.85,18.71);tp.rotation.y=Math.PI;g.add(tp);}
+  for(const[x0,x1]of[[-51.0,-49.25],[-48.65,-46.9]])for(const n of[-19.12,-18.73]){box(gold,x0-0.09,x0,0,2.4,n-0.03,n+0.03);box(gold,x1,x1+0.09,0,2.4,n-0.03,n+0.03);box(gold,x0-0.09,x1+0.09,2.3,2.4,n-0.03,n+0.03);}
+  const tp=txt('장미홀',0.9,0.22,'#1d1d1d','#f4f4f2');tp.position.set(-48.95,2.85,18.71);tp.rotation.y=Math.PI;g.add(tp);}
  s.group.add(g);}
 // Phase 5 interiors: D3 lobby fish tank/TV/독도 board/교훈 board, D4 office corridor wood windows + blinds + frosted glass,
 // D5 나래 corridor purple/yellow walls + yellow door frames, D7 per-floor colour frames at the toilet fronts
