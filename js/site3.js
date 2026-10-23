@@ -78,3 +78,33 @@ export function buildSite4(chunks,WALLS){const s=chunks.site;if(!s)return;const 
   for(const[x0,x1]of[[-51.0,-49.25],[-48.65,-46.9]])for(const n of[-19.12,-18.73]){box(qm,x0-0.35,x0,0,2.3,n-0.02,n+0.02);box(qm,x1,x1+0.35,0,2.3,n-0.02,n+0.02);box(qm,x0-0.35,x1+0.35,2.3,2.6,n-0.02,n+0.02);}
   const tp=txt('장미홀',1.4,0.32,'#c9a35a','#3a1e12');tp.position.set(-48.95,2.85,18.71);tp.rotation.y=Math.PI;g.add(tp);}
  s.group.add(g);}
+// Phase 5 interiors: D3 lobby fish tank/TV/독도 board/교훈 board, D4 office corridor wood windows + blinds + frosted glass,
+// D5 나래 corridor purple/yellow walls + yellow door frames, D7 per-floor colour frames at the toilet fronts
+export function buildInterior5(chunks,WALLS){const S2=S;
+ const add=(ck,f)=>{const c=chunks[ck];if(!c)return;const g=new THREE.Group();g.userData.kind='photo';f(g,c.elev??0);c.group.add(g);};
+ const mk=(g)=>(m,x0,x1,y0,y1,n0,n1)=>{const b=new THREE.Mesh(new THREE.BoxGeometry(x1-x0,y1-y0,n1-n0),m);b.position.set((x0+x1)/2,(y0+y1)/2,-(n0+n1)/2);b.receiveShadow=true;g.add(b);return b;};
+ const pl=(g,m,w,h,x,y,n,ry)=>{const p=new THREE.Mesh(new THREE.PlaneGeometry(w,h),m);p.position.set(x,y,-n);p.rotation.y=ry;g.add(p);return p;};
+ add('main_1F',(g)=>{const box=mk(g);const W=WALLS.main_1F;
+  // lobby (x 2.55..6.65, n 13..20.2)
+  const cab=S2({color:0x5a3d2b}),gl=S2({color:0x7fc8e0,transparent:true,opacity:0.45,roughness:0.05}),wat=S2({color:0x2f8fc0,transparent:true,opacity:0.55,roughness:0.1,emissive:0x0a3550});
+  box(cab,6.15,6.65,0,0.8,14.6,16.8);box(wat,6.2,6.6,0.82,1.38,14.65,16.75);box(gl,6.17,6.63,0.8,1.45,14.62,16.78);box(S2({color:0x222}),6.15,6.65,1.45,1.52,14.6,16.8);
+  const fish=S2({color:0xff8a2a,emissive:0x552200});for(let i=0;i<6;i++){const f=new THREE.Mesh(new THREE.SphereGeometry(0.04,6,4),fish);f.scale.set(1.8,1,0.6);f.position.set(6.4,0.95+(i%3)*0.13,-(14.9+i*0.3));g.add(f);}
+  W&&W.r.push([6.15,14.6,6.65,16.8]);
+  const tv=S2({color:0x111,roughness:0.2});box(tv,2.56,2.62,1.6,2.35,18.4,19.75);pl(g,S2({color:0x1e4f8a,emissive:0x0d2a4a}),1.25,0.65,2.63,1.975,19.075,Math.PI/2);
+  const dok=cvT(512,384,(x,w,h)=>{x.fillStyle='#2d6fb0';x.fillRect(0,0,w,h);x.fillStyle='#fff';x.font='bold 54px NanumGothic, sans-serif';x.textAlign='center';x.fillText('독도 학습관',w/2,70);x.fillStyle='#5aa65a';x.beginPath();x.ellipse(w*0.4,h*0.62,70,50,0,0,7);x.fill();x.beginPath();x.ellipse(w*0.65,h*0.6,50,38,0,0,7);x.fill();x.fillStyle='#fff';x.font='28px NanumGothic, sans-serif';x.fillText('동도 · 서도',w/2,h-30);});
+  pl(g,S2({map:dok}),2.0,1.5,6.63,1.6,18.6,-Math.PI/2);
+  const kh=cvT(512,512,(x,w,h)=>{x.fillStyle='#f4ead2';x.fillRect(0,0,w,h);x.strokeStyle='#8a5a2b';x.lineWidth=18;x.strokeRect(9,9,w-18,h-18);x.fillStyle='#5a3d22';x.textAlign='center';x.font='bold 64px NanumGothic, sans-serif';x.fillText('교 훈',w/2,110);x.font='bold 52px NanumGothic, sans-serif';['고운 마음','바른 행동','큰 꿈'].forEach((t,i)=>x.fillText(t,w/2,210+i*90));});
+  pl(g,S2({map:kh}),1.3,1.3,2.32,1.7,14.6,Math.PI/2);
+  // office corridor windows (face n 20.47, x -33.5..-11) between doors
+  const wood=S2({color:0x8a5a34}),frost=S2({color:0xe8eef0,transparent:true,opacity:0.85,roughness:0.3}),blind=S2({map:cvT(64,64,(x,w,h)=>{x.fillStyle='#f3f1ea';x.fillRect(0,0,w,h);x.fillStyle='#cfcabd';for(let y=0;y<h;y+=6)x.fillRect(0,y,w,1.5);})});
+  const doors=[[-31.25,-30.4],[-27.95,-27.05],[-22.25,-21.4],[-18.95,-18.05],[-13.25,-12.4]];let a=-33.3;
+  for(const[d0,d1]of[...doors,[-11.2,-11.2]]){const b=d0-0.35;if(b-a>1.2){const n=20.47;box(wood,a,b,1.15,1.22,n,n+0.06);box(wood,a,b,2.28,2.35,n,n+0.06);box(wood,a-0.06,a,1.15,2.35,n,n+0.06);box(wood,b,b+0.06,1.15,2.35,n,n+0.06);
+    const k=Math.max(1,Math.round((b-a)/1.4));for(let i=1;i<k;i++){const x=a+i*(b-a)/k;box(wood,x-0.03,x+0.03,1.22,2.28,n,n+0.06);}
+    pl(g,blind,b-a,0.6,(a+b)/2,1.95,n+0.02,0);pl(g,frost,b-a,0.45,(a+b)/2,1.45,n+0.025,0);}a=d1+0.35;}
+  // 나래 corridor (classroom wall face x -49.98, n -2..22): purple dado, yellow upper stripe, yellow door frames
+  const pur=S2({color:0x8e6bc4}),yel=S2({color:0xf2c230});const nd=[[-2.9,-2.0],[2.75,3.65],[6.1,7.0],[11.75,12.65],[15.1,16.0],[20.75,21.65]];let b0=-1.6;
+  for(const[d0,d1]of nd.slice(1)){if(d0-0.2-b0>0.4){pl(g,pur,d0-0.2-b0,1.0,-49.97,0.55,(b0+d0-0.2)/2,Math.PI/2);pl(g,yel,d0-0.2-b0,0.18,-49.97,1.25,(b0+d0-0.2)/2,Math.PI/2);}b0=d1+0.2;}
+  for(const[d0,d1]of nd){box(yel,-49.98,-49.9,0,2.2,d0-0.12,d0);box(yel,-49.98,-49.9,0,2.2,d1,d1+0.12);box(yel,-49.98,-49.9,2.2,2.32,d0-0.12,d1+0.12);}});
+ // toilet fronts: per-floor colour frame around the recess (x -42..-36, BN 18.63)
+ const TC={'1F':0xf2c230,'2F':0xe0457b,'3F':0x8cc63f,'4F':0x2e9a5a,'5F':0x4fa8e0};
+ for(const f in TC)add('main_'+f,(g,e)=>{const box=mk(g);const m=S2({color:TC[f]});const n0=19.0,n1=19.12;box(m,-42.2,-35.9,e+2.62,e+2.8,n0,n1);box(m,-42.2,-42.0,e,e+2.8,n0,n1);box(m,-36.1,-35.9,e,e+2.8,n0,n1);});}
