@@ -8,10 +8,10 @@ import {GTAOPass} from 'three/addons/postprocessing/GTAOPass.js';
 import {OutputPass} from 'three/addons/postprocessing/OutputPass.js';
 import {RoomEnvironment} from 'three/addons/environments/RoomEnvironment.js';
 import {mergeGeometries} from 'three/addons/utils/BufferGeometryUtils.js';
-import {buildRooms} from './rooms.js?v=202610232036';
-import * as T from './tex.js?v=202610232036';
-import {buildInstanced} from './furn.js?v=202610232036';
-import {sinkField} from './terrain.js?v=202610232036';
+import {buildRooms} from './rooms.js?v=202610232137';
+import * as T from './tex.js?v=202610232137';
+import {buildInstanced} from './furn.js?v=202610232137';
+import {sinkField} from './terrain.js?v=202610232137';
 import {buildProps6} from './site6.js?v=202610231736';
 import {buildHall7} from './site7.js?v=202610232003';
 import {buildSite3,buildSite4,buildInterior5} from './site3.js?v=202610231640';
@@ -304,7 +304,7 @@ function hallExterior(){const sm=(o)=>new THREE.MeshStandardMaterial(Object.assi
  const teal=sm({color:0x2f8f8a,transparent:true,opacity:0.6,side:THREE.DoubleSide,roughness:0.3}),post=sm({color:0x9aa3a8,metalness:0.6,roughness:0.35});
  const seg=(n0,n1,y0,y1)=>{const L=Math.hypot(n1-n0,y1-y0),ang=Math.atan2(y1-y0,n1-n0);const r=new THREE.Mesh(new THREE.CylinderGeometry(1.7,1.7,L,20,1,true,-0.8,1.6),teal);r.rotation.x=Math.PI/2;const G=new THREE.Group();G.add(r);G.position.set(43.6,(y0+y1)/2+1.6,-(n0+n1)/2);G.rotation.x=ang;g.add(G);
   for(const t of[0,1]){const n=n0+(n1-n0)*t,y=y0+(y1-y0)*t;for(const x of[42.2,45.0]){const p=new THREE.Mesh(new THREE.CylinderGeometry(0.05,0.05,2.9,8),post);p.position.set(x,y+1.45,-n);g.add(p);}}};
- seg(-23.6,-33.6,0,3.6);seg(-33.6,-38.0,3.6,3.6);
+
  const em=sm({map:_cvT(1024,256,(x,W,H)=>{x.clearRect(0,0,W,H);x.fillStyle='#ffffff';x.beginPath();x.arc(128,128,100,0,7);x.fill();x.fillStyle='#2b6f3a';x.beginPath();x.arc(128,128,80,0,7);x.fill();x.fillStyle='#f2c230';x.beginPath();x.moveTo(128,62);x.lineTo(170,150);x.lineTo(86,150);x.fill();x.fillStyle='#fff';x.font='bold 150px NanumGothic, sans-serif';x.textBaseline='middle';x.fillText('가동문화관',260,136);}),transparent:true});
  
  const rw=sm({color:0x2e4a5c,roughness:0.2,metalness:0.3}),rf=sm({color:0xf1efe8});for(let n=-50;n<=-26;n+=4){const f=new THREE.Mesh(new THREE.CircleGeometry(0.62,24),rf);f.position.set(44.92,6.2,-n);f.rotation.y=-Math.PI/2;g.add(f);const w=new THREE.Mesh(new THREE.CircleGeometry(0.5,24),rw);w.position.set(44.91,6.2,-n);w.rotation.y=-Math.PI/2;g.add(w);}

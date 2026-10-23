@@ -61,14 +61,6 @@ export function buildHall7(chunks,WALLS){const s=chunks.site;if(!s)return;const 
   const sf=new THREE.Shape();sf.moveTo(-0.62,-0.72);sf.lineTo(0.62,-0.72);sf.lineTo(0.62,0.2);sf.absarc(0,0.2,0.62,0,Math.PI,false);sf.lineTo(-0.62,-0.72);
   const gw=new THREE.ShapeGeometry(sh,16),gf=new THREE.ShapeGeometry(sf,16),mw=S({color:0x2e4a5c,roughness:0.2,metalness:0.3}),mf=S({color:0xf1efe8});
   for(let n=-54;n<=-26;n+=2.8){const f=new THREE.Mesh(gf,mf);f.position.set(44.9,6.3,-n);f.rotation.y=-Math.PI/2;g.add(f);const w=new THREE.Mesh(gw,mw);w.position.set(44.89,6.3,-n);w.rotation.y=-Math.PI/2;g.add(w);}}
- // 6: lime stair corridor around the remaining outdoor flight (n -23.6 -> -33.6, 0 -> 3.6 m), curved green roof
- {const lime=S({color:0xb5d443,roughness:0.55,side:THREE.DoubleSide});const xw=42.15;
-  const sh=new THREE.Shape();sh.moveTo(-23.0,0);sh.lineTo(-38.0,0);sh.lineTo(-38.0,6.4);sh.lineTo(-33.6,6.4);sh.lineTo(-23.0,2.8);sh.lineTo(-23.0,0);
-  const wg=new THREE.ExtrudeGeometry(sh,{depth:0.12,bevelEnabled:false});const w=new THREE.Mesh(wg,lime);w.rotation.y=Math.PI/2;w.position.set(xw-0.12,0,0);
-  // shape x = n, so map: after rotation.y=+90deg local x -> -z ... local x=n maps to world z=-n
-  g.add(w);box(lime,41.2,42.15,0,6.2,-23.25,-22.95);
-
-  s.group.traverse(o=>{if(o.isMesh&&o.geometry.type==='CylinderGeometry'&&Math.abs((o.geometry.parameters.radiusTop||0)-1.7)<0.01&&o.material&&o.material.opacity===0.6){o.material=o.material.clone();o.material.color.set(0x2f8a5c);o.material.opacity=0.55;}});}
  // 7: 강당 entrance walkway (photo 182): straight curved translucent green roof on posts, tiled floor, ending at the school door
  {const N0=-37.4,N1=-34.1,x0=34.0,x1=42.2,post=S({color:0xb3bac0,metalness:0.6,roughness:0.3});
   const rf=new THREE.Mesh(new THREE.CylinderGeometry(2.1,2.1,x1-x0,24,1,true,Math.PI/2-0.75,1.5),S({color:0x2f8f78,transparent:true,opacity:0.5,side:THREE.DoubleSide,roughness:0.25}));rf.rotation.z=Math.PI/2;rf.rotation.x=0;rf.position.set((x0+x1)/2,1.25,-(N0+N1)/2);g.add(rf);
