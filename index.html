@@ -27,7 +27,7 @@ button{font:inherit;cursor:pointer;color:#1f3d6b}
 #joy i{position:absolute;left:39px;top:39px;width:52px;height:52px;border-radius:50%;background:#1f3d6bcc}
 body.walk #joy{display:block}
 #pad{position:fixed;right:calc(14px + env(safe-area-inset-right,0px));bottom:24px;display:none;grid-template-columns:76px 76px;gap:8px;z-index:5;touch-action:none;user-select:none}
-body.walk #pad{display:grid}#pad .dr{display:none}body.drone #pad .dr{display:grid}body.drone #pJump,body.drone #pDoor{display:none}#pad .g2{display:contents}
+body.walk #pad{display:grid}#pad .dr{display:none!important}body.drone #pad .dr{display:grid!important}body.drone #pJump,body.drone #pDoor{display:none}#pad .g2{display:contents}
 #pad button{min-height:56px;white-space:nowrap;padding:0 4px;border:1px solid #c9d3e0;border-radius:14px;background:rgba(255,255,255,.92);font:bold 14px 'Nanum Gothic',sans-serif;touch-action:none;box-shadow:0 2px 8px #0002}
 body.walk #camg{display:none}#pRun.on{background:#1f3d6b;color:#fff}
 #xh{position:fixed;left:50%;top:50%;width:6px;height:6px;margin:-3px 0 0 -3px;border-radius:50%;background:#fff;box-shadow:0 0 0 1.5px #0008;display:none;pointer-events:none;z-index:5}body.walk #xh{display:block}
