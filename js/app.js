@@ -8,14 +8,14 @@ import {GTAOPass} from 'three/addons/postprocessing/GTAOPass.js';
 import {OutputPass} from 'three/addons/postprocessing/OutputPass.js';
 import {RoomEnvironment} from 'three/addons/environments/RoomEnvironment.js';
 import {mergeGeometries} from 'three/addons/utils/BufferGeometryUtils.js';
-import {buildRooms} from './rooms.js?v=202610261354';
-import * as T from './tex.js?v=202610261354';
-import {buildInstanced} from './furn.js?v=202610261354';
-import {sinkHall,backCorridor,sinkNuri,hooMunWalk} from './site8.js?v=202610261354';
-import {sinkField,FIELD,LOW} from './terrain.js?v=202610261354';
-import {buildProps6} from './site6.js?v=202610261354';
-import {buildHall7} from './site7.js?v=202610261354';
-import {buildSite3,buildSite4,buildInterior5} from './site3.js?v=202610261354';
+import {buildRooms} from './rooms.js?v=202610261453';
+import * as T from './tex.js?v=202610261453';
+import {buildInstanced} from './furn.js?v=202610261453';
+import {sinkHall,backCorridor,sinkNuri,hooMunWalk} from './site8.js?v=202610261453';
+import {sinkField,FIELD,LOW} from './terrain.js?v=202610261453';
+import {buildProps6} from './site6.js?v=202610261453';
+import {buildHall7} from './site7.js?v=202610261453';
+import {buildSite3,buildSite4,buildInterior5} from './site3.js?v=202610261453';
 const Q=new URLSearchParams(location.search);const SHOT=Q.has('shot');
 const MOBILE=matchMedia('(pointer:coarse)').matches||innerWidth<760;
 await document.fonts.load('bold 40px NanumGothic').catch(()=>{});
@@ -554,9 +554,9 @@ r.domElement.addEventListener('pointermove',e=>{if(ptrs.has(e.pointerId))ptrs.se
  else if(e.pointerType==='mouse')hoverCursor(e);});
 const pend=e=>{ptrs.delete(e.pointerId);if(ptrs.size<2){pinch0=null;twist0=null;}if(e.pointerId===lookId){lookId=null;last=null;}
  if(e.type==='pointerup'&&downAt&&!dragged&&e.button!==2)clickAt(e);downAt=null;};
-document.addEventListener('mousemove',e=>{if(!walk||document.pointerLockElement!==r.domElement)return;const k=0.0022*cam.fov/72;yaw+=e.movementX*k;pitch=Math.max(-1.35,Math.min(1.35,pitch+e.movementY*k));cam.rotation.set(pitch,yaw,0,'YXZ');loop();});
+document.addEventListener('mousemove',e=>{if(!walk||document.pointerLockElement!==r.domElement)return;const k=0.0022*cam.fov/72;yaw-=e.movementX*k;pitch=Math.max(-1.35,Math.min(1.35,pitch-e.movementY*k));cam.rotation.set(pitch,yaw,0,'YXZ');loop();});
 document.addEventListener('pointerlockchange',()=>{document.body.classList.toggle('locked',!!document.pointerLockElement);});
-window.__setYaw=y=>{yaw=y;cam.rotation.set(pitch,yaw,0,"YXZ");loop();};window.__look=(dx,dy)=>{const k=0.0022*cam.fov/72;yaw+=dx*k;pitch=Math.max(-1.35,Math.min(1.35,pitch+dy*k));cam.rotation.set(pitch,yaw,0,'YXZ');loop();};
+window.__setYaw=y=>{yaw=y;cam.rotation.set(pitch,yaw,0,"YXZ");loop();};window.__look=(dx,dy)=>{const k=0.0022*cam.fov/72;yaw-=dx*k;pitch=Math.max(-1.35,Math.min(1.35,pitch-dy*k));cam.rotation.set(pitch,yaw,0,'YXZ');loop();};
 r.domElement.addEventListener('pointerup',pend);r.domElement.addEventListener('pointercancel',pend);
 r.domElement.addEventListener('wheel',e=>{if(!walk)return;cam.fov=Math.max(30,Math.min(90,cam.fov+e.deltaY*0.03));cam.updateProjectionMatrix();render();},{passive:true});
 // ---------- doors ----------
