@@ -20,6 +20,9 @@ with sync_playwright() as p:
     pg.evaluate("__spawn()");pg.evaluate(f"__simTo({x},{n},900)");pg.wait_for_timeout(200);look(f'walk{i}')
     for (px,py) in [(400,200),(250,150),(550,150),(400,100),(150,250),(650,250),(400,60)]:
       pg.evaluate(f"__goAt({px},{py})");pg.wait_for_timeout(900);look(f'tap{i}@{px},{py}')
+  # walk off a 0-level edge into the lowered field / LOW strips: must fall to the pit floor
+  for i,(x,n) in enumerate([(0.5,-40),(20,-70),(-40,-35),(60,-80),(0,-100)]):
+    pg.evaluate(f"__api.setWalk(true,[{x},1.6,{-n}],0)");pg.evaluate(f"__simTo({x},{n-3},120)");look(f'drop{i}')
   print('WORST',round(worst,2));[print('AIR',*x) for x in bad[:20]]
   print('EYE PASS' if not bad else 'EYE FAIL')
   b.close()
