@@ -71,11 +71,13 @@ export function buildHall7(chunks,WALLS){const s=chunks.site;if(!s)return;const 
   s.group.traverse(o=>{if(o.isMesh&&o.geometry.type==='CylinderGeometry'&&Math.abs((o.geometry.parameters.radiusTop||0)-2.0)<0.01&&o.material&&o.material.opacity===0.85){o.material=o.material.clone();o.material.color.set(0x3fa58a);o.material.opacity=0.5;}});}
  // 8: hall roof: smaller west overhang and lower profile
  {const r=chunks.hall_roof;if(r&&!r.group.userData.r7){const a=65.7,sx=(65.7-44.6)/(65.7-41.6),y0=10.4,sy=0.5;r.group.scale.x*=sx;r.group.position.x+=a*(1-sx);r.group.scale.y*=sy;r.group.position.y+=y0*(1-sy);r.group.userData.r7=1;}}
- // 9: brick stair tower with white bands and a sloped roof at the north end
+ // 9: brick stair tower (north doorway x45.3..47.4 to 2.4 m = hall stair top exit) at the 강당 north-west corner (photo 38): one solid brick block rising from the ground past the hall roof, white bands, flat white coping.
+ // Only the outer faces (north, west) run down to the ground; the south/east faces start at the hall roof so the interior stair core and its doors stay open.
  {const br=cvT(256,256,(x,w,h)=>{x.fillStyle='#6d2f24';x.fillRect(0,0,w,h);for(let j=0;j<16;j++)for(let i=0;i<8;i++){x.fillStyle=['#7a3428','#63291f','#83402f'][(i+j*3)%3];x.fillRect(i*32+(j%2)*16,j*16,30,14);}});br.wrapS=br.wrapT=THREE.RepeatWrapping;br.repeat.set(2,2);
-  const bm=S({map:br,roughness:0.9}),wh=S({color:0xf0ede4});const x0=45.4,x1=49.6,n0=-19.4,n1=-12.6;box(bm,x0,x1,9.6,13.4,n0,n1);for(const y of[10.6,12.4])box(wh,x0-0.03,x1+0.03,y,y+0.18,n0-0.03,n1+0.03);
-  const fw=new THREE.Mesh(new THREE.PlaneGeometry(n1-n0,6.0),bm);fw.position.set(x0-0.04,6.6+3.0-0.0,-(n0+n1)/2);fw.rotation.y=-Math.PI/2;g.add(fw);for(const y of[7.2])box(wh,x0-0.09,x0-0.04,y,y+0.18,n0,n1);
-  const rg=new THREE.BufferGeometry();const v=[x0-0.3,13.4,-(n0-0.3), x1+0.3,14.4,-(n0-0.3), x1+0.3,14.4,-(n1+0.3), x0-0.3,13.4,-(n1+0.3)];rg.setAttribute('position',new THREE.Float32BufferAttribute(v,3));rg.setIndex([0,1,2,0,2,3]);rg.computeVertexNormals();g.add(new THREE.Mesh(rg,S({color:0x3d4246,side:THREE.DoubleSide,metalness:0.4})));}
+  const bm=S({map:br,roughness:0.9}),wh=S({color:0xf0ede4});const xw=44.65,x1=49.6,n0=-19.4,n1=-12.6,G=-2.7,R=6.8,T=9.8,t=0.3;
+  box(bm,xw,45.3,G,T,n1-t,n1);box(bm,47.4,x1,G,T,n1-t,n1);box(bm,45.3,47.4,2.4,T,n1-t,n1);box(bm,xw,xw+t,G,T,n0,n1);box(bm,xw,x1,R,T,n0,n0+t);box(bm,x1-t,x1,R,T,n0,n1);box(bm,xw,x1,T-0.2,T,n0,n1);
+  box(wh,xw-0.06,x1+0.06,T,T+0.18,n0-0.06,n1+0.06);for(const y of[3.0,6.6])box(wh,xw-0.04,x1+0.04,y,y+0.18,n1-t-0.02,n1+0.04),box(wh,xw-0.04,xw+t+0.02,y,y+0.18,n0-0.04,n1+0.04);
+  {SR.r.push([xw,n1-t,45.3,n1]);SR.r.push([47.4,n1-t,x1,n1]);SR.r.push([xw,n0,xw+t,n1]);}}
  // 11: 누리관 (indoor baseball hall): replace horizontal window bands with tall narrow vertical slits
  {const b=chunks.baseball;if(b){b.group.traverse(o=>{if(o.isMesh&&/baseball__(glass|frameW|frameT|white)$/.test(o.name))o.visible=false;});
   const gm=S({color:0x2b3d4c,roughness:0.15,metalness:0.4}),fm=S({color:0xd9dde0});const x0=33.4,x1=63.7,n0=-87.8,n1=-69.6;
