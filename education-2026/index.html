@@ -569,9 +569,23 @@ go(0,0);
 })();
 </script>
 <script>
-(()=>{const videos=[...document.querySelectorAll('video')];
-function sync(){videos.forEach(v=>{v.muted=true;const active=v.closest('.slide')?.classList.contains('active');if(active){if(v.paused&&!v.ended)v.play().catch(()=>{});}else v.pause();});}
+(()=>{
+const videos=[...document.querySelectorAll('video')];
+const active=v=>!document.hidden&&v.closest('.slide')?.classList.contains('active')&&(!v.closest('.st')||v.closest('.st').classList.contains('on'));
+function play(v){if(!active(v))return;v.muted=true;v.defaultMuted=true;if(v.id!=='droneIntro'){v.loop=true;if(v.ended)v.currentTime=0;}else if(v.ended)return;if(v.paused)v.play().catch(()=>{});}
+function sync(){videos.forEach(v=>active(v)?play(v):v.pause());}
+videos.forEach(v=>{
+ v.muted=true;v.defaultMuted=true;
+ ['loadeddata','canplay','ended'].forEach(e=>v.addEventListener(e,()=>play(v)));
+ if(v.id!=='droneIntro'){
+ v.title='영상이 멈추면 눌러 재생';
+ v.addEventListener('click',e=>{e.stopPropagation();if(v.ended)v.currentTime=0;play(v);});
+ }
+});
 new MutationObserver(sync).observe(document.querySelector('#stage'),{subtree:true,attributes:true,attributeFilter:['class']});
-document.addEventListener('visibilitychange',()=>{if(document.hidden)videos.forEach(v=>v.pause());else sync();});window.addEventListener('load',sync);sync();})();
+['visibilitychange','pointerup','keydown'].forEach(e=>document.addEventListener(e,sync));
+['load','pageshow','focus'].forEach(e=>window.addEventListener(e,sync));
+setInterval(sync,1500);sync();
+})();
 </script></body>
 </html>
