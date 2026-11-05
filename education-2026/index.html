@@ -174,7 +174,7 @@ h1,h2,h3{margin:0;font-family:'Jua','Noto Sans KR','Malgun Gothic',sans-serif;fo
 #juri,#say{visibility:hidden}
 #stage[data-character="on"] #juri,#stage[data-character="on"] #say{visibility:visible}
 .slide.drone.active{opacity:1;transform:none;transition:none}
-</style>
+#prevSlide{position:absolute;left:28px;bottom:18px;z-index:60;border:0;border-radius:18px;padding:12px 22px;background:#fff;color:#6a5340;font:700 25px sans-serif;cursor:pointer} </style>
 </head>
 <body>
 <div id="vp"><div id="stage" data-theme="intro">
@@ -420,7 +420,7 @@ h1,h2,h3{margin:0;font-family:'Jua','Noto Sans KR','Malgun Gothic',sans-serif;fo
   <nav id="nav"></nav>
   <button id="fs" title="전체화면 (F)">전체화면</button>
   <div id="pg"></div>
-  <div id="hint">← → / 스페이스 : 이동 · F : 전체화면</div>
+  <button id="prevSlide" type="button" aria-label="이전 단계">← 이전</button><div id="hint">← → / 스페이스 : 이동 · F : 전체화면</div>
   <div id="bar"></div>
 </div></div>
 
@@ -498,7 +498,8 @@ addEventListener('keydown',e=>{
 });
 function toggleFs(){if(!document.fullscreenElement)document.documentElement.requestFullscreen&&document.documentElement.requestFullscreen();else document.exitFullscreen();}
 $('#fs').onclick=e=>{e.stopPropagation();toggleFs();};
-$('#vp').addEventListener('click',e=>{const r=stage.getBoundingClientRect();const x=(e.clientX-r.left)/r.width;if(x<.18)prev();else next();});
+$('#vp').addEventListener('click',e=>{if(e.target.closest('button,a,input,select,textarea'))return;next();});
+$('#prevSlide').onclick=e=>{e.stopPropagation();prev();};
 let tx0=null;addEventListener('touchstart',e=>{tx0=e.touches[0].clientX},{passive:true});
 addEventListener('touchend',e=>{if(tx0==null)return;const dx=e.changedTouches[0].clientX-tx0;if(Math.abs(dx)>50){dx<0?next():prev();}tx0=null;});
 
@@ -578,8 +579,8 @@ videos.forEach(v=>{
  v.muted=true;v.defaultMuted=true;
  ['loadeddata','canplay','ended'].forEach(e=>v.addEventListener(e,()=>play(v)));
  if(v.id!=='droneIntro'){
- v.title='영상이 멈추면 눌러 재생';
- v.addEventListener('click',e=>{e.stopPropagation();if(v.ended)v.currentTime=0;play(v);});
+ v.title='클릭하면 다음 단계';
+ v.addEventListener('click',()=>{if(v.ended)v.currentTime=0;play(v);});
  }
 });
 new MutationObserver(sync).observe(document.querySelector('#stage'),{subtree:true,attributes:true,attributeFilter:['class']});
